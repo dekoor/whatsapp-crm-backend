@@ -1,117 +1,119 @@
-require('dotenv').config();
-const express = 'express';
-const admin = require('firebase-admin');
-const cors = require('cors');
-const axios = require('axios');
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM para WhatsApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #e5e7eb; }
+        ::-webkit-scrollbar-thumb { background: #9ca3af; border-radius: 4px; }
+        .contact-item.active { background-color: #d1d5db; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- El HTML de login-screen y crm-app se mantiene igual -->
+    <div id="login-screen">...</div>
+    <div id="crm-app" class="hidden">...</div>
 
-// ... (La configuración de Firebase y Express se mantiene igual)
-const serviceAccount = require('./serviceAccountKey.json');
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: process.env.DATABASE_URL
-});
-const db = admin.firestore();
+    <script>
+        // --- Las configuraciones, inicialización y lógica de autenticación se mantienen igual ---
+        const BACKEND_URL = '...';
+        const firebaseConfig = { /* ... */ };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        // ...
 
-const app = express();
-app.use(cors());
-app.use(express.json());
+        // --- Lógica del CRM (con funciones actualizadas) ---
 
-const PORT = process.env.PORT || 3000;
-const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
-const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
-const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
-
-// ... (GET /, GET /webhook se mantienen igual)
-app.get('/', (req, res) => res.send('Backend del CRM v7.'));
-app.get('/webhook', (req, res) => { /* ...código sin cambios... */ });
-
-// --- RUTA WEBHOOK ACTUALIZADA PARA MANEJAR MENSAJES Y ESTADOS ---
-app.post('/webhook', async (req, res) => {
-    const change = req.body.entry?.[0]?.changes?.[0]?.value;
-
-    // Si es un mensaje nuevo
-    if (change?.messages) {
-        const message = change.messages[0];
-        const contactInfo = change.contacts[0];
-        const from = message.from;
-        const text = message.text.body;
-        const timestamp = admin.firestore.FieldValue.serverTimestamp();
-        try {
-            const contactRef = db.collection('contacts_whatsapp').doc(from);
-            await contactRef.set({ lastMessageTimestamp: timestamp, name: contactInfo.profile.name, lastMessage: text, wa_id: contactInfo.wa_id }, { merge: true });
-            await contactRef.collection('messages').add({ text: text, timestamp: timestamp, from: from, status: 'received' });
-            console.log(`Mensaje de ${from} guardado.`);
-        } catch (error) { console.error("Error al guardar mensaje recibido:", error); }
-    }
-    // Si es una actualización de estado
-    else if (change?.statuses) {
-        const statusInfo = change.statuses[0];
-        const messageId = statusInfo.id; // wamid del mensaje
-        const newStatus = statusInfo.status; // sent, delivered, read
-
-        try {
-            // Buscamos el mensaje por su wamid en todas las subcolecciones 'messages'
-            const querySnapshot = await db.collectionGroup('messages').where('wamid', '==', messageId).limit(1).get();
-            if (!querySnapshot.empty) {
-                const messageDoc = querySnapshot.docs[0];
-                await messageDoc.ref.update({ status: newStatus });
-                console.log(`Estado del mensaje ${messageId} actualizado a ${newStatus}.`);
+        function getStatusIcon(status) {
+            const blue = '#34B7F1';
+            const gray = '#a1a1aa';
+            switch (status) {
+                case 'sending':
+                    return `<svg class="w-4 h-4 inline-block" fill="${gray}" viewBox="0 0 16 16"><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/></svg>`;
+                case 'sent':
+                    return `<svg class="w-4 h-4 inline-block" fill="${gray}" viewBox="0 0 16 16"><path d="M12.354 4.354a.5.5 0 0 0-.708-.708L7 8.293 4.854 6.146a.5.5 0 1 0-.708.708l2.5 2.5a.5.5 0 0 0 .708 0l5-5z"/></svg>`;
+                case 'delivered':
+                    return `<svg class="w-4 h-4 inline-block" fill="${gray}" viewBox="0 0 16 16"><path d="M12.354 4.354a.5.5 0 0 0-.708-.708L7 8.293 4.854 6.146a.5.5 0 1 0-.708.708l2.5 2.5a.5.5 0 0 0 .708 0l5-5z"/><path d="m5.354 7.146.853-.854-.708-.708-.853.854a.5.5 0 0 0 0 .708l.707.708a.5.5 0 0 0 .708 0L6.5 7.5l-.707-.707L5.354 7.146z"/></svg>`;
+                case 'read':
+                    return `<svg class="w-4 h-4 inline-block" fill="${blue}" viewBox="0 0 16 16"><path d="M12.354 4.354a.5.5 0 0 0-.708-.708L7 8.293 4.854 6.146a.5.5 0 1 0-.708.708l2.5 2.5a.5.5 0 0 0 .708 0l5-5z"/><path d="m5.354 7.146.853-.854-.708-.708-.853.854a.5.5 0 0 0 0 .708l.707.708a.5.5 0 0 0 .708 0L6.5 7.5l-.707-.707L5.354 7.146z"/></svg>`;
+                default:
+                    return ''; // No mostrar icono para mensajes recibidos
             }
-        } catch(error) {
-            console.error(`Error actualizando estado para ${messageId}:`, error);
         }
-    }
-
-    res.sendStatus(200);
-});
-
-
-// --- RUTA DE ENVÍO ACTUALIZADA PARA GUARDAR EL ID DEL MENSAJE ---
-app.post('/api/contacts/:contactId/messages', async (req, res) => {
-    const { contactId } = req.params;
-    const { text } = req.body;
-
-    if (!text) return res.status(400).send('El texto es requerido.');
-    if (!WHATSAPP_TOKEN || !PHONE_NUMBER_ID) return res.status(500).send('Error de configuración.');
-
-    try {
-        const response = await axios.post(`https://graph.facebook.com/v19.0/${PHONE_NUMBER_ID}/messages`, {
-            messaging_product: 'whatsapp',
-            to: contactId,
-            text: { body: text }
-        }, {
-            headers: {
-                'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        const messageId = response.data.messages[0].id; // ¡Obtenemos el ID!
-        const timestamp = admin.firestore.FieldValue.serverTimestamp();
-        const contactRef = db.collection('contacts_whatsapp').doc(contactId);
         
-        // Guardamos el mensaje con su wamid y estado inicial 'sending'
-        await contactRef.collection('messages').add({
-            text: text,
-            timestamp: timestamp,
-            status: 'sending',
-            wamid: messageId // ¡Guardamos el ID!
-        });
+        function appendMessage(message, isOptimistic = false) {
+            const messageEl = document.createElement('div');
+            const isSent = message.status !== 'received';
+            messageEl.className = `flex my-2 ${isSent ? 'justify-end' : 'justify-start'}`;
+            const bgColor = isSent ? 'bg-blue-500 text-white' : 'bg-white text-gray-800';
+            
+            let time;
+            if (message.timestamp && message.timestamp.toDate) {
+                time = message.timestamp.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            } else if (isOptimistic && message.timestamp) {
+                time = new Date(message.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            } else { time = '' }
 
-        await contactRef.update({ lastMessage: text, lastMessageTimestamp: timestamp });
-        res.status(200).send({ success: true, wamid: messageId });
-    } catch (error) {
-        console.error('ERROR AL ENVIAR MENSAJE:', error.response ? error.response.data.error : error.message);
-        res.status(500).send({ success: false, error: 'Error al procesar el envío.' });
-    }
-});
+            const statusIcon = isSent ? getStatusIcon(message.status) : '';
 
+            messageEl.innerHTML = `
+                <div class="rounded-lg p-3 max-w-sm shadow ${bgColor}">
+                    <p class="text-sm">${message.text}</p>
+                    <div class="text-xs mt-1 ${isSent ? 'text-blue-200' : 'text-gray-400'} text-right flex items-center justify-end gap-1">
+                        <span>${time}</span>
+                        ${statusIcon}
+                    </div>
+                </div>
+            `;
+            if (isOptimistic) messageEl.id = 'optimistic-message';
+            
+            const existingOptimistic = document.getElementById('optimistic-message');
+            if (existingOptimistic) {
+                existingOptimistic.remove();
+            }
 
-// ... (Las rutas GET /api/contacts y GET /api/contacts/:contactId/messages se mantienen igual)
-app.get('/api/contacts', async (req, res) => { /* ...código sin cambios... */ });
-app.get('/api/contacts/:contactId/messages', async (req, res) => { /* ...código sin cambios... */ });
+            chatMessagesEl.appendChild(messageEl);
+            chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+            return messageEl;
+        }
 
+        async function handleSendMessage(event) {
+            event.preventDefault();
+            const text = messageInputEl.value.trim();
+            if (!text || !currentContactId) return;
 
-app.listen(PORT, () => {
-  console.log(`Servidor escuchando en el puerto ${PORT}`);
-});
+            const originalInputText = text;
+            messageInputEl.value = '';
+            
+            appendMessage({ text: originalInputText, status: 'sending', timestamp: new Date() }, true);
+
+            try {
+                await fetch(`${BACKEND_URL}/api/contacts/${currentContactId}/messages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: originalInputText })
+                });
+                console.log('Solicitud de envío enviada al backend.');
+                // Ya no necesitamos la UI optimista, el listener de Firebase se encargará de todo
+                // fetchContacts(); // Ya no es necesario
+            } catch(error) {
+                console.error('Error al enviar el mensaje:', error);
+                alert('Error: No se pudo enviar el mensaje.');
+                // Quitar el mensaje optimista si falla
+                const optimisticMessageEl = document.getElementById('optimistic-message');
+                if (optimisticMessageEl) optimisticMessageEl.remove();
+                messageInputEl.value = originalInputText;
+            }
+        }
+        
+        // El resto de las funciones (initCRM, fetchContacts, displayContacts, loadChat, displayMessages) se mantienen igual.
+    </script>
+</body>
+</html>
