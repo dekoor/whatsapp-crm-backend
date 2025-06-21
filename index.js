@@ -1,119 +1,171 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRM para WhatsApp</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
-    <style>
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #e5e7eb; }
-        ::-webkit-scrollbar-thumb { background: #9ca3af; border-radius: 4px; }
-        .contact-item.active { background-color: #d1d5db; }
-    </style>
-</head>
-<body class="bg-gray-100 font-sans">
-    <!-- El HTML de login-screen y crm-app se mantiene igual -->
-    <div id="login-screen">...</div>
-    <div id="crm-app" class="hidden">...</div>
+require('dotenv').config();
+const express = require('express');
+const admin = require('firebase-admin');
+const cors = require('cors');
+const axios = require('axios'); // Asegúrate de que axios esté instalado
 
-    <script>
-        // --- Las configuraciones, inicialización y lógica de autenticación se mantienen igual ---
-        const BACKEND_URL = '...';
-        const firebaseConfig = { /* ... */ };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-        // ...
+// --- CONFIGURACIÓN DE FIREBASE ---
+const serviceAccount = require('./serviceAccountKey.json');
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: process.env.DATABASE_URL
+});
+const db = admin.firestore();
+console.log('Conexión con Firebase establecida.');
 
-        // --- Lógica del CRM (con funciones actualizadas) ---
+// --- CONFIGURACIÓN DEL SERVIDOR EXPRESS ---
+const app = express();
+app.use(cors());
+app.use(express.json());
 
-        function getStatusIcon(status) {
-            const blue = '#34B7F1';
-            const gray = '#a1a1aa';
-            switch (status) {
-                case 'sending':
-                    return `<svg class="w-4 h-4 inline-block" fill="${gray}" viewBox="0 0 16 16"><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/></svg>`;
-                case 'sent':
-                    return `<svg class="w-4 h-4 inline-block" fill="${gray}" viewBox="0 0 16 16"><path d="M12.354 4.354a.5.5 0 0 0-.708-.708L7 8.293 4.854 6.146a.5.5 0 1 0-.708.708l2.5 2.5a.5.5 0 0 0 .708 0l5-5z"/></svg>`;
-                case 'delivered':
-                    return `<svg class="w-4 h-4 inline-block" fill="${gray}" viewBox="0 0 16 16"><path d="M12.354 4.354a.5.5 0 0 0-.708-.708L7 8.293 4.854 6.146a.5.5 0 1 0-.708.708l2.5 2.5a.5.5 0 0 0 .708 0l5-5z"/><path d="m5.354 7.146.853-.854-.708-.708-.853.854a.5.5 0 0 0 0 .708l.707.708a.5.5 0 0 0 .708 0L6.5 7.5l-.707-.707L5.354 7.146z"/></svg>`;
-                case 'read':
-                    return `<svg class="w-4 h-4 inline-block" fill="${blue}" viewBox="0 0 16 16"><path d="M12.354 4.354a.5.5 0 0 0-.708-.708L7 8.293 4.854 6.146a.5.5 0 1 0-.708.708l2.5 2.5a.5.5 0 0 0 .708 0l5-5z"/><path d="m5.354 7.146.853-.854-.708-.708-.853.854a.5.5 0 0 0 0 .708l.707.708a.5.5 0 0 0 .708 0L6.5 7.5l-.707-.707L5.354 7.146z"/></svg>`;
-                default:
-                    return ''; // No mostrar icono para mensajes recibidos
-            }
+// Leemos las variables de entorno
+const PORT = process.env.PORT || 3000;
+const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
+const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
+const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
+
+// --- RUTAS DE LA API ---
+
+// ... (Las rutas GET / y GET /webhook se mantienen igual)
+app.get('/', (req, res) => {
+  res.send('¡El backend del CRM de WhatsApp está vivo y listo para servir y enviar datos!');
+});
+
+app.get('/webhook', (req, res) => {
+  const mode = req.query['hub.mode'];
+  const token = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+  if (mode && token) {
+    if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+      console.log('WEBHOOK_VERIFIED');
+      res.status(200).send(challenge);
+    } else {
+      res.sendStatus(403);
+    }
+  } else {
+    res.sendStatus(404);
+  }
+});
+
+
+// Ruta para RECIBIR los mensajes entrantes de WhatsApp
+app.post('/webhook', async (req, res) => {
+    // ... (Esta ruta se mantiene igual que en la v4)
+    const message = req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
+    const contactInfo = req.body.entry?.[0]?.changes?.[0]?.value?.contacts?.[0];
+
+    if (message) {
+        const from = message.from;
+        const text = message.text.body;
+        const timestamp = admin.firestore.FieldValue.serverTimestamp();
+        try {
+            const contactRef = db.collection('contacts_whatsapp').doc(from);
+            await contactRef.set({
+                lastMessageTimestamp: timestamp,
+                name: contactInfo.profile.name,
+                lastMessage: text,
+                wa_id: contactInfo.wa_id
+            }, { merge: true });
+            await contactRef.collection('messages').add({
+                text: text,
+                timestamp: timestamp,
+                from: from,
+                status: 'received'
+            });
+            console.log(`Mensaje de ${from} guardado y contacto actualizado.`);
+        } catch (error) {
+            console.error("Error al guardar en Firestore:", error);
         }
+    }
+    res.sendStatus(200);
+});
+
+// Ruta para entregar la LISTA DE CONTACTOS al frontend
+app.get('/api/contacts', async (req, res) => {
+    // ... (Esta ruta se mantiene igual que en la v4)
+    try {
+        const contactsSnapshot = await db.collection('contacts_whatsapp').orderBy('lastMessageTimestamp', 'desc').get();
+        const contacts = [];
+        contactsSnapshot.forEach(doc => {
+            contacts.push({ id: doc.id, ...doc.data() });
+        });
+        res.status(200).json(contacts);
+        console.log('Se entregó la lista de contactos al frontend.');
+    } catch (error) {
+        console.error('Error al obtener contactos:', error);
+        res.status(500).send('Error al obtener la lista de contactos.');
+    }
+});
+
+// Ruta para obtener los MENSAJES DE UN CHAT
+app.get('/api/contacts/:contactId/messages', async (req, res) => {
+    // ... (Esta ruta se mantiene igual que en la v4)
+    try {
+        const contactId = req.params.contactId;
+        const messagesSnapshot = await db.collection('contacts_whatsapp').doc(contactId).collection('messages').orderBy('timestamp', 'asc').get();
+        const messages = [];
+        messagesSnapshot.forEach(doc => {
+            messages.push({ id: doc.id, ...doc.data() });
+        });
+        res.status(200).json(messages);
+        console.log(`Se entregaron los mensajes para el contacto ${contactId}.`);
+    } catch (error) {
+        console.error(`Error al obtener mensajes para ${req.params.contactId}:`, error);
+        res.status(500).send('Error al obtener los mensajes.');
+    }
+});
+
+
+// --- NUEVA RUTA PARA ENVIAR MENSAJES ---
+app.post('/api/contacts/:contactId/messages', async (req, res) => {
+    const { contactId } = req.params;
+    const { text } = req.body;
+
+    if (!text) {
+        return res.status(400).send('El texto del mensaje es requerido.');
+    }
+
+    try {
+        // 1. Enviar el mensaje a través de la API de Meta
+        await axios.post(`https://graph.facebook.com/v19.0/${PHONE_NUMBER_ID}/messages`, {
+            messaging_product: 'whatsapp',
+            to: contactId,
+            text: { body: text }
+        }, {
+            headers: {
+                'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        console.log(`Mensaje enviado a ${contactId} a través de la API de Meta.`);
+
+        // 2. Guardar el mensaje enviado en nuestra base de datos
+        const timestamp = admin.firestore.FieldValue.serverTimestamp();
+        const contactRef = db.collection('contacts_whatsapp').doc(contactId);
         
-        function appendMessage(message, isOptimistic = false) {
-            const messageEl = document.createElement('div');
-            const isSent = message.status !== 'received';
-            messageEl.className = `flex my-2 ${isSent ? 'justify-end' : 'justify-start'}`;
-            const bgColor = isSent ? 'bg-blue-500 text-white' : 'bg-white text-gray-800';
-            
-            let time;
-            if (message.timestamp && message.timestamp.toDate) {
-                time = message.timestamp.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            } else if (isOptimistic && message.timestamp) {
-                time = new Date(message.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            } else { time = '' }
+        await contactRef.collection('messages').add({
+            text: text,
+            timestamp: timestamp,
+            status: 'sent' // Marcamos el mensaje como 'enviado'
+        });
 
-            const statusIcon = isSent ? getStatusIcon(message.status) : '';
+        // 3. Actualizar el último mensaje del contacto
+        await contactRef.update({
+            lastMessage: text,
+            lastMessageTimestamp: timestamp
+        });
 
-            messageEl.innerHTML = `
-                <div class="rounded-lg p-3 max-w-sm shadow ${bgColor}">
-                    <p class="text-sm">${message.text}</p>
-                    <div class="text-xs mt-1 ${isSent ? 'text-blue-200' : 'text-gray-400'} text-right flex items-center justify-end gap-1">
-                        <span>${time}</span>
-                        ${statusIcon}
-                    </div>
-                </div>
-            `;
-            if (isOptimistic) messageEl.id = 'optimistic-message';
-            
-            const existingOptimistic = document.getElementById('optimistic-message');
-            if (existingOptimistic) {
-                existingOptimistic.remove();
-            }
+        console.log(`Mensaje enviado guardado en Firestore para ${contactId}.`);
+        res.status(200).send({ success: true });
 
-            chatMessagesEl.appendChild(messageEl);
-            chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
-            return messageEl;
-        }
+    } catch (error) {
+        console.error('Error al enviar el mensaje:', error.response ? error.response.data : error.message);
+        res.status(500).send('Error al procesar el envío del mensaje.');
+    }
+});
 
-        async function handleSendMessage(event) {
-            event.preventDefault();
-            const text = messageInputEl.value.trim();
-            if (!text || !currentContactId) return;
 
-            const originalInputText = text;
-            messageInputEl.value = '';
-            
-            appendMessage({ text: originalInputText, status: 'sending', timestamp: new Date() }, true);
-
-            try {
-                await fetch(`${BACKEND_URL}/api/contacts/${currentContactId}/messages`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text: originalInputText })
-                });
-                console.log('Solicitud de envío enviada al backend.');
-                // Ya no necesitamos la UI optimista, el listener de Firebase se encargará de todo
-                // fetchContacts(); // Ya no es necesario
-            } catch(error) {
-                console.error('Error al enviar el mensaje:', error);
-                alert('Error: No se pudo enviar el mensaje.');
-                // Quitar el mensaje optimista si falla
-                const optimisticMessageEl = document.getElementById('optimistic-message');
-                if (optimisticMessageEl) optimisticMessageEl.remove();
-                messageInputEl.value = originalInputText;
-            }
-        }
-        
-        // El resto de las funciones (initCRM, fetchContacts, displayContacts, loadChat, displayMessages) se mantienen igual.
-    </script>
-</body>
-</html>
+// --- INICIAMOS EL SERVIDOR ---
+app.listen(PORT, () => {
+  console.log(`Servidor escuchando en el puerto ${PORT}`);
+});
