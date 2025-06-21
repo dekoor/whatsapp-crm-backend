@@ -59,27 +59,36 @@ app.post('/webhook', async (req, res) => {
   // Usamos JSON.stringify para ver el objeto completo que nos manda Meta
   console.log(JSON.stringify(req.body, null, 2)); 
 
-  // Extraemos el mensaje del cuerpo de la petición
+  // Extraemos el mensaje y el perfil del remitente
   const message = req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
+  const contactInfo = req.body.entry?.[0]?.changes?.[0]?.value?.contacts?.[0];
 
   if (message) {
     const from = message.from; // Número de teléfono del cliente
     const text = message.text.body; // El texto del mensaje
+    const timestamp = admin.firestore.FieldValue.serverTimestamp();
 
     try {
-        // Creamos una nueva colección 'contacts_whatsapp' si no existe
-        // y un documento por cada número de teléfono
         const contactRef = db.collection('contacts_whatsapp').doc(from);
         
-        // Guardamos el mensaje en una sub-colección llamada 'messages'
+        // --- NUEVA LÍNEA ---
+        // Actualizamos o creamos el documento del contacto con nueva información
+        await contactRef.set({
+            lastMessageTimestamp: timestamp,
+            name: contactInfo.profile.name, // Guardamos el nombre del perfil de WhatsApp
+            lastMessage: text,
+            wa_id: contactInfo.wa_id // Guardamos el ID de WhatsApp del contacto
+        }, { merge: true }); // 'merge: true' evita que sobreescribamos datos existentes
+
+        // Guardamos el mensaje en la sub-colección 'messages'
         await contactRef.collection('messages').add({
             text: text,
-            timestamp: admin.firestore.FieldValue.serverTimestamp(),
+            timestamp: timestamp,
             from: from,
-            status: 'received' // Marcamos que es un mensaje recibido
+            status: 'received'
         });
 
-        console.log(`Mensaje de ${from} guardado correctamente en Firestore.`);
+        console.log(`Mensaje de ${from} guardado y contacto actualizado.`);
 
     } catch (error) {
         console.error("Error al guardar en Firestore:", error);
