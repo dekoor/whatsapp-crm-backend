@@ -87,12 +87,11 @@ app.post('/webhook', async (req, res) => {
   res.sendStatus(200);
 });
 
-// --- NUEVA RUTA PARA EL FRONTEND ---
-// Esta ruta entregará la lista de contactos a nuestra página HTML
+// Ruta para entregar la lista de contactos al frontend
 app.get('/api/contacts', async (req, res) => {
     try {
         const contactsSnapshot = await db.collection('contacts_whatsapp')
-            .orderBy('lastMessageTimestamp', 'desc') // Ordenamos por el mensaje más reciente
+            .orderBy('lastMessageTimestamp', 'desc') 
             .get();
 
         const contacts = [];
@@ -111,6 +110,30 @@ app.get('/api/contacts', async (req, res) => {
     }
 });
 
+// --- NUEVA RUTA PARA OBTENER MENSAJES DE UN CHAT ---
+app.get('/api/contacts/:contactId/messages', async (req, res) => {
+    try {
+        const contactId = req.params.contactId;
+        const messagesSnapshot = await db.collection('contacts_whatsapp').doc(contactId)
+            .collection('messages')
+            .orderBy('timestamp', 'asc') // Ordenamos los mensajes del más antiguo al más nuevo
+            .get();
+
+        const messages = [];
+        messagesSnapshot.forEach(doc => {
+            messages.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+
+        res.status(200).json(messages);
+        console.log(`Se entregaron los mensajes para el contacto ${contactId}.`);
+    } catch (error) {
+        console.error(`Error al obtener mensajes para ${req.params.contactId}:`, error);
+        res.status(500).send('Error al obtener los mensajes.');
+    }
+});
 
 // --- INICIAMOS EL SERVIDOR ---
 app.listen(PORT, () => {
