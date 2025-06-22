@@ -10,7 +10,7 @@ const axios = require('axios');
 const serviceAccount = require('./serviceAccountKey.json');
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  // ¡Importante! storageBucket CORREGIDO
+  // ¡Importante! Asegúrate de que el bucket de storage esté en tu config
   storageBucket: 'pedidos-con-gemini.firebasestorage.app' 
 });
 const db = admin.firestore();
@@ -52,7 +52,7 @@ app.get('/webhook', (req, res) => {
 });
 
 
-// Ruta para RECIBIR los mensajes entrantes de WhatsApp (ACTUALIZADA)
+// Ruta para RECIBIR los mensajes entrantes de WhatsApp
 app.post('/webhook', async (req, res) => {
     const message = req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
     const contactInfo = req.body.entry?.[0]?.changes?.[0]?.value?.contacts?.[0];
@@ -83,25 +83,22 @@ app.post('/webhook', async (req, res) => {
                     messageData.fileType = message.type;
                     lastMessageText = isImage ? '📷 Imagen' : '🎥 Video';
                     
-                    // 1. Obtener la URL temporal del medio desde Meta
                     const mediaUrlResponse = await axios.get(`https://graph.facebook.com/v19.0/${mediaInfo.id}`, {
                         headers: { 'Authorization': `Bearer ${WHATSAPP_TOKEN}` }
                     });
                     const mediaUrl = mediaUrlResponse.data.url;
                     
-                    // 2. Descargar el archivo
                     const fileResponse = await axios.get(mediaUrl, {
                         responseType: 'arraybuffer',
                         headers: { 'Authorization': `Bearer ${WHATSAPP_TOKEN}` }
                     });
 
-                    // 3. Subirlo a nuestro Firebase Storage
                     const fileName = `received/${from}_${Date.now()}`;
                     const file = bucket.file(fileName);
                     await file.save(fileResponse.data, {
                         metadata: { contentType: mediaInfo.mime_type }
                     });
-                    await file.makePublic(); // Hacer el archivo públicamente accesible
+                    await file.makePublic();
                     messageData.fileUrl = file.publicUrl();
                     break;
                 
@@ -112,7 +109,6 @@ app.post('/webhook', async (req, res) => {
                     break;
             }
 
-            // Guardar el mensaje y actualizar el contacto en Firestore
             await contactRef.collection('messages').add(messageData);
             await contactRef.set({
                 lastMessageTimestamp: timestamp,
@@ -161,7 +157,7 @@ app.get('/api/contacts/:contactId/messages', async (req, res) => {
 });
 
 
-// Ruta para ENVIAR MENSAJES (Texto y Multimedia) - ACTUALIZADA
+// Ruta para ENVIAR MENSAJES (Texto y Multimedia) - CORREGIDA
 app.post('/api/contacts/:contactId/messages', async (req, res) => {
     const { contactId } = req.params;
     const { text, fileUrl, fileType } = req.body;
@@ -182,12 +178,16 @@ app.post('/api/contacts/:contactId/messages', async (req, res) => {
         let lastMessageText = '';
 
         if (text) {
+            // Mensaje de texto
+            messagePayload.type = 'text';
             messagePayload.text = { body: text };
             firestoreMessage.text = text;
             lastMessageText = text;
         } else if (fileUrl && fileType) {
+            // Mensaje multimedia
             const type = fileType.split('/')[0]; // "image/png" -> "image"
             if (type === 'image' || type === 'video') {
+                messagePayload.type = type; // **LA CORRECCIÓN CLAVE ESTÁ AQUÍ**
                 messagePayload[type] = { link: fileUrl };
                 firestoreMessage.fileUrl = fileUrl;
                 firestoreMessage.fileType = type;
