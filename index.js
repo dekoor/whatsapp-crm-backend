@@ -10,8 +10,8 @@ const axios = require('axios');
 const serviceAccount = require('./serviceAccountKey.json');
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  // ¡Importante! Asegúrate de que el bucket de storage esté en tu config
-  storageBucket: 'pedidos-con-gemini.appspot.com' 
+  // ¡Importante! storageBucket CORREGIDO
+  storageBucket: 'pedidos-con-gemini.firebasestorage.app' 
 });
 const db = admin.firestore();
 const bucket = getStorage().bucket();
