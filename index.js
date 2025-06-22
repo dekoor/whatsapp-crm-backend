@@ -27,11 +27,10 @@ const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 
 // --- RUTAS DE LA API ---
-
+// ... (Rutas GET / y GET /webhook sin cambios) ...
 app.get('/', (req, res) => {
   res.send('¡El backend del CRM de WhatsApp está vivo y listo para servir y enviar datos!');
 });
-
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
@@ -84,21 +83,13 @@ app.post('/webhook', async (req, res) => {
                         messageData.fileType = message.type;
                         lastMessageText = isImage ? '📷 Imagen' : '🎥 Video';
                         
-                        const mediaUrlResponse = await axios.get(`https://graph.facebook.com/v19.0/${mediaInfo.id}`, {
-                            headers: { 'Authorization': `Bearer ${WHATSAPP_TOKEN}` }
-                        });
+                        const mediaUrlResponse = await axios.get(`https://graph.facebook.com/v19.0/${mediaInfo.id}`, { headers: { 'Authorization': `Bearer ${WHATSAPP_TOKEN}` } });
                         const mediaUrl = mediaUrlResponse.data.url;
-                        
-                        const fileResponse = await axios.get(mediaUrl, {
-                            responseType: 'arraybuffer',
-                            headers: { 'Authorization': `Bearer ${WHATSAPP_TOKEN}` }
-                        });
+                        const fileResponse = await axios.get(mediaUrl, { responseType: 'arraybuffer', headers: { 'Authorization': `Bearer ${WHATSAPP_TOKEN}` } });
 
                         const fileName = `received/${from}_${Date.now()}`;
                         const file = bucket.file(fileName);
-                        await file.save(fileResponse.data, {
-                            metadata: { contentType: mediaInfo.mime_type }
-                        });
+                        await file.save(fileResponse.data, { metadata: { contentType: mediaInfo.mime_type } });
                         await file.makePublic();
                         messageData.fileUrl = file.publicUrl();
                         break;
@@ -109,27 +100,28 @@ app.post('/webhook', async (req, res) => {
                 }
 
                 await contactRef.collection('messages').add(messageData);
+
+                // --- MODIFICACIÓN CLAVE AQUÍ ---
+                // Se actualiza el contacto y se incrementa el contador de mensajes no leídos.
                 await contactRef.set({
                     lastMessageTimestamp: timestamp,
                     name: contactInfo.profile.name,
                     lastMessage: lastMessageText,
-                    wa_id: contactInfo.wa_id
+                    wa_id: contactInfo.wa_id,
+                    unreadCount: admin.firestore.FieldValue.increment(1) // ¡Incrementa el contador!
                 }, { merge: true });
-                console.log(`Mensaje (${message.type}) de ${from} guardado y contacto actualizado.`);
+
+                console.log(`Mensaje (${message.type}) de ${from} guardado y contador de no leídos incrementado.`);
 
             } catch (error) {
                 console.error("Error procesando webhook de mensaje:", error.response ? error.response.data : error.message);
             }
         }
         
-        // Caso 2: Se recibe una actualización de estado (sent, delivered, read)
+        // Caso 2: Se recibe una actualización de estado (sin cambios)
         else if (value.statuses) {
             const statusInfo = value.statuses[0];
-            // --- LA CORRECCIÓN ESTÁ AQUÍ ---
-            // Cambiamos message_id por id para que coincida con la API de Meta
             const { status: newStatus, id: wamid, recipient_id: from } = statusInfo;
-            
-            // Solo procesamos si tenemos los datos necesarios
             if (wamid && from) {
                 try {
                     const messagesRef = db.collection('contacts_whatsapp').doc(from).collection('messages');
@@ -138,30 +130,19 @@ app.post('/webhook', async (req, res) => {
 
                     if (!querySnapshot.empty) {
                         const messageDocRef = querySnapshot.docs[0].ref;
-                        // No actualizaremos a 'sent' si ya está 'delivered' o 'read'
                         const currentStatus = querySnapshot.docs[0].data().status;
-                        if (currentStatus === 'read') {
-                            // Si ya está leído, no hacemos nada
-                        } else if (currentStatus === 'delivered' && newStatus === 'sent') {
-                            // Si ya está entregado, no lo volvemos a poner como 'sent'
-                        } else {
-                            await messageDocRef.update({ status: newStatus });
-                            console.log(`Estado del mensaje ${wamid} actualizado a: ${newStatus} para ${from}`);
-                        }
-                    } else {
-                        // Opcional: registrar si no se encuentra el mensaje
-                        // console.log(`No se encontró el mensaje con wamid: ${wamid} para actualizar estado.`);
+                        if (currentStatus === 'read') {} 
+                        else if (currentStatus === 'delivered' && newStatus === 'sent') {}
+                        else { await messageDocRef.update({ status: newStatus }); }
                     }
-                } catch (error) {
-                    console.error("Error procesando actualización de estado:", error.message);
-                }
+                } catch (error) { console.error("Error procesando actualización de estado:", error.message); }
             }
         }
     }
     res.sendStatus(200);
 });
 
-// Ruta para entregar la LISTA DE CONTACTOS al frontend
+// ... (Resto del archivo js sin cambios: GET /api/contacts, GET /api/contacts/:contactId/messages, POST /api/contacts/:contactId/messages, app.listen) ...
 app.get('/api/contacts', async (req, res) => {
     try {
         const contactsSnapshot = await db.collection('contacts_whatsapp').orderBy('lastMessageTimestamp', 'desc').get();
@@ -175,8 +156,6 @@ app.get('/api/contacts', async (req, res) => {
         res.status(500).send('Error al obtener la lista de contactos.');
     }
 });
-
-// Ruta para obtener los MENSAJES DE UN CHAT
 app.get('/api/contacts/:contactId/messages', async (req, res) => {
     try {
         const contactId = req.params.contactId;
@@ -191,28 +170,14 @@ app.get('/api/contacts/:contactId/messages', async (req, res) => {
         res.status(500).send('Error al obtener los mensajes.');
     }
 });
-
-
-// Ruta para ENVIAR MENSAJES
 app.post('/api/contacts/:contactId/messages', async (req, res) => {
     const { contactId } = req.params;
     const { text, fileUrl, fileType } = req.body;
-
-    if (!text && !fileUrl) {
-        return res.status(400).send('Se requiere texto o un archivo.');
-    }
-
+    if (!text && !fileUrl) { return res.status(400).send('Se requiere texto o un archivo.'); }
     try {
-        let messagePayload = {
-            messaging_product: 'whatsapp',
-            to: contactId,
-        };
-        let firestoreMessage = {
-            timestamp: admin.firestore.FieldValue.serverTimestamp(),
-            status: 'sent'
-        };
+        let messagePayload = { messaging_product: 'whatsapp', to: contactId, };
+        let firestoreMessage = { timestamp: admin.firestore.FieldValue.serverTimestamp(), status: 'sent' };
         let lastMessageText = '';
-
         if (text) {
             messagePayload.type = 'text';
             messagePayload.text = { body: text };
@@ -226,40 +191,21 @@ app.post('/api/contacts/:contactId/messages', async (req, res) => {
                 firestoreMessage.fileUrl = fileUrl;
                 firestoreMessage.fileType = type;
                 lastMessageText = type === 'image' ? '📷 Imagen' : '🎥 Video';
-            } else {
-                 return res.status(400).send('Tipo de archivo no soportado. Solo imágenes y videos.');
-            }
+            } else { return res.status(400).send('Tipo de archivo no soportado.'); }
         }
-
-        const metaApiResponse = await axios.post(`https://graph.facebook.com/v19.0/${PHONE_NUMBER_ID}/messages`, messagePayload, {
-            headers: {
-                'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        
+        const metaApiResponse = await axios.post(`https://graph.facebook.com/v19.0/${PHONE_NUMBER_ID}/messages`, messagePayload, { headers: { 'Authorization': `Bearer ${WHATSAPP_TOKEN}`, 'Content-Type': 'application/json' } });
         const wamid = metaApiResponse.data.messages[0].id;
         firestoreMessage.wamid = wamid; 
-
         const contactRef = db.collection('contacts_whatsapp').doc(contactId);
         await contactRef.collection('messages').add(firestoreMessage);
-
-        await contactRef.update({
-            lastMessage: lastMessageText,
-            lastMessageTimestamp: firestoreMessage.timestamp
-        });
-
+        await contactRef.update({ lastMessage: lastMessageText, lastMessageTimestamp: firestoreMessage.timestamp });
         console.log(`Mensaje enviado (wamid: ${wamid}) guardado en Firestore para ${contactId}.`);
         res.status(200).send({ success: true, wamid: wamid });
-
     } catch (error) {
         console.error('Error al enviar el mensaje:', error.response ? error.response.data : error.message);
         res.status(500).send('Error al procesar el envío del mensaje.');
     }
 });
-
-
-// --- INICIAMOS EL SERVIDOR ---
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en el puerto ${PORT}`);
 });
