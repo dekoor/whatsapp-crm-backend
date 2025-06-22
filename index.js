@@ -49,7 +49,7 @@ app.get('/webhook', (req, res) => {
 });
 
 
-// Ruta para RECIBIR los mensajes y ACTUALIZACIONES DE ESTADO - MODIFICADA
+// Ruta para RECIBIR los mensajes y ACTUALIZACIONES DE ESTADO
 app.post('/webhook', async (req, res) => {
     const entry = req.body.entry?.[0];
     const change = entry?.changes?.[0];
@@ -67,7 +67,7 @@ app.post('/webhook', async (req, res) => {
             let messageData = {
                 timestamp: timestamp,
                 from: from,
-                status: 'received' // 'received' para mensajes entrantes
+                status: 'received'
             };
             let lastMessageText = '';
 
@@ -125,20 +125,36 @@ app.post('/webhook', async (req, res) => {
         // Caso 2: Se recibe una actualización de estado (sent, delivered, read)
         else if (value.statuses) {
             const statusInfo = value.statuses[0];
-            const { status: newStatus, message_id: wamid, recipient_id: from } = statusInfo;
+            // --- LA CORRECCIÓN ESTÁ AQUÍ ---
+            // Cambiamos message_id por id para que coincida con la API de Meta
+            const { status: newStatus, id: wamid, recipient_id: from } = statusInfo;
             
-            try {
-                const messagesRef = db.collection('contacts_whatsapp').doc(from).collection('messages');
-                const q = messagesRef.where('wamid', '==', wamid).limit(1);
-                const querySnapshot = await q.get();
+            // Solo procesamos si tenemos los datos necesarios
+            if (wamid && from) {
+                try {
+                    const messagesRef = db.collection('contacts_whatsapp').doc(from).collection('messages');
+                    const q = messagesRef.where('wamid', '==', wamid).limit(1);
+                    const querySnapshot = await q.get();
 
-                if (!querySnapshot.empty) {
-                    const messageDocRef = querySnapshot.docs[0].ref;
-                    await messageDocRef.update({ status: newStatus });
-                    console.log(`Estado del mensaje ${wamid} actualizado a: ${newStatus} para ${from}`);
+                    if (!querySnapshot.empty) {
+                        const messageDocRef = querySnapshot.docs[0].ref;
+                        // No actualizaremos a 'sent' si ya está 'delivered' o 'read'
+                        const currentStatus = querySnapshot.docs[0].data().status;
+                        if (currentStatus === 'read') {
+                            // Si ya está leído, no hacemos nada
+                        } else if (currentStatus === 'delivered' && newStatus === 'sent') {
+                            // Si ya está entregado, no lo volvemos a poner como 'sent'
+                        } else {
+                            await messageDocRef.update({ status: newStatus });
+                            console.log(`Estado del mensaje ${wamid} actualizado a: ${newStatus} para ${from}`);
+                        }
+                    } else {
+                        // Opcional: registrar si no se encuentra el mensaje
+                        // console.log(`No se encontró el mensaje con wamid: ${wamid} para actualizar estado.`);
+                    }
+                } catch (error) {
+                    console.error("Error procesando actualización de estado:", error.message);
                 }
-            } catch (error) {
-                console.error("Error procesando actualización de estado:", error.message);
             }
         }
     }
@@ -177,7 +193,7 @@ app.get('/api/contacts/:contactId/messages', async (req, res) => {
 });
 
 
-// Ruta para ENVIAR MENSAJES - MODIFICADA
+// Ruta para ENVIAR MENSAJES
 app.post('/api/contacts/:contactId/messages', async (req, res) => {
     const { contactId } = req.params;
     const { text, fileUrl, fileType } = req.body;
@@ -193,7 +209,6 @@ app.post('/api/contacts/:contactId/messages', async (req, res) => {
         };
         let firestoreMessage = {
             timestamp: admin.firestore.FieldValue.serverTimestamp(),
-            // El estado inicial siempre es 'sent' porque lo acabamos de enviar a Meta
             status: 'sent'
         };
         let lastMessageText = '';
@@ -216,7 +231,6 @@ app.post('/api/contacts/:contactId/messages', async (req, res) => {
             }
         }
 
-        // 1. Enviar el mensaje a través de la API de Meta
         const metaApiResponse = await axios.post(`https://graph.facebook.com/v19.0/${PHONE_NUMBER_ID}/messages`, messagePayload, {
             headers: {
                 'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
@@ -224,15 +238,12 @@ app.post('/api/contacts/:contactId/messages', async (req, res) => {
             }
         });
         
-        // **NUEVO**: Obtenemos el ID del mensaje de la respuesta de Meta
         const wamid = metaApiResponse.data.messages[0].id;
-        firestoreMessage.wamid = wamid; // Y lo agregamos al objeto que guardaremos
+        firestoreMessage.wamid = wamid; 
 
-        // 2. Guardar el mensaje enviado en nuestra base de datos
         const contactRef = db.collection('contacts_whatsapp').doc(contactId);
         await contactRef.collection('messages').add(firestoreMessage);
 
-        // 3. Actualizar el último mensaje del contacto
         await contactRef.update({
             lastMessage: lastMessageText,
             lastMessageTimestamp: firestoreMessage.timestamp
