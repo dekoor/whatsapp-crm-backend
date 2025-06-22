@@ -1,17 +1,22 @@
 require('dotenv').config();
 const express = require('express');
 const admin = require('firebase-admin');
+const { getStorage } = require('firebase-admin/storage');
 const cors = require('cors');
-const axios = require('axios'); // Asegúrate de que axios esté instalado
+const axios = require('axios');
 
 // --- CONFIGURACIÓN DE FIREBASE ---
+// Asegúrate de que tu serviceAccountKey.json está en la misma carpeta
 const serviceAccount = require('./serviceAccountKey.json');
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: process.env.DATABASE_URL
+  // ¡Importante! Asegúrate de que el bucket de storage esté en tu config
+  storageBucket: 'pedidos-con-gemini.appspot.com' 
 });
 const db = admin.firestore();
-console.log('Conexión con Firebase establecida.');
+const bucket = getStorage().bucket();
+console.log('Conexión con Firebase (Firestore y Storage) establecida.');
+
 
 // --- CONFIGURACIÓN DEL SERVIDOR EXPRESS ---
 const app = express();
@@ -26,7 +31,6 @@ const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 
 // --- RUTAS DE LA API ---
 
-// ... (Las rutas GET / y GET /webhook se mantienen igual)
 app.get('/', (req, res) => {
   res.send('¡El backend del CRM de WhatsApp está vivo y listo para servir y enviar datos!');
 });
@@ -48,33 +52,78 @@ app.get('/webhook', (req, res) => {
 });
 
 
-// Ruta para RECIBIR los mensajes entrantes de WhatsApp
+// Ruta para RECIBIR los mensajes entrantes de WhatsApp (ACTUALIZADA)
 app.post('/webhook', async (req, res) => {
-    // ... (Esta ruta se mantiene igual que en la v4)
     const message = req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
     const contactInfo = req.body.entry?.[0]?.changes?.[0]?.value?.contacts?.[0];
 
-    if (message) {
+    if (message && contactInfo) {
         const from = message.from;
-        const text = message.text.body;
         const timestamp = admin.firestore.FieldValue.serverTimestamp();
+        const contactRef = db.collection('contacts_whatsapp').doc(from);
+        
+        let messageData = {
+            timestamp: timestamp,
+            from: from,
+            status: 'received'
+        };
+        let lastMessageText = '';
+
         try {
-            const contactRef = db.collection('contacts_whatsapp').doc(from);
+            switch (message.type) {
+                case 'text':
+                    messageData.text = message.text.body;
+                    lastMessageText = message.text.body;
+                    break;
+
+                case 'image':
+                case 'video':
+                    const isImage = message.type === 'image';
+                    const mediaInfo = isImage ? message.image : message.video;
+                    messageData.fileType = message.type;
+                    lastMessageText = isImage ? '📷 Imagen' : '🎥 Video';
+                    
+                    // 1. Obtener la URL temporal del medio desde Meta
+                    const mediaUrlResponse = await axios.get(`https://graph.facebook.com/v19.0/${mediaInfo.id}`, {
+                        headers: { 'Authorization': `Bearer ${WHATSAPP_TOKEN}` }
+                    });
+                    const mediaUrl = mediaUrlResponse.data.url;
+                    
+                    // 2. Descargar el archivo
+                    const fileResponse = await axios.get(mediaUrl, {
+                        responseType: 'arraybuffer',
+                        headers: { 'Authorization': `Bearer ${WHATSAPP_TOKEN}` }
+                    });
+
+                    // 3. Subirlo a nuestro Firebase Storage
+                    const fileName = `received/${from}_${Date.now()}`;
+                    const file = bucket.file(fileName);
+                    await file.save(fileResponse.data, {
+                        metadata: { contentType: mediaInfo.mime_type }
+                    });
+                    await file.makePublic(); // Hacer el archivo públicamente accesible
+                    messageData.fileUrl = file.publicUrl();
+                    break;
+                
+                default:
+                    lastMessageText = `Mensaje no soportado: ${message.type}`;
+                    messageData.text = lastMessageText;
+                    console.log(`Mensaje de tipo ${message.type} no soportado.`);
+                    break;
+            }
+
+            // Guardar el mensaje y actualizar el contacto en Firestore
+            await contactRef.collection('messages').add(messageData);
             await contactRef.set({
                 lastMessageTimestamp: timestamp,
                 name: contactInfo.profile.name,
-                lastMessage: text,
+                lastMessage: lastMessageText,
                 wa_id: contactInfo.wa_id
             }, { merge: true });
-            await contactRef.collection('messages').add({
-                text: text,
-                timestamp: timestamp,
-                from: from,
-                status: 'received'
-            });
-            console.log(`Mensaje de ${from} guardado y contacto actualizado.`);
+            console.log(`Mensaje (${message.type}) de ${from} guardado y contacto actualizado.`);
+
         } catch (error) {
-            console.error("Error al guardar en Firestore:", error);
+            console.error("Error procesando webhook:", error.response ? error.response.data : error.message);
         }
     }
     res.sendStatus(200);
@@ -82,7 +131,6 @@ app.post('/webhook', async (req, res) => {
 
 // Ruta para entregar la LISTA DE CONTACTOS al frontend
 app.get('/api/contacts', async (req, res) => {
-    // ... (Esta ruta se mantiene igual que en la v4)
     try {
         const contactsSnapshot = await db.collection('contacts_whatsapp').orderBy('lastMessageTimestamp', 'desc').get();
         const contacts = [];
@@ -90,7 +138,6 @@ app.get('/api/contacts', async (req, res) => {
             contacts.push({ id: doc.id, ...doc.data() });
         });
         res.status(200).json(contacts);
-        console.log('Se entregó la lista de contactos al frontend.');
     } catch (error) {
         console.error('Error al obtener contactos:', error);
         res.status(500).send('Error al obtener la lista de contactos.');
@@ -99,7 +146,6 @@ app.get('/api/contacts', async (req, res) => {
 
 // Ruta para obtener los MENSAJES DE UN CHAT
 app.get('/api/contacts/:contactId/messages', async (req, res) => {
-    // ... (Esta ruta se mantiene igual que en la v4)
     try {
         const contactId = req.params.contactId;
         const messagesSnapshot = await db.collection('contacts_whatsapp').doc(contactId).collection('messages').orderBy('timestamp', 'asc').get();
@@ -108,7 +154,6 @@ app.get('/api/contacts/:contactId/messages', async (req, res) => {
             messages.push({ id: doc.id, ...doc.data() });
         });
         res.status(200).json(messages);
-        console.log(`Se entregaron los mensajes para el contacto ${contactId}.`);
     } catch (error) {
         console.error(`Error al obtener mensajes para ${req.params.contactId}:`, error);
         res.status(500).send('Error al obtener los mensajes.');
@@ -116,43 +161,58 @@ app.get('/api/contacts/:contactId/messages', async (req, res) => {
 });
 
 
-// --- NUEVA RUTA PARA ENVIAR MENSAJES ---
+// Ruta para ENVIAR MENSAJES (Texto y Multimedia) - ACTUALIZADA
 app.post('/api/contacts/:contactId/messages', async (req, res) => {
     const { contactId } = req.params;
-    const { text } = req.body;
+    const { text, fileUrl, fileType } = req.body;
 
-    if (!text) {
-        return res.status(400).send('El texto del mensaje es requerido.');
+    if (!text && !fileUrl) {
+        return res.status(400).send('Se requiere texto o un archivo.');
     }
 
     try {
-        // 1. Enviar el mensaje a través de la API de Meta
-        await axios.post(`https://graph.facebook.com/v19.0/${PHONE_NUMBER_ID}/messages`, {
+        let messagePayload = {
             messaging_product: 'whatsapp',
             to: contactId,
-            text: { body: text }
-        }, {
+        };
+        let firestoreMessage = {
+            timestamp: admin.firestore.FieldValue.serverTimestamp(),
+            status: 'sent'
+        };
+        let lastMessageText = '';
+
+        if (text) {
+            messagePayload.text = { body: text };
+            firestoreMessage.text = text;
+            lastMessageText = text;
+        } else if (fileUrl && fileType) {
+            const type = fileType.split('/')[0]; // "image/png" -> "image"
+            if (type === 'image' || type === 'video') {
+                messagePayload[type] = { link: fileUrl };
+                firestoreMessage.fileUrl = fileUrl;
+                firestoreMessage.fileType = type;
+                lastMessageText = type === 'image' ? '📷 Imagen' : '🎥 Video';
+            } else {
+                 return res.status(400).send('Tipo de archivo no soportado. Solo imágenes y videos.');
+            }
+        }
+
+        // 1. Enviar el mensaje a través de la API de Meta
+        await axios.post(`https://graph.facebook.com/v19.0/${PHONE_NUMBER_ID}/messages`, messagePayload, {
             headers: {
                 'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
                 'Content-Type': 'application/json'
             }
         });
-        console.log(`Mensaje enviado a ${contactId} a través de la API de Meta.`);
 
         // 2. Guardar el mensaje enviado en nuestra base de datos
-        const timestamp = admin.firestore.FieldValue.serverTimestamp();
         const contactRef = db.collection('contacts_whatsapp').doc(contactId);
-        
-        await contactRef.collection('messages').add({
-            text: text,
-            timestamp: timestamp,
-            status: 'sent' // Marcamos el mensaje como 'enviado'
-        });
+        await contactRef.collection('messages').add(firestoreMessage);
 
         // 3. Actualizar el último mensaje del contacto
         await contactRef.update({
-            lastMessage: text,
-            lastMessageTimestamp: timestamp
+            lastMessage: lastMessageText,
+            lastMessageTimestamp: firestoreMessage.timestamp
         });
 
         console.log(`Mensaje enviado guardado en Firestore para ${contactId}.`);
