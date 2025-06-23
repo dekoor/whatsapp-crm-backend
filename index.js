@@ -165,7 +165,7 @@ app.get('/api/contacts/:contactId/messages', async (req, res) => {
     }
 });
 
-// --- MODIFICACIÓN CLAVE: Endpoint de envío de mensajes con validación de 24 horas ---
+// --- Endpoint de envío de mensajes con validación de 24 horas ---
 app.post('/api/contacts/:contactId/messages', async (req, res) => {
     const { contactId } = req.params;
     const { text, fileUrl, fileType } = req.body;
@@ -196,9 +196,10 @@ app.post('/api/contacts/:contactId/messages', async (req, res) => {
             const timeDifference = now.getTime() - lastMessageDate.getTime();
 
             if (timeDifference > twentyFourHoursInMillis) {
+                // --- MODIFICACIÓN CLAVE: Mensaje de error actualizado ---
                 return res.status(403).json({
                     success: false,
-                    message: 'No se puede enviar. Han pasado más de 24 horas desde el último mensaje del contacto.'
+                    message: 'No se puede enviar el mensaje. Han pasado más de 24 horas'
                 });
             }
         }
