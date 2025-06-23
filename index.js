@@ -27,7 +27,6 @@ const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 
 // --- RUTAS DE LA API ---
-// ... (Rutas GET / y GET /webhook sin cambios) ...
 app.get('/', (req, res) => {
   res.send('¡El backend del CRM de WhatsApp está vivo y listo para servir y enviar datos!');
 });
@@ -55,7 +54,6 @@ app.post('/webhook', async (req, res) => {
     const value = change?.value;
 
     if (value) {
-        // Caso 1: Se recibe un mensaje nuevo
         if (value.messages) {
             const message = value.messages[0];
             const contactInfo = value.contacts[0];
@@ -66,7 +64,7 @@ app.post('/webhook', async (req, res) => {
             let messageData = {
                 timestamp: timestamp,
                 from: from,
-                status: 'received'
+                status: 'received' // Mensaje recibido del usuario
             };
             let lastMessageText = '';
 
@@ -101,14 +99,12 @@ app.post('/webhook', async (req, res) => {
 
                 await contactRef.collection('messages').add(messageData);
 
-                // --- MODIFICACIÓN CLAVE AQUÍ ---
-                // Se actualiza el contacto y se incrementa el contador de mensajes no leídos.
                 await contactRef.set({
                     lastMessageTimestamp: timestamp,
                     name: contactInfo.profile.name,
                     lastMessage: lastMessageText,
                     wa_id: contactInfo.wa_id,
-                    unreadCount: admin.firestore.FieldValue.increment(1) // ¡Incrementa el contador!
+                    unreadCount: admin.firestore.FieldValue.increment(1)
                 }, { merge: true });
 
                 console.log(`Mensaje (${message.type}) de ${from} guardado y contador de no leídos incrementado.`);
@@ -118,7 +114,6 @@ app.post('/webhook', async (req, res) => {
             }
         }
         
-        // Caso 2: Se recibe una actualización de estado (sin cambios)
         else if (value.statuses) {
             const statusInfo = value.statuses[0];
             const { status: newStatus, id: wamid, recipient_id: from } = statusInfo;
@@ -142,7 +137,6 @@ app.post('/webhook', async (req, res) => {
     res.sendStatus(200);
 });
 
-// ... (Resto del archivo js sin cambios: GET /api/contacts, GET /api/contacts/:contactId/messages, POST /api/contacts/:contactId/messages, app.listen) ...
 app.get('/api/contacts', async (req, res) => {
     try {
         const contactsSnapshot = await db.collection('contacts_whatsapp').orderBy('lastMessageTimestamp', 'desc').get();
@@ -170,14 +164,50 @@ app.get('/api/contacts/:contactId/messages', async (req, res) => {
         res.status(500).send('Error al obtener los mensajes.');
     }
 });
+
+// --- MODIFICACIÓN CLAVE: Endpoint de envío de mensajes con validación de 24 horas ---
 app.post('/api/contacts/:contactId/messages', async (req, res) => {
     const { contactId } = req.params;
     const { text, fileUrl, fileType } = req.body;
-    if (!text && !fileUrl) { return res.status(400).send('Se requiere texto o un archivo.'); }
+    if (!text && !fileUrl) { 
+        return res.status(400).json({ success: false, message: 'Se requiere texto o un archivo.' });
+    }
+
     try {
+        // Validación de la ventana de 24 horas
+        const messagesRef = db.collection('contacts_whatsapp').doc(contactId).collection('messages');
+        const lastReceivedQuery = messagesRef.where('status', '==', 'received').orderBy('timestamp', 'desc').limit(1);
+        const lastReceivedSnapshot = await lastReceivedQuery.get();
+
+        if (lastReceivedSnapshot.empty) {
+            return res.status(403).json({
+                success: false,
+                message: 'No puedes iniciar una conversación. Responde a un mensaje del usuario primero.'
+            });
+        }
+
+        const lastReceivedMessage = lastReceivedSnapshot.docs[0].data();
+        const lastMessageTimestamp = lastReceivedMessage.timestamp;
+
+        if (lastMessageTimestamp) {
+            const lastMessageDate = lastMessageTimestamp.toDate();
+            const now = new Date();
+            const twentyFourHoursInMillis = 24 * 60 * 60 * 1000;
+            const timeDifference = now.getTime() - lastMessageDate.getTime();
+
+            if (timeDifference > twentyFourHoursInMillis) {
+                return res.status(403).json({
+                    success: false,
+                    message: 'No se puede enviar. Han pasado más de 24 horas desde el último mensaje del contacto.'
+                });
+            }
+        }
+        // Fin de la validación
+
         let messagePayload = { messaging_product: 'whatsapp', to: contactId, };
         let firestoreMessage = { timestamp: admin.firestore.FieldValue.serverTimestamp(), status: 'sent' };
         let lastMessageText = '';
+
         if (text) {
             messagePayload.type = 'text';
             messagePayload.text = { body: text };
@@ -191,21 +221,28 @@ app.post('/api/contacts/:contactId/messages', async (req, res) => {
                 firestoreMessage.fileUrl = fileUrl;
                 firestoreMessage.fileType = type;
                 lastMessageText = type === 'image' ? '📷 Imagen' : '🎥 Video';
-            } else { return res.status(400).send('Tipo de archivo no soportado.'); }
+            } else { 
+                return res.status(400).json({ success: false, message: 'Tipo de archivo no soportado.' });
+            }
         }
+
         const metaApiResponse = await axios.post(`https://graph.facebook.com/v19.0/${PHONE_NUMBER_ID}/messages`, messagePayload, { headers: { 'Authorization': `Bearer ${WHATSAPP_TOKEN}`, 'Content-Type': 'application/json' } });
         const wamid = metaApiResponse.data.messages[0].id;
         firestoreMessage.wamid = wamid; 
+        
         const contactRef = db.collection('contacts_whatsapp').doc(contactId);
         await contactRef.collection('messages').add(firestoreMessage);
         await contactRef.update({ lastMessage: lastMessageText, lastMessageTimestamp: firestoreMessage.timestamp });
+        
         console.log(`Mensaje enviado (wamid: ${wamid}) guardado en Firestore para ${contactId}.`);
         res.status(200).send({ success: true, wamid: wamid });
+
     } catch (error) {
         console.error('Error al enviar el mensaje:', error.response ? error.response.data : error.message);
-        res.status(500).send('Error al procesar el envío del mensaje.');
+        res.status(500).json({ success: false, message: 'Error al procesar el envío del mensaje.' });
     }
 });
+
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en el puerto ${PORT}`);
 });
