@@ -75,17 +75,17 @@ const sendConversionEvent = async (eventName, contactInfo, referralInfo, customD
             user_data: userData,
             custom_data: finalCustomData
         }],
-        // **CÓDIGO DE PRUEBA ACTUALIZADO**
-        test_event_code: "TEST13491",
+        // La siguiente línea se elimina para producción.
+        // test_event_code: "TEST13491",
     };
 
     try {
-        console.log(`🧪 Enviando evento de PRUEBA '${eventName}' para ${contactInfo.wa_id}.`);
+        console.log(`Enviando evento de PRODUCCIÓN '${eventName}' para ${contactInfo.wa_id}.`);
         await axios.post(url, payload, { headers: { 'Authorization': `Bearer ${META_CAPI_ACCESS_TOKEN}`, 'Content-Type': 'application/json' } });
-        console.log(`✅ Evento de PRUEBA '${eventName}' enviado a Meta.`);
+        console.log(`✅ Evento de PRODUCCIÓN '${eventName}' enviado a Meta.`);
     } catch (error) {
-        console.error(`❌ Error al enviar evento de PRUEBA '${eventName}' a Meta.`, error.response ? JSON.stringify(error.response.data, null, 2) : error.message);
-        throw new Error(`Falló el envío del evento de PRUEBA '${eventName}' a Meta.`);
+        console.error(`❌ Error al enviar evento de PRODUCCIÓN '${eventName}' a Meta.`, error.response ? JSON.stringify(error.response.data, null, 2) : error.message);
+        throw new Error(`Falló el envío del evento de PRODUCCIÓN '${eventName}' a Meta.`);
     }
 };
 
