@@ -250,13 +250,14 @@ app.post('/api/contacts/:contactId/mark-as-registration', async (req, res) => {
     }
 });
 
-// --- NUEVO: Endpoint para marcar una compra ---
+// --- NUEVO Y CORREGIDO: Endpoint para marcar una compra ---
 app.post('/api/contacts/:contactId/mark-as-purchase', async (req, res) => {
     const { contactId } = req.params;
-    const { value, currency } = req.body;
+    const { value } = req.body;
+    const currency = 'MXN'; // Moneda definida en el servidor
 
-    if (!value || !currency || isNaN(parseFloat(value))) {
-        return res.status(400).json({ success: false, message: 'Se requiere un valor y una moneda válidos.' });
+    if (!value || isNaN(parseFloat(value))) {
+        return res.status(400).json({ success: false, message: 'Se requiere un valor numérico válido.' });
     }
 
     const contactRef = db.collection('contacts_whatsapp').doc(contactId);
@@ -273,14 +274,14 @@ app.post('/api/contacts/:contactId/mark-as-purchase', async (req, res) => {
                 'Purchase',
                 { wa_id: contactData.wa_id, profile: { name: contactData.name } },
                 contactData.adReferral,
-                { value: parseFloat(value), currency }
+                { value: parseFloat(value), currency } // Se usa la moneda MXN
             );
         }
 
         await contactRef.update({
             purchaseStatus: 'completed',
             purchaseValue: parseFloat(value),
-            purchaseCurrency: currency,
+            purchaseCurrency: currency, // Se guarda la moneda MXN
             purchaseDate: admin.firestore.FieldValue.serverTimestamp()
         });
 
