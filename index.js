@@ -4,7 +4,7 @@ const admin = require('firebase-admin');
 const { getStorage } = require('firebase-admin/storage');
 const cors = require('cors');
 const axios = require('axios');
-const crypto = require('crypto'); // Módulo para encriptar
+const crypto = require('crypto');
 
 // --- CONFIGURACIÓN DE FIREBASE ---
 const serviceAccount = require('./serviceAccountKey.json');
@@ -15,7 +15,6 @@ admin.initializeApp({
 const db = admin.firestore();
 const bucket = getStorage().bucket();
 console.log('Conexión con Firebase (Firestore y Storage) establecida.');
-
 
 // --- CONFIGURACIÓN DEL SERVIDOR EXPRESS ---
 const app = express();
@@ -32,13 +31,12 @@ const META_CAPI_ACCESS_TOKEN = process.env.META_CAPI_ACCESS_TOKEN;
 // --- FUNCIÓN PARA HASHEAR DATOS ---
 function sha256(data) {
     if (!data) return null;
-    // Normaliza a minúsculas y quita espacios para nombres, pero no para números
     const normalizedData = typeof data === 'string' ? data.toLowerCase().replace(/\s/g, '') : data.toString();
     return crypto.createHash('sha256').update(normalizedData).digest('hex');
 }
 
-// --- FUNCIÓN PARA ENVIAR EVENTO DE CONVERSIÓN A META (ACTUALIZADA)---
-const sendLeadConversionEvent = async (contactInfo, referralInfo) => {
+// --- FUNCIÓN GENÉRICA PARA ENVIAR EVENTOS DE CONVERSIÓN A META (API de Conversiones) ---
+const sendConversionEvent = async (eventName, contactInfo, referralInfo, customData = {}) => {
     if (!META_PIXEL_ID || !META_CAPI_ACCESS_TOKEN) {
         console.warn('Advertencia: Faltan credenciales de Meta. No se enviará el evento.');
         return;
@@ -47,37 +45,38 @@ const sendLeadConversionEvent = async (contactInfo, referralInfo) => {
     const url = `https://graph.facebook.com/v19.0/${META_PIXEL_ID}/events`;
     const eventTime = Math.floor(Date.now() / 1000);
     
-    // Hasheamos los datos del usuario antes de enviarlos
     const userData = {
         ph: [sha256(contactInfo.wa_id)],
         fn: sha256(contactInfo.profile.name)
     };
+    
+    // Fusionamos los datos custom base con los adicionales (ej. para Purchase)
+    const finalCustomData = {
+        lead_source: 'WhatsApp Ad',
+        ad_headline: referralInfo?.headline,
+        ad_id: referralInfo?.source_id,
+        ...customData // Aquí se añaden 'value' y 'currency' para el evento Purchase
+    };
 
     const payload = {
         data: [{
-            event_name: 'Lead',
+            event_name: eventName,
             event_time: eventTime,
-            action_source: 'website', // Corregido
-            user_data: userData,      // Datos hasheados
-            custom_data: {
-                lead_source: 'WhatsApp Ad',
-                ad_headline: referralInfo.headline,
-                ad_id: referralInfo.source_id
-            }
+            action_source: 'website', // Usamos 'website' como fuente para alinear con el Píxel.
+            user_data: userData,
+            custom_data: finalCustomData
         }],
-        // Asegúrate de que test_event_code esté comentado para campañas reales
-        // test_event_code: 'TU_CODIGO_DE_PRUEBA'
+        // test_event_code: 'TU_CODIGO_DE_PRUEBA' // Descomentar solo para pruebas
     };
 
     try {
         await axios.post(url, payload, { headers: { 'Authorization': `Bearer ${META_CAPI_ACCESS_TOKEN}`, 'Content-Type': 'application/json' } });
-        console.log(`✅ Evento 'Lead' (hasheado) enviado a Meta para ${contactInfo.wa_id}.`);
+        console.log(`✅ Evento '${eventName}' enviado a Meta para ${contactInfo.wa_id}.`);
     } catch (error) {
-        console.error("❌ Error al enviar evento de conversión a Meta:", error.response ? JSON.stringify(error.response.data, null, 2) : error.message);
-        throw new Error('Falló el envío del evento a Meta.');
+        console.error(`❌ Error al enviar evento '${eventName}' a Meta:`, error.response ? JSON.stringify(error.response.data, null, 2) : error.message);
+        throw new Error(`Falló el envío del evento '${eventName}' a Meta.`);
     }
 };
-
 
 // --- RUTAS DE LA API ---
 app.get('/', (req, res) => {
@@ -85,6 +84,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/webhook', (req, res) => {
+  // ... (código de verificación sin cambios)
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
   const challenge = req.query['hub.challenge'];
@@ -100,7 +100,6 @@ app.get('/webhook', (req, res) => {
   }
 });
 
-// Ruta para RECIBIR los mensajes y ACTUALIZACIONES DE ESTADO
 app.post('/webhook', async (req, res) => {
     const entry = req.body.entry?.[0];
     const change = entry?.changes?.[0];
@@ -120,25 +119,28 @@ app.post('/webhook', async (req, res) => {
                 wa_id: contactInfo.wa_id,
                 unreadCount: admin.firestore.FieldValue.increment(1)
             };
-
+            
+            let isNewAdContact = false;
+            // Si el mensaje viene de un anuncio, guardamos la info
             if (message.referral && message.referral.source_type === 'ad') {
-                console.log(`📬 Mensaje de anuncio detectado de ${from}. Guardando información de referral.`);
+                console.log(`📬 Mensaje de anuncio detectado de ${from}.`);
+                const contactDoc = await contactRef.get();
+                // Solo lo consideramos "nuevo" si no tenía ya info de referral
+                if (!contactDoc.exists || !contactDoc.data().adReferral) {
+                    isNewAdContact = true;
+                }
                 contactData.adReferral = {
                     source_id: message.referral.source_id,
                     headline: message.referral.headline,
-                    source_type: message.referral.source_type
+                    source_type: message.referral.source_type,
+                    receivedAt: timestamp
                 };
-                contactData.isLead = false; 
-                contactData.conversionSent = false;
             }
 
-            let messageData = {
-                timestamp: timestamp,
-                from: from,
-                status: 'received'
-            };
+            // Guardamos el mensaje (código sin cambios importantes)
+            let messageData = { timestamp: timestamp, from: from, status: 'received' };
             let lastMessageText = '';
-
+            //... (código para procesar tipos de mensaje: text, image, etc. sin cambios)
             try {
                 switch (message.type) {
                     case 'text':
@@ -167,19 +169,32 @@ app.post('/webhook', async (req, res) => {
                         messageData.text = lastMessageText;
                         break;
                 }
-
-                await contactRef.collection('messages').add(messageData);
-                contactData.lastMessage = lastMessageText;
-                await contactRef.set(contactData, { merge: true });
-
-                console.log(`Mensaje (${message.type}) de ${from} guardado.`);
-
             } catch (error) {
-                console.error("Error procesando webhook de mensaje:", error.response ? error.response.data : error.message);
+                console.error("Error procesando media de webhook:", error.response ? error.response.data : error.message);
             }
-        }
-        
-        else if (value.statuses) {
+
+            await contactRef.collection('messages').add(messageData);
+            contactData.lastMessage = lastMessageText;
+            await contactRef.set(contactData, { merge: true });
+
+            console.log(`Mensaje (${message.type}) de ${from} guardado.`);
+
+            // --- NUEVO: Enviar evento ViewContent si es el primer mensaje de un anuncio ---
+            if (isNewAdContact) {
+                try {
+                    await sendConversionEvent(
+                        'ViewContent',
+                        contactInfo,
+                        contactData.adReferral
+                    );
+                    await contactRef.update({ viewContentSent: true });
+                } catch (error) {
+                    console.error(`Fallo al enviar evento ViewContent para ${from}`);
+                }
+            }
+
+        } else if (value.statuses) {
+            // ... (código de actualización de estado sin cambios)
             const statusInfo = value.statuses[0];
             const { status: newStatus, id: wamid, recipient_id: from } = statusInfo;
             if (wamid && from) {
@@ -202,69 +217,83 @@ app.post('/webhook', async (req, res) => {
     res.sendStatus(200);
 });
 
-app.post('/api/contacts/:contactId/mark-as-lead', async (req, res) => {
+// Endpoint para marcar un registro completado (antes 'Lead')
+app.post('/api/contacts/:contactId/mark-as-registration', async (req, res) => {
     const { contactId } = req.params;
     const contactRef = db.collection('contacts_whatsapp').doc(contactId);
 
     try {
         const contactDoc = await contactRef.get();
-        if (!contactDoc.exists) {
-            return res.status(404).json({ success: false, message: 'Contacto no encontrado.' });
-        }
-
+        if (!contactDoc.exists) return res.status(404).json({ success: false, message: 'Contacto no encontrado.' });
+        
         const contactData = contactDoc.data();
-
-        if (contactData.conversionSent) {
-            return res.status(400).json({ success: false, message: 'La conversión para este lead ya fue enviada.' });
+        if (contactData.registrationStatus === 'completed') return res.status(400).json({ success: false, message: 'Este contacto ya fue registrado.' });
+        
+        // Si viene de un anuncio, enviar evento.
+        if (contactData.adReferral) {
+            await sendConversionEvent(
+                'CompleteRegistration',
+                { wa_id: contactData.wa_id, profile: { name: contactData.name } },
+                contactData.adReferral
+            );
         }
-        if (!contactData.adReferral) {
-            return res.status(400).json({ success: false, message: 'Este contacto no provino de un anuncio de Meta. Usa el endpoint manual.' });
-        }
-
-        await sendLeadConversionEvent(
-            { wa_id: contactData.wa_id, profile: { name: contactData.name } },
-            contactData.adReferral
-        );
 
         await contactRef.update({
-            isLead: true,
-            conversionSent: true,
-            leadSource: 'meta_ad'
+            registrationStatus: 'completed',
+            registrationSource: contactData.adReferral ? 'meta_ad' : 'manual',
+            registrationDate: admin.firestore.FieldValue.serverTimestamp()
         });
 
-        res.status(200).json({ success: true, message: 'Contacto marcado como Lead y evento de conversión enviado a Meta.' });
-
+        res.status(200).json({ success: true, message: 'Contacto marcado como "Registro Completado".' });
     } catch (error) {
-        console.error(`Error al marcar como lead a ${contactId}:`, error.response ? error.response.data : error.message);
         res.status(500).json({ success: false, message: 'Error al procesar la solicitud.' });
     }
 });
 
-app.post('/api/contacts/:contactId/mark-as-lead-manual', async (req, res) => {
+// --- NUEVO: Endpoint para marcar una compra ---
+app.post('/api/contacts/:contactId/mark-as-purchase', async (req, res) => {
     const { contactId } = req.params;
+    const { value, currency } = req.body;
+
+    if (!value || !currency || isNaN(parseFloat(value))) {
+        return res.status(400).json({ success: false, message: 'Se requiere un valor y una moneda válidos.' });
+    }
+
     const contactRef = db.collection('contacts_whatsapp').doc(contactId);
-    
     try {
         const contactDoc = await contactRef.get();
-        if (!contactDoc.exists) {
-            return res.status(404).json({ success: false, message: 'Contacto no encontrado.' });
-        }
+        if (!contactDoc.exists) return res.status(404).json({ success: false, message: 'Contacto no encontrado.' });
         
-        await contactRef.update({
-            isLead: true,
-            leadSource: 'manual'
-        });
-        
-        res.status(200).json({ success: true, message: 'Contacto marcado como Lead manualmente.' });
+        const contactData = contactDoc.data();
+        if (contactData.purchaseStatus === 'completed') return res.status(400).json({ success: false, message: 'Este contacto ya realizó una compra.' });
 
+        // Si viene de un anuncio, enviar evento de compra
+        if (contactData.adReferral) {
+            await sendConversionEvent(
+                'Purchase',
+                { wa_id: contactData.wa_id, profile: { name: contactData.name } },
+                contactData.adReferral,
+                { value: parseFloat(value), currency }
+            );
+        }
+
+        await contactRef.update({
+            purchaseStatus: 'completed',
+            purchaseValue: parseFloat(value),
+            purchaseCurrency: currency,
+            purchaseDate: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        res.status(200).json({ success: true, message: 'Compra registrada y evento enviado a Meta.' });
     } catch (error) {
-        console.error(`Error al marcar como lead manual a ${contactId}:`, error.message);
-        res.status(500).json({ success: false, message: 'Error al procesar la solicitud manual.' });
+        res.status(500).json({ success: false, message: 'Error al procesar la compra.' });
     }
 });
 
 
+// Rutas para obtener contactos y mensajes (sin cambios mayores)
 app.get('/api/contacts', async (req, res) => {
+    // ... código sin cambios
     try {
         const contactsSnapshot = await db.collection('contacts_whatsapp').orderBy('lastMessageTimestamp', 'desc').get();
         const contacts = [];
@@ -279,6 +308,7 @@ app.get('/api/contacts', async (req, res) => {
 });
 
 app.get('/api/contacts/:contactId/messages', async (req, res) => {
+    // ... código sin cambios
     try {
         const contactId = req.params.contactId;
         const messagesSnapshot = await db.collection('contacts_whatsapp').doc(contactId).collection('messages').orderBy('timestamp', 'asc').get();
@@ -294,6 +324,7 @@ app.get('/api/contacts/:contactId/messages', async (req, res) => {
 });
 
 app.post('/api/contacts/:contactId/messages', async (req, res) => {
+    // ... código sin cambios
     const { contactId } = req.params;
     const { text, fileUrl, fileType } = req.body;
     if (!text && !fileUrl) { 
@@ -367,6 +398,7 @@ app.post('/api/contacts/:contactId/messages', async (req, res) => {
         res.status(500).json({ success: false, message: 'Error al procesar el envío del mensaje.' });
     }
 });
+
 
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en el puerto ${PORT}`);
