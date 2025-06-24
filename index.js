@@ -35,7 +35,7 @@ function sha256(data) {
     return crypto.createHash('sha256').update(normalizedData).digest('hex');
 }
 
-// --- FUNCIÓN GENÉRICA PARA ENVIAR EVENTOS DE CONVERSIÓN A META (CORREGIDA Y MEJORADA) ---
+// --- FUNCIÓN GENÉRICA PARA ENVIAR EVENTOS DE CONVERSIÓN A META (CORREGIDA) ---
 const sendConversionEvent = async (eventName, contactInfo, referralInfo, customData = {}) => {
     if (!META_PIXEL_ID || !META_CAPI_ACCESS_TOKEN) {
         console.warn('Advertencia: Faltan credenciales de Meta. No se enviará el evento.');
@@ -44,18 +44,16 @@ const sendConversionEvent = async (eventName, contactInfo, referralInfo, customD
 
     const url = `https://graph.facebook.com/v19.0/${META_PIXEL_ID}/events`;
     const eventTime = Math.floor(Date.now() / 1000);
-    const eventId = `${eventName}_${contactInfo.wa_id}_${eventTime}`; // **MEJORA: Crear un event_id único
+    const eventId = `${eventName}_${contactInfo.wa_id}_${eventTime}`; 
 
-    // Construir user_data de forma segura, evitando valores nulos
     const userData = { ph: [] };
     if (contactInfo.wa_id) {
         userData.ph.push(sha256(contactInfo.wa_id));
     }
-    if (contactInfo.profile?.name) { // Usar optional chaining por seguridad
+    if (contactInfo.profile?.name) {
         userData.fn = sha256(contactInfo.profile.name);
     }
     
-    // Si no tenemos identificador de teléfono, no enviar el evento.
     if (userData.ph.length === 0) {
         console.error(`No se puede enviar el evento '${eventName}' porque falta el wa_id (número de teléfono).`);
         return;
@@ -72,8 +70,9 @@ const sendConversionEvent = async (eventName, contactInfo, referralInfo, customD
         data: [{
             event_name: eventName,
             event_time: eventTime,
-            event_id: eventId,                      // **MEJORA: Añadir el event_id para deduplicación
-            action_source: 'whatsapp',              // **CORRECCIÓN CLAVE: Cambiado de 'website' a 'whatsapp'
+            event_id: eventId,
+            // **CORRECCIÓN FINAL: Cambiado de 'whatsapp' a 'other' según el error de la API**
+            action_source: 'other', 
             user_data: userData,
             custom_data: finalCustomData
         }],
@@ -85,7 +84,6 @@ const sendConversionEvent = async (eventName, contactInfo, referralInfo, customD
         await axios.post(url, payload, { headers: { 'Authorization': `Bearer ${META_CAPI_ACCESS_TOKEN}`, 'Content-Type': 'application/json' } });
         console.log(`✅ Evento '${eventName}' enviado a Meta para ${contactInfo.wa_id}. Event ID: ${eventId}`);
     } catch (error) {
-        // Loguear el error detallado que devuelve la API de Meta
         console.error(`❌ Error al enviar evento '${eventName}' a Meta. Event ID: ${eventId}`, error.response ? JSON.stringify(error.response.data, null, 2) : error.message);
         throw new Error(`Falló el envío del evento '${eventName}' a Meta.`);
     }
@@ -123,7 +121,6 @@ app.post('/api/contacts/:contactId/mark-as-registration', async (req, res) => {
 
         res.status(200).json({ success: true, message: 'Contacto marcado como "Registro Completado".' });
     } catch (error) {
-        // La función sendConversionEvent ya loguea el error de Meta, aquí solo respondemos a nuestro frontend
         res.status(500).json({ success: false, message: 'Error al procesar la solicitud.' });
     }
 });
