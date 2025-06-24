@@ -1,5 +1,3 @@
-// --- START OF FILE index.js ---
-
 require('dotenv').config();
 const express = require('express');
 const admin = require('firebase-admin');
@@ -11,7 +9,7 @@ const axios = require('axios');
 const serviceAccount = require('./serviceAccountKey.json');
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: 'pedidos-con-gemini.firebasestorage.app' 
+  storageBucket: 'pedidos-con-gemini.firebasestorage.app'
 });
 const db = admin.firestore();
 const bucket = getStorage().bucket();
@@ -27,17 +25,11 @@ const PORT = process.env.PORT || 3000;
 const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
-// --- NUEVO: Variables de entorno de Meta ---
 const META_PIXEL_ID = process.env.META_PIXEL_ID;
 const META_CAPI_ACCESS_TOKEN = process.env.META_CAPI_ACCESS_TOKEN;
 
 
-// --- NUEVO: Función para enviar evento de conversión a Meta ---
-/**
- * Envía un evento "Lead" a la API de Conversiones de Meta.
- * @param {object} contactInfo - El objeto de contacto de WhatsApp con `wa_id` y `profile.name`.
- * @param {object} referralInfo - El objeto referral del mensaje de WhatsApp.
- */
+// --- FUNCIÓN PARA ENVIAR EVENTO DE CONVERSIÓN A META ---
 const sendLeadConversionEvent = async (contactInfo, referralInfo) => {
     if (!META_PIXEL_ID || !META_CAPI_ACCESS_TOKEN) {
         console.warn('Advertencia: Faltan las credenciales de Meta (PIXEL_ID o CAPI_ACCESS_TOKEN). No se enviará el evento de conversión.');
@@ -45,44 +37,33 @@ const sendLeadConversionEvent = async (contactInfo, referralInfo) => {
     }
 
     const url = `https://graph.facebook.com/v19.0/${META_PIXEL_ID}/events`;
-    
-    // El timestamp debe estar en segundos.
     const eventTime = Math.floor(Date.now() / 1000);
-    
-    // Preparamos los datos del usuario. El número de teléfono es el dato más valioso aquí.
     const userData = {
-        ph: [contactInfo.wa_id], // ph = phone, sin el '+' y solo números
-        fn: contactInfo.profile.name, // fn = first name
+        ph: [contactInfo.wa_id],
+        fn: contactInfo.profile.name,
     };
 
     const payload = {
-        data: [
-            {
-                event_name: 'Lead',
-                event_time: eventTime,
-                action_source: 'whatsapp',
-                user_data: userData,
-                custom_data: {
-                    lead_source: 'WhatsApp Ad',
-                    ad_headline: referralInfo.headline,
-                    ad_id: referralInfo.source_id
-                }
+        data: [{
+            event_name: 'Lead',
+            event_time: eventTime,
+            action_source: 'whatsapp',
+            user_data: userData,
+            custom_data: {
+                lead_source: 'WhatsApp Ad',
+                ad_headline: referralInfo.headline,
+                ad_id: referralInfo.source_id
             }
-        ],
-        // Opcional: Para depuración en el Administrador de Eventos. Eliminar en producción.
-        // test_event_code: 'TESTXXXXX' 
+        }],
+        // test_event_code: 'TU_CODIGO_DE_PRUEBA' // Descomentar solo para pruebas
     };
 
     try {
-        await axios.post(url, payload, {
-            headers: {
-                'Authorization': `Bearer ${META_CAPI_ACCESS_TOKEN}`,
-                'Content-Type': 'application/json'
-            }
-        });
+        await axios.post(url, payload, { headers: { 'Authorization': `Bearer ${META_CAPI_ACCESS_TOKEN}`, 'Content-Type': 'application/json' } });
         console.log(`✅ Evento 'Lead' enviado a Meta para el usuario ${contactInfo.wa_id}. Proveniente del anuncio: ${referralInfo.source_id}`);
     } catch (error) {
         console.error("❌ Error al enviar evento de conversión a Meta:", error.response ? error.response.data : error.message);
+        throw new Error('Falló el envío del evento a Meta.');
     }
 };
 
@@ -91,6 +72,7 @@ const sendLeadConversionEvent = async (contactInfo, referralInfo) => {
 app.get('/', (req, res) => {
   res.send('¡El backend del CRM de WhatsApp está vivo y listo para servir y enviar datos!');
 });
+
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
@@ -107,7 +89,6 @@ app.get('/webhook', (req, res) => {
   }
 });
 
-
 // Ruta para RECIBIR los mensajes y ACTUALIZACIONES DE ESTADO
 app.post('/webhook', async (req, res) => {
     const entry = req.body.entry?.[0];
@@ -119,23 +100,31 @@ app.post('/webhook', async (req, res) => {
             const message = value.messages[0];
             const contactInfo = value.contacts[0];
             const from = message.from;
-            
-            // --- MODIFICADO: Lógica de detección de anuncios ---
-            // Si el mensaje viene de un anuncio, `message.referral` existirá.
-            if (message.referral && message.referral.source_type === 'ad') {
-                console.log(`📬 Mensaje recibido de un anuncio de Meta. ID del Anuncio: ${message.referral.source_id}`);
-                // Enviamos el evento de conversión a Meta en segundo plano.
-                // No usamos await aquí para no retrasar la respuesta al webhook.
-                sendLeadConversionEvent(contactInfo, message.referral);
-            }
-
             const timestamp = admin.firestore.FieldValue.serverTimestamp();
             const contactRef = db.collection('contacts_whatsapp').doc(from);
             
+            let contactData = {
+                lastMessageTimestamp: timestamp,
+                name: contactInfo.profile.name,
+                wa_id: contactInfo.wa_id,
+                unreadCount: admin.firestore.FieldValue.increment(1)
+            };
+
+            if (message.referral && message.referral.source_type === 'ad') {
+                console.log(`📬 Mensaje de anuncio detectado de ${from}. Guardando información de referral.`);
+                contactData.adReferral = {
+                    source_id: message.referral.source_id,
+                    headline: message.referral.headline,
+                    source_type: message.referral.source_type
+                };
+                contactData.isLead = false; 
+                contactData.conversionSent = false;
+            }
+
             let messageData = {
                 timestamp: timestamp,
                 from: from,
-                status: 'received' // Mensaje recibido del usuario
+                status: 'received'
             };
             let lastMessageText = '';
 
@@ -169,16 +158,10 @@ app.post('/webhook', async (req, res) => {
                 }
 
                 await contactRef.collection('messages').add(messageData);
+                contactData.lastMessage = lastMessageText;
+                await contactRef.set(contactData, { merge: true });
 
-                await contactRef.set({
-                    lastMessageTimestamp: timestamp,
-                    name: contactInfo.profile.name,
-                    lastMessage: lastMessageText,
-                    wa_id: contactInfo.wa_id,
-                    unreadCount: admin.firestore.FieldValue.increment(1)
-                }, { merge: true });
-
-                console.log(`Mensaje (${message.type}) de ${from} guardado y contador de no leídos incrementado.`);
+                console.log(`Mensaje (${message.type}) de ${from} guardado.`);
 
             } catch (error) {
                 console.error("Error procesando webhook de mensaje:", error.response ? error.response.data : error.message);
@@ -208,6 +191,44 @@ app.post('/webhook', async (req, res) => {
     res.sendStatus(200);
 });
 
+app.post('/api/contacts/:contactId/mark-as-lead', async (req, res) => {
+    const { contactId } = req.params;
+    const contactRef = db.collection('contacts_whatsapp').doc(contactId);
+
+    try {
+        const contactDoc = await contactRef.get();
+        if (!contactDoc.exists) {
+            return res.status(404).json({ success: false, message: 'Contacto no encontrado.' });
+        }
+
+        const contactData = contactDoc.data();
+
+        if (contactData.conversionSent) {
+            return res.status(400).json({ success: false, message: 'La conversión para este lead ya fue enviada.' });
+        }
+        if (!contactData.adReferral) {
+            return res.status(400).json({ success: false, message: 'Este contacto no provino de un anuncio de Meta.' });
+        }
+
+        await sendLeadConversionEvent(
+            { wa_id: contactData.wa_id, profile: { name: contactData.name } },
+            contactData.adReferral
+        );
+
+        await contactRef.update({
+            isLead: true,
+            conversionSent: true
+        });
+
+        res.status(200).json({ success: true, message: 'Contacto marcado como Lead y evento de conversión enviado a Meta.' });
+
+    } catch (error) {
+        console.error(`Error al marcar como lead a ${contactId}:`, error.response ? error.response.data : error.message);
+        res.status(500).json({ success: false, message: 'Error al procesar la solicitud.' });
+    }
+});
+
+
 app.get('/api/contacts', async (req, res) => {
     try {
         const contactsSnapshot = await db.collection('contacts_whatsapp').orderBy('lastMessageTimestamp', 'desc').get();
@@ -221,6 +242,7 @@ app.get('/api/contacts', async (req, res) => {
         res.status(500).send('Error al obtener la lista de contactos.');
     }
 });
+
 app.get('/api/contacts/:contactId/messages', async (req, res) => {
     try {
         const contactId = req.params.contactId;
@@ -236,7 +258,6 @@ app.get('/api/contacts/:contactId/messages', async (req, res) => {
     }
 });
 
-// --- Endpoint de envío de mensajes con validación de 24 horas ---
 app.post('/api/contacts/:contactId/messages', async (req, res) => {
     const { contactId } = req.params;
     const { text, fileUrl, fileType } = req.body;
@@ -245,7 +266,6 @@ app.post('/api/contacts/:contactId/messages', async (req, res) => {
     }
 
     try {
-        // Validación de la ventana de 24 horas
         const messagesRef = db.collection('contacts_whatsapp').doc(contactId).collection('messages');
         const lastReceivedQuery = messagesRef.where('status', '==', 'received').orderBy('timestamp', 'desc').limit(1);
         const lastReceivedSnapshot = await lastReceivedQuery.get();
@@ -267,15 +287,13 @@ app.post('/api/contacts/:contactId/messages', async (req, res) => {
             const timeDifference = now.getTime() - lastMessageDate.getTime();
 
             if (timeDifference > twentyFourHoursInMillis) {
-                // --- MODIFICACIÓN CLAVE: Mensaje de error actualizado ---
                 return res.status(403).json({
                     success: false,
                     message: 'No se puede enviar el mensaje. Han pasado más de 24 horas'
                 });
             }
         }
-        // Fin de la validación
-
+        
         let messagePayload = { messaging_product: 'whatsapp', to: contactId, };
         let firestoreMessage = { timestamp: admin.firestore.FieldValue.serverTimestamp(), status: 'sent' };
         let lastMessageText = '';
