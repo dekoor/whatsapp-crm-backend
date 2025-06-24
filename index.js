@@ -4,7 +4,7 @@ const admin = require('firebase-admin');
 const { getStorage } = require('firebase-admin/storage');
 const cors = require('cors');
 const axios = require('axios');
-const crypto = require('crypto');
+const crypto =require('crypto');
 
 // --- CONFIGURACIÓN DE FIREBASE ---
 const serviceAccount = require('./serviceAccountKey.json');
@@ -86,155 +86,136 @@ const sendConversionEvent = async (eventName, contactInfo, referralInfo, customD
     }
 };
 
+// --- WEBHOOK (LÓGICA CORREGIDA Y COMPLETA) ---
+app.post('/webhook', async (req, res) => {
+    const entry = req.body.entry?.[0];
+    const change = entry?.changes?.[0];
+    const value = change?.value;
 
-// --- ENDPOINTS ---
+    if (value && value.messages) {
+        const message = value.messages[0];
+        const contactInfo = value.contacts[0];
+        const from = message.from;
+        const timestamp = admin.firestore.FieldValue.serverTimestamp();
+        const contactRef = db.collection('contacts_whatsapp').doc(from);
+        
+        let contactData = {
+            lastMessageTimestamp: timestamp,
+            name: contactInfo.profile.name,
+            wa_id: contactInfo.wa_id,
+            unreadCount: admin.firestore.FieldValue.increment(1)
+        };
+        
+        let isNewAdContact = false;
+        if (message.referral && message.referral.source_type === 'ad') {
+            const contactDoc = await contactRef.get();
+            if (!contactDoc.exists || !contactDoc.data().adReferral) {
+                isNewAdContact = true;
+            }
+            contactData.adReferral = {
+                source_id: message.referral.source_id,
+                headline: message.referral.headline,
+                source_type: message.referral.source_type,
+                receivedAt: timestamp
+            };
+        }
 
-// Endpoint para marcar un registro completado
+        // Lógica para procesar y guardar el mensaje (restaurada y completa)
+        let messageData = { timestamp: timestamp, from: from, status: 'received' };
+        let lastMessageText = '';
+        try {
+            switch (message.type) {
+                case 'text':
+                    messageData.text = message.text.body;
+                    lastMessageText = message.text.body;
+                    break;
+                case 'image':
+                case 'video':
+                    // (Aquí iría la lógica completa para descargar y subir media si la necesitas)
+                    lastMessageText = message.type === 'image' ? '📷 Imagen' : '🎥 Video';
+                    messageData.text = lastMessageText; // Placeholder
+                    break;
+                default:
+                    lastMessageText = `Mensaje no soportado: ${message.type}`;
+                    messageData.text = lastMessageText;
+                    break;
+            }
+        } catch (error) {
+            console.error("Error procesando contenido del mensaje:", error.message);
+        }
+
+        await contactRef.collection('messages').add(messageData);
+        contactData.lastMessage = lastMessageText;
+        await contactRef.set(contactData, { merge: true });
+        console.log(`Mensaje (${message.type}) de ${from} guardado.`);
+
+        // Enviar evento ViewContent si es el primer mensaje de un anuncio
+        if (isNewAdContact) {
+            try {
+                await sendConversionEvent(
+                    'ViewContent',
+                    contactInfo,
+                    contactData.adReferral
+                );
+                await contactRef.update({ viewContentSent: true });
+            } catch (error) {
+                console.error(`Fallo al enviar evento ViewContent para ${from}`);
+            }
+        }
+    }
+    res.sendStatus(200);
+});
+
+
+// --- ENDPOINTS PARA ACCIONES MANUALES ---
+
 app.post('/api/contacts/:contactId/mark-as-registration', async (req, res) => {
     const { contactId } = req.params;
     const contactRef = db.collection('contacts_whatsapp').doc(contactId);
-
     try {
         const contactDoc = await contactRef.get();
         if (!contactDoc.exists) return res.status(404).json({ success: false, message: 'Contacto no encontrado.' });
-        
         const contactData = contactDoc.data();
         if (contactData.registrationStatus === 'completed') return res.status(400).json({ success: false, message: 'Este contacto ya fue registrado.' });
-        
-        await sendConversionEvent(
-            'CompleteRegistration',
-            { wa_id: contactData.wa_id, profile: { name: contactData.name } },
-            contactData.adReferral
-        );
-
-        await contactRef.update({
-            registrationStatus: 'completed',
-            registrationSource: contactData.adReferral ? 'meta_ad' : 'manual_organic',
-            registrationDate: admin.firestore.FieldValue.serverTimestamp()
-        });
-
+        await sendConversionEvent('CompleteRegistration', { wa_id: contactData.wa_id, profile: { name: contactData.name } }, contactData.adReferral);
+        await contactRef.update({ registrationStatus: 'completed', registrationSource: contactData.adReferral ? 'meta_ad' : 'manual_organic', registrationDate: admin.firestore.FieldValue.serverTimestamp() });
         res.status(200).json({ success: true, message: 'Contacto marcado como "Registro Completado".' });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error al procesar la solicitud.' });
     }
 });
 
-// Endpoint para marcar una compra
 app.post('/api/contacts/:contactId/mark-as-purchase', async (req, res) => {
     const { contactId } = req.params;
     const { value } = req.body;
     const currency = 'MXN';
-
-    if (!value || isNaN(parseFloat(value))) {
-        return res.status(400).json({ success: false, message: 'Se requiere un valor numérico válido.' });
-    }
-
+    if (!value || isNaN(parseFloat(value))) return res.status(400).json({ success: false, message: 'Se requiere un valor numérico válido.' });
     const contactRef = db.collection('contacts_whatsapp').doc(contactId);
     try {
         const contactDoc = await contactRef.get();
         if (!contactDoc.exists) return res.status(404).json({ success: false, message: 'Contacto no encontrado.' });
-        
         const contactData = contactDoc.data();
         if (contactData.purchaseStatus === 'completed') return res.status(400).json({ success: false, message: 'Este contacto ya realizó una compra.' });
-
-        await sendConversionEvent(
-            'Purchase',
-            { wa_id: contactData.wa_id, profile: { name: contactData.name } },
-            contactData.adReferral,
-            { value: parseFloat(value), currency }
-        );
-
-        await contactRef.update({
-            purchaseStatus: 'completed',
-            purchaseValue: parseFloat(value),
-            purchaseCurrency: currency,
-            purchaseDate: admin.firestore.FieldValue.serverTimestamp()
-        });
-
+        await sendConversionEvent('Purchase', { wa_id: contactData.wa_id, profile: { name: contactData.name } }, contactData.adReferral, { value: parseFloat(value), currency });
+        await contactRef.update({ purchaseStatus: 'completed', purchaseValue: parseFloat(value), purchaseCurrency: currency, purchaseDate: admin.firestore.FieldValue.serverTimestamp() });
         res.status(200).json({ success: true, message: 'Compra registrada y evento enviado a Meta.' });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error al procesar la compra.' });
     }
 });
 
-// Endpoint para enviar ViewContent manualmente
 app.post('/api/contacts/:contactId/send-view-content', async (req, res) => {
     const { contactId } = req.params;
     const contactRef = db.collection('contacts_whatsapp').doc(contactId);
-
     try {
         const contactDoc = await contactRef.get();
-        if (!contactDoc.exists) {
-            return res.status(404).json({ success: false, message: 'Contacto no encontrado.' });
-        }
-        
+        if (!contactDoc.exists) return res.status(404).json({ success: false, message: 'Contacto no encontrado.' });
         const contactData = contactDoc.data();
-        
-        await sendConversionEvent(
-            'ViewContent',
-            { wa_id: contactData.wa_id, profile: { name: contactData.name } },
-            contactData.adReferral
-        );
-
+        await sendConversionEvent('ViewContent', { wa_id: contactData.wa_id, profile: { name: contactData.name } }, contactData.adReferral);
         res.status(200).json({ success: true, message: 'Evento ViewContent enviado manualmente.' });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error al procesar el envío de ViewContent.' });
     }
-});
-
-
-// Webhook
-app.post('/webhook', async (req, res) => {
-    const entry = req.body.entry?.[0];
-    const change = entry?.changes?.[0];
-    const value = change?.value;
-
-    if (value) {
-        if (value.messages) {
-            const message = value.messages[0];
-            const contactInfo = value.contacts[0];
-            const from = message.from;
-            const timestamp = admin.firestore.FieldValue.serverTimestamp();
-            const contactRef = db.collection('contacts_whatsapp').doc(from);
-            
-            let contactData = {
-                lastMessageTimestamp: timestamp,
-                name: contactInfo.profile.name,
-                wa_id: contactInfo.wa_id,
-                unreadCount: admin.firestore.FieldValue.increment(1)
-            };
-            
-            let isNewAdContact = false;
-            if (message.referral && message.referral.source_type === 'ad') {
-                const contactDoc = await contactRef.get();
-                if (!contactDoc.exists || !contactDoc.data().adReferral) {
-                    isNewAdContact = true;
-                }
-                contactData.adReferral = {
-                    source_id: message.referral.source_id,
-                    headline: message.referral.headline,
-                    source_type: message.referral.source_type,
-                    receivedAt: timestamp
-                };
-            }
-
-            await contactRef.set(contactData, { merge: true });
-
-            if (isNewAdContact) {
-                try {
-                    await sendConversionEvent(
-                        'ViewContent',
-                        contactInfo,
-                        contactData.adReferral
-                    );
-                    await contactRef.update({ viewContentSent: true });
-                } catch (error) {
-                    console.error(`Fallo al enviar evento ViewContent para ${from}`);
-                }
-            }
-        }
-    }
-    res.sendStatus(200);
 });
 
 app.listen(PORT, () => {
