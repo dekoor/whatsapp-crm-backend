@@ -207,7 +207,7 @@ app.post('/api/contacts/:contactId/mark-as-lead', async (req, res) => {
             return res.status(400).json({ success: false, message: 'La conversión para este lead ya fue enviada.' });
         }
         if (!contactData.adReferral) {
-            return res.status(400).json({ success: false, message: 'Este contacto no provino de un anuncio de Meta.' });
+            return res.status(400).json({ success: false, message: 'Este contacto no provino de un anuncio de Meta. Usa el endpoint manual.' });
         }
 
         await sendLeadConversionEvent(
@@ -217,7 +217,8 @@ app.post('/api/contacts/:contactId/mark-as-lead', async (req, res) => {
 
         await contactRef.update({
             isLead: true,
-            conversionSent: true
+            conversionSent: true,
+            leadSource: 'meta_ad'
         });
 
         res.status(200).json({ success: true, message: 'Contacto marcado como Lead y evento de conversión enviado a Meta.' });
@@ -225,6 +226,29 @@ app.post('/api/contacts/:contactId/mark-as-lead', async (req, res) => {
     } catch (error) {
         console.error(`Error al marcar como lead a ${contactId}:`, error.response ? error.response.data : error.message);
         res.status(500).json({ success: false, message: 'Error al procesar la solicitud.' });
+    }
+});
+
+app.post('/api/contacts/:contactId/mark-as-lead-manual', async (req, res) => {
+    const { contactId } = req.params;
+    const contactRef = db.collection('contacts_whatsapp').doc(contactId);
+    
+    try {
+        const contactDoc = await contactRef.get();
+        if (!contactDoc.exists) {
+            return res.status(404).json({ success: false, message: 'Contacto no encontrado.' });
+        }
+        
+        await contactRef.update({
+            isLead: true,
+            leadSource: 'manual'
+        });
+        
+        res.status(200).json({ success: true, message: 'Contacto marcado como Lead manualmente.' });
+
+    } catch (error) {
+        console.error(`Error al marcar como lead manual a ${contactId}:`, error.message);
+        res.status(500).json({ success: false, message: 'Error al procesar la solicitud manual.' });
     }
 });
 
