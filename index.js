@@ -1,3 +1,5 @@
+// index (1).js - VERSIÓN MEJORADA
+
 require('dotenv').config();
 const express = require('express');
 const admin = require('firebase-admin');
@@ -6,7 +8,7 @@ const cors = require('cors');
 const axios = require('axios');
 const crypto = require('crypto');
 
-// --- CONFIGURACIÓN DE FIREBASE ---
+// --- CONFIGURACIÓN DE FIREBASE (sin cambios) ---
 const serviceAccount = require('./serviceAccountKey.json');
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -16,7 +18,7 @@ const db = admin.firestore();
 const bucket = getStorage().bucket();
 console.log('Conexión con Firebase (Firestore y Storage) establecida.');
 
-// --- CONFIGURACIÓN DEL SERVIDOR EXPRESS ---
+// --- CONFIGURACIÓN DEL SERVIDOR EXPRESS (sin cambios) ---
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -28,14 +30,15 @@ const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 const META_PIXEL_ID = process.env.META_PIXEL_ID;
 const META_CAPI_ACCESS_TOKEN = process.env.META_CAPI_ACCESS_TOKEN;
 
-// --- FUNCIÓN PARA HASHEAR DATOS ---
+// --- FUNCIÓN PARA HASHEAR DATOS (sin cambios) ---
 function sha256(data) {
     if (!data) return null;
     const normalizedData = typeof data === 'string' ? data.toLowerCase().replace(/\s/g, '') : data.toString();
     return crypto.createHash('sha256').update(normalizedData).digest('hex');
 }
 
-// --- FUNCIÓN GENÉRICA PARA ENVIAR EVENTOS DE CONVERSIÓN A META (MODIFICADA) ---
+// --- FUNCIÓN GENÉRICA PARA ENVIAR EVENTOS DE CONVERSIÓN (MODIFICADA) ---
+// --> CAMBIO: La función ahora acepta y procesa fbc, email y otros datos del cliente.
 const sendConversionEvent = async (eventName, actionSource, contactInfo, referralInfo, customData = {}) => {
     if (!META_PIXEL_ID || !META_CAPI_ACCESS_TOKEN) {
         console.warn('Advertencia: Faltan credenciales de Meta. No se enviará el evento.');
@@ -46,16 +49,15 @@ const sendConversionEvent = async (eventName, actionSource, contactInfo, referra
     const eventTime = Math.floor(Date.now() / 1000);
     const eventId = `${eventName}_${contactInfo.wa_id}_${eventTime}`; 
 
-    const userData = { ph: [] };
-    if (contactInfo.wa_id) {
-        userData.ph.push(sha256(contactInfo.wa_id));
-    }
-    if (contactInfo.profile?.name) {
-        userData.fn = sha256(contactInfo.profile.name);
-    }
+    // --> CAMBIO: userData ahora es mucho más rico.
+    const userData = { ph: [], em: [] };
+    if (contactInfo.wa_id) userData.ph.push(sha256(contactInfo.wa_id));
+    if (contactInfo.email) userData.em.push(sha256(contactInfo.email)); // <-- Nuevo: Email
+    if (contactInfo.profile?.name) userData.fn = sha256(contactInfo.profile.name);
+    // --> Podrías añadir más datos aquí si los recopilas: ln (apellido), ct (ciudad), st (estado), etc.
     
-    if (userData.ph.length === 0) {
-        console.error(`No se puede enviar el evento '${eventName}' porque falta el wa_id (número de teléfono).`);
+    if (userData.ph.length === 0 && userData.em.length === 0) {
+        console.error(`No se puede enviar el evento '${eventName}' porque faltan identificadores de usuario (teléfono o email).`);
         return;
     }
 
@@ -71,15 +73,23 @@ const sendConversionEvent = async (eventName, actionSource, contactInfo, referra
             event_name: eventName,
             event_time: eventTime,
             event_id: eventId,
-            action_source: actionSource, // Se usa el nuevo parámetro
+            action_source: actionSource,
             user_data: userData,
-            custom_data: finalCustomData
+            custom_data: finalCustomData,
+            // --> CAMBIO: Añadimos event_source_url y fbc para una atribución de máxima calidad.
+            event_source_url: referralInfo?.source_url, // <-- Nuevo: URL del anuncio
+            fbc: referralInfo?.fbc, // <-- Nuevo: Facebook Click ID
         }],
         // test_event_code: "YOUR_TEST_CODE_HERE",
     };
+    
+    // Eliminar claves nulas o indefinidas del payload para no enviar datos vacíos
+    if (!payload.data[0].event_source_url) delete payload.data[0].event_source_url;
+    if (!payload.data[0].fbc) delete payload.data[0].fbc;
+
 
     try {
-        console.log(`Enviando evento de PRODUCCIÓN '${eventName}' con action_source '${actionSource}' para ${contactInfo.wa_id}.`);
+        console.log(`Enviando evento de PRODUCCIÓN '${eventName}' para ${contactInfo.wa_id}. Payload:`, JSON.stringify(payload, null, 2));
         await axios.post(url, payload, { headers: { 'Authorization': `Bearer ${META_CAPI_ACCESS_TOKEN}`, 'Content-Type': 'application/json' } });
         console.log(`✅ Evento de PRODUCCIÓN '${eventName}' enviado a Meta.`);
     } catch (error) {
@@ -88,7 +98,7 @@ const sendConversionEvent = async (eventName, actionSource, contactInfo, referra
     }
 };
 
-// --- WEBHOOK DE WHATSAPP ---
+// --- WEBHOOK DE WHATSAPP (MODIFICADO) ---
 app.post('/webhook', async (req, res) => {
     const entry = req.body.entry?.[0];
     const change = entry?.changes?.[0];
@@ -109,6 +119,7 @@ app.post('/webhook', async (req, res) => {
         };
         
         let isNewAdContact = false;
+        // --> CAMBIO: Capturamos todos los datos de referral
         if (message.referral && message.referral.source_type === 'ad') {
             const contactDoc = await contactRef.get();
             if (!contactDoc.exists || !contactDoc.data().adReferral) {
@@ -118,6 +129,8 @@ app.post('/webhook', async (req, res) => {
                 source_id: message.referral.source_id,
                 headline: message.referral.headline,
                 source_type: message.referral.source_type,
+                source_url: message.referral.source_url, // <-- Nuevo
+                fbc: message.referral.ref, // <-- Nuevo (El 'ref' suele ser el fbc)
                 receivedAt: timestamp
             };
         }
@@ -126,23 +139,11 @@ app.post('/webhook', async (req, res) => {
         let lastMessageText = '';
         try {
             switch (message.type) {
-                case 'text':
-                    messageData.text = message.text.body;
-                    lastMessageText = message.text.body;
-                    break;
-                case 'image':
-                case 'video':
-                    lastMessageText = message.type === 'image' ? '📷 Imagen' : '🎥 Video';
-                    messageData.text = lastMessageText;
-                    break;
-                default:
-                    lastMessageText = `Mensaje no soportado: ${message.type}`;
-                    messageData.text = lastMessageText;
-                    break;
+                case 'text': messageData.text = message.text.body; lastMessageText = message.text.body; break;
+                case 'image': case 'video': lastMessageText = message.type === 'image' ? '📷 Imagen' : '🎥 Video'; messageData.text = lastMessageText; break;
+                default: lastMessageText = `Mensaje no soportado: ${message.type}`; messageData.text = lastMessageText; break;
             }
-        } catch (error) {
-            console.error("Error procesando contenido del mensaje:", error.message);
-        }
+        } catch (error) { console.error("Error procesando contenido del mensaje:", error.message); }
 
         await contactRef.collection('messages').add(messageData);
         contactData.lastMessage = lastMessageText;
@@ -151,24 +152,23 @@ app.post('/webhook', async (req, res) => {
 
         if (isNewAdContact) {
             try {
-                // Se usa 'website' para ViewContent como sugiere el error de Meta
-                await sendConversionEvent(
-                    'ViewContent',
-                    'website', 
-                    contactInfo,
-                    contactData.adReferral
-                );
-                await contactRef.update({ viewContentSent: true });
+                // --> CAMBIO: Enviamos ViewContent Y Lead para un seguimiento más completo.
+                // Se usa 'website' para ViewContent/Lead como punto de origen de la interacción con el anuncio.
+                await sendConversionEvent('ViewContent', 'website', contactInfo, contactData.adReferral);
+                await sendConversionEvent('Lead', 'website', contactInfo, contactData.adReferral);
+
+                await contactRef.update({ viewContentSent: true, leadEventSent: true });
             } catch (error) {
-                console.error(`Fallo al enviar evento ViewContent para ${from}`);
+                console.error(`Fallo al enviar eventos iniciales para ${from}:`, error.message);
             }
         }
     }
     res.sendStatus(200);
 });
 
-// --- ENDPOINT PARA ENVIAR MENSAJES DESDE EL CRM ---
+// --- ENDPOINT PARA ENVIAR MENSAJES (sin cambios) ---
 app.post('/api/contacts/:contactId/messages', async (req, res) => {
+    // ... (código sin cambios)
     const { contactId } = req.params;
     const { text, fileUrl, fileType } = req.body;
 
@@ -228,7 +228,7 @@ app.post('/api/contacts/:contactId/messages', async (req, res) => {
 });
 
 
-// --- ENDPOINTS PARA ACCIONES MANUALES ---
+// --- ENDPOINTS PARA ACCIONES MANUALES (MODIFICADOS) ---
 
 app.post('/api/contacts/:contactId/mark-as-registration', async (req, res) => {
     const { contactId } = req.params;
@@ -236,11 +236,18 @@ app.post('/api/contacts/:contactId/mark-as-registration', async (req, res) => {
     try {
         const contactDoc = await contactRef.get();
         if (!contactDoc.exists) return res.status(404).json({ success: false, message: 'Contacto no encontrado.' });
+        
         const contactData = contactDoc.data();
         if (contactData.registrationStatus === 'completed') return res.status(400).json({ success: false, message: 'Este contacto ya fue registrado.' });
         
-        // Se usa 'chat' porque la acción ocurre en el CRM
-        await sendConversionEvent('CompleteRegistration', 'chat', { wa_id: contactData.wa_id, profile: { name: contactData.name } }, contactData.adReferral);
+        // --> CAMBIO: Pasamos el objeto de contacto completo para que sendConversionEvent tenga acceso a email, etc.
+        const contactInfoForEvent = {
+            wa_id: contactData.wa_id,
+            profile: { name: contactData.name },
+            email: contactData.email // <-- Nuevo: se usará si existe en Firestore
+        };
+
+        await sendConversionEvent('CompleteRegistration', 'chat', contactInfoForEvent, contactData.adReferral);
         await contactRef.update({ registrationStatus: 'completed', registrationSource: contactData.adReferral ? 'meta_ad' : 'manual_organic', registrationDate: admin.firestore.FieldValue.serverTimestamp() });
         res.status(200).json({ success: true, message: 'Contacto marcado como "Registro Completado".' });
     } catch (error) {
@@ -253,15 +260,23 @@ app.post('/api/contacts/:contactId/mark-as-purchase', async (req, res) => {
     const { value } = req.body;
     const currency = 'MXN';
     if (!value || isNaN(parseFloat(value))) return res.status(400).json({ success: false, message: 'Se requiere un valor numérico válido.' });
+    
     const contactRef = db.collection('contacts_whatsapp').doc(contactId);
     try {
         const contactDoc = await contactRef.get();
         if (!contactDoc.exists) return res.status(404).json({ success: false, message: 'Contacto no encontrado.' });
+        
         const contactData = contactDoc.data();
         if (contactData.purchaseStatus === 'completed') return res.status(400).json({ success: false, message: 'Este contacto ya realizó una compra.' });
+        
+        // --> CAMBIO: Pasamos el objeto de contacto completo.
+        const contactInfoForEvent = {
+            wa_id: contactData.wa_id,
+            profile: { name: contactData.name },
+            email: contactData.email // <-- Nuevo
+        };
 
-        // Se usa 'chat' porque la acción ocurre en el CRM
-        await sendConversionEvent('Purchase', 'chat', { wa_id: contactData.wa_id, profile: { name: contactData.name } }, contactData.adReferral, { value: parseFloat(value), currency });
+        await sendConversionEvent('Purchase', 'chat', contactInfoForEvent, contactData.adReferral, { value: parseFloat(value), currency });
         await contactRef.update({ purchaseStatus: 'completed', purchaseValue: parseFloat(value), purchaseCurrency: currency, purchaseDate: admin.firestore.FieldValue.serverTimestamp() });
         res.status(200).json({ success: true, message: 'Compra registrada y evento enviado a Meta.' });
     } catch (error) {
@@ -269,6 +284,7 @@ app.post('/api/contacts/:contactId/mark-as-purchase', async (req, res) => {
     }
 });
 
+// --> CAMBIO: El endpoint 'send-view-content' es ahora menos necesario si se envía automáticamente, pero lo mantenemos por si acaso.
 app.post('/api/contacts/:contactId/send-view-content', async (req, res) => {
     const { contactId } = req.params;
     const contactRef = db.collection('contacts_whatsapp').doc(contactId);
@@ -277,8 +293,13 @@ app.post('/api/contacts/:contactId/send-view-content', async (req, res) => {
         if (!contactDoc.exists) return res.status(404).json({ success: false, message: 'Contacto no encontrado.' });
         const contactData = contactDoc.data();
 
-        // Se usa 'website' para ViewContent como sugiere el error de Meta
-        await sendConversionEvent('ViewContent', 'website', { wa_id: contactData.wa_id, profile: { name: contactData.name } }, contactData.adReferral);
+        const contactInfoForEvent = {
+            wa_id: contactData.wa_id,
+            profile: { name: contactData.name },
+            email: contactData.email // <-- Nuevo
+        };
+
+        await sendConversionEvent('ViewContent', 'website', contactInfoForEvent, contactData.adReferral);
         res.status(200).json({ success: true, message: 'Evento ViewContent enviado manualmente.' });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error al procesar el envío de ViewContent.' });
