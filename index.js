@@ -4,7 +4,7 @@ const admin = require('firebase-admin');
 const { getStorage } = require('firebase-admin/storage');
 const cors = require('cors');
 const axios = require('axios');
-const crypto =require('crypto');
+const crypto = require('crypto');
 
 // --- CONFIGURACIÓN DE FIREBASE ---
 const serviceAccount = require('./serviceAccountKey.json');
@@ -75,18 +75,21 @@ const sendConversionEvent = async (eventName, contactInfo, referralInfo, customD
             user_data: userData,
             custom_data: finalCustomData
         }],
+        // **CÓDIGO DE PRUEBA ACTUALIZADO**
+        test_event_code: "TEST13491",
     };
 
     try {
+        console.log(`🧪 Enviando evento de PRUEBA '${eventName}' para ${contactInfo.wa_id}.`);
         await axios.post(url, payload, { headers: { 'Authorization': `Bearer ${META_CAPI_ACCESS_TOKEN}`, 'Content-Type': 'application/json' } });
-        console.log(`✅ Evento '${eventName}' [${finalCustomData.lead_source}] enviado a Meta para ${contactInfo.wa_id}.`);
+        console.log(`✅ Evento de PRUEBA '${eventName}' enviado a Meta.`);
     } catch (error) {
-        console.error(`❌ Error al enviar evento '${eventName}' a Meta.`, error.response ? JSON.stringify(error.response.data, null, 2) : error.message);
-        throw new Error(`Falló el envío del evento '${eventName}' a Meta.`);
+        console.error(`❌ Error al enviar evento de PRUEBA '${eventName}' a Meta.`, error.response ? JSON.stringify(error.response.data, null, 2) : error.message);
+        throw new Error(`Falló el envío del evento de PRUEBA '${eventName}' a Meta.`);
     }
 };
 
-// --- WEBHOOK (LÓGICA CORREGIDA Y COMPLETA) ---
+// --- WEBHOOK ---
 app.post('/webhook', async (req, res) => {
     const entry = req.body.entry?.[0];
     const change = entry?.changes?.[0];
@@ -120,7 +123,6 @@ app.post('/webhook', async (req, res) => {
             };
         }
 
-        // Lógica para procesar y guardar el mensaje (restaurada y completa)
         let messageData = { timestamp: timestamp, from: from, status: 'received' };
         let lastMessageText = '';
         try {
@@ -131,9 +133,8 @@ app.post('/webhook', async (req, res) => {
                     break;
                 case 'image':
                 case 'video':
-                    // (Aquí iría la lógica completa para descargar y subir media si la necesitas)
                     lastMessageText = message.type === 'image' ? '📷 Imagen' : '🎥 Video';
-                    messageData.text = lastMessageText; // Placeholder
+                    messageData.text = lastMessageText;
                     break;
                 default:
                     lastMessageText = `Mensaje no soportado: ${message.type}`;
@@ -149,7 +150,6 @@ app.post('/webhook', async (req, res) => {
         await contactRef.set(contactData, { merge: true });
         console.log(`Mensaje (${message.type}) de ${from} guardado.`);
 
-        // Enviar evento ViewContent si es el primer mensaje de un anuncio
         if (isNewAdContact) {
             try {
                 await sendConversionEvent(
@@ -165,7 +165,6 @@ app.post('/webhook', async (req, res) => {
     }
     res.sendStatus(200);
 });
-
 
 // --- ENDPOINTS PARA ACCIONES MANUALES ---
 
