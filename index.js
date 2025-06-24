@@ -71,12 +71,11 @@ const sendConversionEvent = async (eventName, contactInfo, referralInfo, customD
             event_name: eventName,
             event_time: eventTime,
             event_id: eventId,
-            action_source: 'other', 
+            action_source: 'crm', 
             user_data: userData,
             custom_data: finalCustomData
         }],
-        // La siguiente línea se elimina para producción.
-        // test_event_code: "TEST13491",
+        // test_event_code: "YOUR_TEST_CODE_HERE",
     };
 
     try {
@@ -89,7 +88,7 @@ const sendConversionEvent = async (eventName, contactInfo, referralInfo, customD
     }
 };
 
-// --- WEBHOOK ---
+// --- WEBHOOK DE WHATSAPP ---
 app.post('/webhook', async (req, res) => {
     const entry = req.body.entry?.[0];
     const change = entry?.changes?.[0];
@@ -165,6 +164,70 @@ app.post('/webhook', async (req, res) => {
     }
     res.sendStatus(200);
 });
+
+
+// ==================================================================
+//      NUEVO ENDPOINT PARA ENVIAR MENSAJES DESDE EL CRM
+// ==================================================================
+app.post('/api/contacts/:contactId/messages', async (req, res) => {
+    const { contactId } = req.params;
+    const { text, fileUrl, fileType } = req.body;
+
+    if (!WHATSAPP_TOKEN || !PHONE_NUMBER_ID) {
+        return res.status(500).json({ success: false, message: 'Faltan las credenciales de WhatsApp en el servidor.' });
+    }
+
+    if (!text && !fileUrl) {
+        return res.status(400).json({ success: false, message: 'El mensaje no puede estar vacío.' });
+    }
+
+    const url = `https://graph.facebook.com/v19.0/${PHONE_NUMBER_ID}/messages`;
+    const headers = { 'Authorization': `Bearer ${WHATSAPP_TOKEN}`, 'Content-Type': 'application/json' };
+    
+    let messagePayload;
+
+    try {
+        if (text) {
+            messagePayload = { messaging_product: 'whatsapp', to: contactId, type: 'text', text: { body: text } };
+        } else if (fileUrl && fileType) {
+            const type = fileType.startsWith('image/') ? 'image' : 'video';
+            messagePayload = { messaging_product: 'whatsapp', to: contactId, type: type, [type]: { link: fileUrl } };
+        }
+
+        const response = await axios.post(url, messagePayload, { headers });
+        const messageId = response.data.messages[0].id;
+        
+        const contactRef = db.collection('contacts_whatsapp').doc(contactId);
+        const timestamp = admin.firestore.FieldValue.serverTimestamp();
+        let messageToSave = {
+            from: PHONE_NUMBER_ID, 
+            status: 'sent', 
+            timestamp: timestamp, 
+            id: messageId 
+        };
+
+        if (text) {
+            messageToSave.text = text;
+        } else if (fileUrl) {
+            messageToSave.fileUrl = fileUrl;
+            messageToSave.fileType = fileType;
+            messageToSave.text = fileType.startsWith('image/') ? '📷 Imagen' : '🎥 Video';
+        }
+        
+        await contactRef.collection('messages').add(messageToSave);
+        await contactRef.update({
+            lastMessage: messageToSave.text,
+            lastMessageTimestamp: timestamp,
+            unreadCount: 0 // Reseteamos el contador al enviar un mensaje
+        });
+
+        res.status(200).json({ success: true, message: 'Mensaje enviado correctamente.' });
+    } catch (error) {
+        console.error('Error al enviar mensaje vía WhatsApp API:', error.response ? JSON.stringify(error.response.data, null, 2) : error.message);
+        res.status(500).json({ success: false, message: 'Error al enviar el mensaje a través de WhatsApp.' });
+    }
+});
+
 
 // --- ENDPOINTS PARA ACCIONES MANUALES ---
 
