@@ -4,6 +4,7 @@ const admin = require('firebase-admin');
 const { getStorage } = require('firebase-admin/storage');
 const cors = require('cors');
 const axios = require('axios');
+const crypto = require('crypto'); // Módulo para encriptar
 
 // --- CONFIGURACIÓN DE FIREBASE ---
 const serviceAccount = require('./serviceAccountKey.json');
@@ -28,41 +29,51 @@ const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 const META_PIXEL_ID = process.env.META_PIXEL_ID;
 const META_CAPI_ACCESS_TOKEN = process.env.META_CAPI_ACCESS_TOKEN;
 
+// --- FUNCIÓN PARA HASHEAR DATOS ---
+function sha256(data) {
+    if (!data) return null;
+    // Normaliza a minúsculas y quita espacios para nombres, pero no para números
+    const normalizedData = typeof data === 'string' ? data.toLowerCase().replace(/\s/g, '') : data.toString();
+    return crypto.createHash('sha256').update(normalizedData).digest('hex');
+}
 
-// --- FUNCIÓN PARA ENVIAR EVENTO DE CONVERSIÓN A META ---
+// --- FUNCIÓN PARA ENVIAR EVENTO DE CONVERSIÓN A META (ACTUALIZADA)---
 const sendLeadConversionEvent = async (contactInfo, referralInfo) => {
     if (!META_PIXEL_ID || !META_CAPI_ACCESS_TOKEN) {
-        console.warn('Advertencia: Faltan las credenciales de Meta (PIXEL_ID o CAPI_ACCESS_TOKEN). No se enviará el evento de conversión.');
+        console.warn('Advertencia: Faltan credenciales de Meta. No se enviará el evento.');
         return;
     }
 
     const url = `https://graph.facebook.com/v19.0/${META_PIXEL_ID}/events`;
     const eventTime = Math.floor(Date.now() / 1000);
+    
+    // Hasheamos los datos del usuario antes de enviarlos
     const userData = {
-        ph: [contactInfo.wa_id],
-        fn: contactInfo.profile.name,
+        ph: [sha256(contactInfo.wa_id)],
+        fn: sha256(contactInfo.profile.name)
     };
 
     const payload = {
         data: [{
             event_name: 'Lead',
             event_time: eventTime,
-            action_source: 'whatsapp',
-            user_data: userData,
+            action_source: 'website', // Corregido
+            user_data: userData,      // Datos hasheados
             custom_data: {
                 lead_source: 'WhatsApp Ad',
                 ad_headline: referralInfo.headline,
                 ad_id: referralInfo.source_id
             }
         }],
-        // test_event_code: 'TU_CODIGO_DE_PRUEBA' // Descomentar solo para pruebas
+        // Asegúrate de que test_event_code esté comentado para campañas reales
+        // test_event_code: 'TU_CODIGO_DE_PRUEBA'
     };
 
     try {
         await axios.post(url, payload, { headers: { 'Authorization': `Bearer ${META_CAPI_ACCESS_TOKEN}`, 'Content-Type': 'application/json' } });
-        console.log(`✅ Evento 'Lead' enviado a Meta para el usuario ${contactInfo.wa_id}. Proveniente del anuncio: ${referralInfo.source_id}`);
+        console.log(`✅ Evento 'Lead' (hasheado) enviado a Meta para ${contactInfo.wa_id}.`);
     } catch (error) {
-        console.error("❌ Error al enviar evento de conversión a Meta:", error.response ? error.response.data : error.message);
+        console.error("❌ Error al enviar evento de conversión a Meta:", error.response ? JSON.stringify(error.response.data, null, 2) : error.message);
         throw new Error('Falló el envío del evento a Meta.');
     }
 };
