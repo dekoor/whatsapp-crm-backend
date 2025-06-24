@@ -28,14 +28,14 @@ const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 const META_PIXEL_ID = process.env.META_PIXEL_ID;
 const META_CAPI_ACCESS_TOKEN = process.env.META_CAPI_ACCESS_TOKEN;
 
-// --- FUNCIÓN PARA HASHEAR DATOS (Sin cambios) ---
+// --- FUNCIÓN PARA HASHEAR DATOS ---
 function sha256(data) {
     if (!data) return null;
     const normalizedData = typeof data === 'string' ? data.toLowerCase().replace(/\s/g, '') : data.toString();
     return crypto.createHash('sha256').update(normalizedData).digest('hex');
 }
 
-// --- FUNCIÓN GENÉRICA PARA ENVIAR EVENTOS DE CONVERSIÓN A META (CORREGIDA) ---
+// --- FUNCIÓN GENÉRICA PARA ENVIAR EVENTOS DE CONVERSIÓN A META ---
 const sendConversionEvent = async (eventName, contactInfo, referralInfo, customData = {}) => {
     if (!META_PIXEL_ID || !META_CAPI_ACCESS_TOKEN) {
         console.warn('Advertencia: Faltan credenciales de Meta. No se enviará el evento.');
@@ -60,7 +60,7 @@ const sendConversionEvent = async (eventName, contactInfo, referralInfo, customD
     }
 
     const finalCustomData = {
-        lead_source: 'WhatsApp Ad',
+        lead_source: referralInfo ? 'WhatsApp Ad' : 'WhatsApp Organic',
         ad_headline: referralInfo?.headline,
         ad_id: referralInfo?.source_id,
         ...customData
@@ -71,29 +71,25 @@ const sendConversionEvent = async (eventName, contactInfo, referralInfo, customD
             event_name: eventName,
             event_time: eventTime,
             event_id: eventId,
-            // **CORRECCIÓN FINAL: Cambiado de 'whatsapp' a 'other' según el error de la API**
             action_source: 'other', 
             user_data: userData,
             custom_data: finalCustomData
         }],
-        // Descomenta la siguiente línea SOLO para hacer pruebas en la herramienta de Meta
-        // test_event_code: 'YOUR_TEST_CODE' 
     };
 
     try {
         await axios.post(url, payload, { headers: { 'Authorization': `Bearer ${META_CAPI_ACCESS_TOKEN}`, 'Content-Type': 'application/json' } });
-        console.log(`✅ Evento '${eventName}' enviado a Meta para ${contactInfo.wa_id}. Event ID: ${eventId}`);
+        console.log(`✅ Evento '${eventName}' [${finalCustomData.lead_source}] enviado a Meta para ${contactInfo.wa_id}.`);
     } catch (error) {
-        console.error(`❌ Error al enviar evento '${eventName}' a Meta. Event ID: ${eventId}`, error.response ? JSON.stringify(error.response.data, null, 2) : error.message);
+        console.error(`❌ Error al enviar evento '${eventName}' a Meta.`, error.response ? JSON.stringify(error.response.data, null, 2) : error.message);
         throw new Error(`Falló el envío del evento '${eventName}' a Meta.`);
     }
 };
 
-// --- EL RESTO DE TUS RUTAS Y LÓGICA ---
-// No es necesario cambiar el resto del código, ya que las llamadas
-// a sendConversionEvent seguirán funcionando igual.
 
-// Endpoint para marcar un registro completado (antes 'Lead')
+// --- ENDPOINTS ---
+
+// Endpoint para marcar un registro completado
 app.post('/api/contacts/:contactId/mark-as-registration', async (req, res) => {
     const { contactId } = req.params;
     const contactRef = db.collection('contacts_whatsapp').doc(contactId);
@@ -105,17 +101,15 @@ app.post('/api/contacts/:contactId/mark-as-registration', async (req, res) => {
         const contactData = contactDoc.data();
         if (contactData.registrationStatus === 'completed') return res.status(400).json({ success: false, message: 'Este contacto ya fue registrado.' });
         
-        if (contactData.adReferral) {
-            await sendConversionEvent(
-                'CompleteRegistration',
-                { wa_id: contactData.wa_id, profile: { name: contactData.name } },
-                contactData.adReferral
-            );
-        }
+        await sendConversionEvent(
+            'CompleteRegistration',
+            { wa_id: contactData.wa_id, profile: { name: contactData.name } },
+            contactData.adReferral
+        );
 
         await contactRef.update({
             registrationStatus: 'completed',
-            registrationSource: contactData.adReferral ? 'meta_ad' : 'manual',
+            registrationSource: contactData.adReferral ? 'meta_ad' : 'manual_organic',
             registrationDate: admin.firestore.FieldValue.serverTimestamp()
         });
 
@@ -143,14 +137,12 @@ app.post('/api/contacts/:contactId/mark-as-purchase', async (req, res) => {
         const contactData = contactDoc.data();
         if (contactData.purchaseStatus === 'completed') return res.status(400).json({ success: false, message: 'Este contacto ya realizó una compra.' });
 
-        if (contactData.adReferral) {
-            await sendConversionEvent(
-                'Purchase',
-                { wa_id: contactData.wa_id, profile: { name: contactData.name } },
-                contactData.adReferral,
-                { value: parseFloat(value), currency }
-            );
-        }
+        await sendConversionEvent(
+            'Purchase',
+            { wa_id: contactData.wa_id, profile: { name: contactData.name } },
+            contactData.adReferral,
+            { value: parseFloat(value), currency }
+        );
 
         await contactRef.update({
             purchaseStatus: 'completed',
@@ -165,8 +157,33 @@ app.post('/api/contacts/:contactId/mark-as-purchase', async (req, res) => {
     }
 });
 
+// Endpoint para enviar ViewContent manualmente
+app.post('/api/contacts/:contactId/send-view-content', async (req, res) => {
+    const { contactId } = req.params;
+    const contactRef = db.collection('contacts_whatsapp').doc(contactId);
 
-// Webhook (solo la parte relevante del envío de evento)
+    try {
+        const contactDoc = await contactRef.get();
+        if (!contactDoc.exists) {
+            return res.status(404).json({ success: false, message: 'Contacto no encontrado.' });
+        }
+        
+        const contactData = contactDoc.data();
+        
+        await sendConversionEvent(
+            'ViewContent',
+            { wa_id: contactData.wa_id, profile: { name: contactData.name } },
+            contactData.adReferral
+        );
+
+        res.status(200).json({ success: true, message: 'Evento ViewContent enviado manualmente.' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error al procesar el envío de ViewContent.' });
+    }
+});
+
+
+// Webhook
 app.post('/webhook', async (req, res) => {
     const entry = req.body.entry?.[0];
     const change = entry?.changes?.[0];
@@ -189,7 +206,6 @@ app.post('/webhook', async (req, res) => {
             
             let isNewAdContact = false;
             if (message.referral && message.referral.source_type === 'ad') {
-                console.log(`📬 Mensaje de anuncio detectado de ${from}.`);
                 const contactDoc = await contactRef.get();
                 if (!contactDoc.exists || !contactDoc.data().adReferral) {
                     isNewAdContact = true;
@@ -202,32 +218,13 @@ app.post('/webhook', async (req, res) => {
                 };
             }
 
-            // ... (resto de tu lógica para guardar el mensaje)
-            let messageData = { timestamp: timestamp, from: from, status: 'received' };
-            let lastMessageText = '';
-             try {
-                switch (message.type) {
-                    case 'text':
-                        messageData.text = message.text.body;
-                        lastMessageText = message.text.body;
-                        break;
-                    // ... otros casos de mensaje
-                }
-            } catch (error) {
-                console.error("Error procesando media de webhook:", error.response ? error.response.data : error.message);
-            }
-
-            await contactRef.collection('messages').add(messageData);
-            contactData.lastMessage = lastMessageText;
             await contactRef.set(contactData, { merge: true });
-            // ...
 
-            // --- Enviar evento ViewContent ---
             if (isNewAdContact) {
                 try {
                     await sendConversionEvent(
                         'ViewContent',
-                        contactInfo, // Este objeto ya tiene wa_id y profile.name
+                        contactInfo,
                         contactData.adReferral
                     );
                     await contactRef.update({ viewContentSent: true });
@@ -235,14 +232,11 @@ app.post('/webhook', async (req, res) => {
                     console.error(`Fallo al enviar evento ViewContent para ${from}`);
                 }
             }
-        } else if (value.statuses) {
-            // ... (tu lógica de statuses)
         }
     }
     res.sendStatus(200);
 });
 
-// ... (resto de tus rutas, no necesitan cambios)
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en el puerto ${PORT}`);
 });
