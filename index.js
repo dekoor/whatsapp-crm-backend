@@ -35,8 +35,8 @@ function sha256(data) {
     return crypto.createHash('sha256').update(normalizedData).digest('hex');
 }
 
-// --- FUNCIÓN GENÉRICA PARA ENVIAR EVENTOS DE CONVERSIÓN A META ---
-const sendConversionEvent = async (eventName, contactInfo, referralInfo, customData = {}) => {
+// --- FUNCIÓN GENÉRICA PARA ENVIAR EVENTOS DE CONVERSIÓN A META (MODIFICADA) ---
+const sendConversionEvent = async (eventName, actionSource, contactInfo, referralInfo, customData = {}) => {
     if (!META_PIXEL_ID || !META_CAPI_ACCESS_TOKEN) {
         console.warn('Advertencia: Faltan credenciales de Meta. No se enviará el evento.');
         return;
@@ -71,7 +71,7 @@ const sendConversionEvent = async (eventName, contactInfo, referralInfo, customD
             event_name: eventName,
             event_time: eventTime,
             event_id: eventId,
-            action_source: 'crm', 
+            action_source: actionSource, // Se usa el nuevo parámetro
             user_data: userData,
             custom_data: finalCustomData
         }],
@@ -79,7 +79,7 @@ const sendConversionEvent = async (eventName, contactInfo, referralInfo, customD
     };
 
     try {
-        console.log(`Enviando evento de PRODUCCIÓN '${eventName}' para ${contactInfo.wa_id}.`);
+        console.log(`Enviando evento de PRODUCCIÓN '${eventName}' con action_source '${actionSource}' para ${contactInfo.wa_id}.`);
         await axios.post(url, payload, { headers: { 'Authorization': `Bearer ${META_CAPI_ACCESS_TOKEN}`, 'Content-Type': 'application/json' } });
         console.log(`✅ Evento de PRODUCCIÓN '${eventName}' enviado a Meta.`);
     } catch (error) {
@@ -151,8 +151,10 @@ app.post('/webhook', async (req, res) => {
 
         if (isNewAdContact) {
             try {
+                // Se usa 'website' para ViewContent como sugiere el error de Meta
                 await sendConversionEvent(
                     'ViewContent',
+                    'website', 
                     contactInfo,
                     contactData.adReferral
                 );
@@ -165,10 +167,7 @@ app.post('/webhook', async (req, res) => {
     res.sendStatus(200);
 });
 
-
-// ==================================================================
-//      NUEVO ENDPOINT PARA ENVIAR MENSAJES DESDE EL CRM
-// ==================================================================
+// --- ENDPOINT PARA ENVIAR MENSAJES DESDE EL CRM ---
 app.post('/api/contacts/:contactId/messages', async (req, res) => {
     const { contactId } = req.params;
     const { text, fileUrl, fileType } = req.body;
@@ -218,7 +217,7 @@ app.post('/api/contacts/:contactId/messages', async (req, res) => {
         await contactRef.update({
             lastMessage: messageToSave.text,
             lastMessageTimestamp: timestamp,
-            unreadCount: 0 // Reseteamos el contador al enviar un mensaje
+            unreadCount: 0 
         });
 
         res.status(200).json({ success: true, message: 'Mensaje enviado correctamente.' });
@@ -239,7 +238,9 @@ app.post('/api/contacts/:contactId/mark-as-registration', async (req, res) => {
         if (!contactDoc.exists) return res.status(404).json({ success: false, message: 'Contacto no encontrado.' });
         const contactData = contactDoc.data();
         if (contactData.registrationStatus === 'completed') return res.status(400).json({ success: false, message: 'Este contacto ya fue registrado.' });
-        await sendConversionEvent('CompleteRegistration', { wa_id: contactData.wa_id, profile: { name: contactData.name } }, contactData.adReferral);
+        
+        // Se usa 'chat' porque la acción ocurre en el CRM
+        await sendConversionEvent('CompleteRegistration', 'chat', { wa_id: contactData.wa_id, profile: { name: contactData.name } }, contactData.adReferral);
         await contactRef.update({ registrationStatus: 'completed', registrationSource: contactData.adReferral ? 'meta_ad' : 'manual_organic', registrationDate: admin.firestore.FieldValue.serverTimestamp() });
         res.status(200).json({ success: true, message: 'Contacto marcado como "Registro Completado".' });
     } catch (error) {
@@ -258,7 +259,9 @@ app.post('/api/contacts/:contactId/mark-as-purchase', async (req, res) => {
         if (!contactDoc.exists) return res.status(404).json({ success: false, message: 'Contacto no encontrado.' });
         const contactData = contactDoc.data();
         if (contactData.purchaseStatus === 'completed') return res.status(400).json({ success: false, message: 'Este contacto ya realizó una compra.' });
-        await sendConversionEvent('Purchase', { wa_id: contactData.wa_id, profile: { name: contactData.name } }, contactData.adReferral, { value: parseFloat(value), currency });
+
+        // Se usa 'chat' porque la acción ocurre en el CRM
+        await sendConversionEvent('Purchase', 'chat', { wa_id: contactData.wa_id, profile: { name: contactData.name } }, contactData.adReferral, { value: parseFloat(value), currency });
         await contactRef.update({ purchaseStatus: 'completed', purchaseValue: parseFloat(value), purchaseCurrency: currency, purchaseDate: admin.firestore.FieldValue.serverTimestamp() });
         res.status(200).json({ success: true, message: 'Compra registrada y evento enviado a Meta.' });
     } catch (error) {
@@ -273,7 +276,9 @@ app.post('/api/contacts/:contactId/send-view-content', async (req, res) => {
         const contactDoc = await contactRef.get();
         if (!contactDoc.exists) return res.status(404).json({ success: false, message: 'Contacto no encontrado.' });
         const contactData = contactDoc.data();
-        await sendConversionEvent('ViewContent', { wa_id: contactData.wa_id, profile: { name: contactData.name } }, contactData.adReferral);
+
+        // Se usa 'website' para ViewContent como sugiere el error de Meta
+        await sendConversionEvent('ViewContent', 'website', { wa_id: contactData.wa_id, profile: { name: contactData.name } }, contactData.adReferral);
         res.status(200).json({ success: true, message: 'Evento ViewContent enviado manualmente.' });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error al procesar el envío de ViewContent.' });
