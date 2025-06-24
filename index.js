@@ -1,3 +1,5 @@
+// --- START OF FILE index.js ---
+
 require('dotenv').config();
 const express = require('express');
 const admin = require('firebase-admin');
@@ -25,6 +27,65 @@ const PORT = process.env.PORT || 3000;
 const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
+// --- NUEVO: Variables de entorno de Meta ---
+const META_PIXEL_ID = process.env.META_PIXEL_ID;
+const META_CAPI_ACCESS_TOKEN = process.env.META_CAPI_ACCESS_TOKEN;
+
+
+// --- NUEVO: Función para enviar evento de conversión a Meta ---
+/**
+ * Envía un evento "Lead" a la API de Conversiones de Meta.
+ * @param {object} contactInfo - El objeto de contacto de WhatsApp con `wa_id` y `profile.name`.
+ * @param {object} referralInfo - El objeto referral del mensaje de WhatsApp.
+ */
+const sendLeadConversionEvent = async (contactInfo, referralInfo) => {
+    if (!META_PIXEL_ID || !META_CAPI_ACCESS_TOKEN) {
+        console.warn('Advertencia: Faltan las credenciales de Meta (PIXEL_ID o CAPI_ACCESS_TOKEN). No se enviará el evento de conversión.');
+        return;
+    }
+
+    const url = `https://graph.facebook.com/v19.0/${META_PIXEL_ID}/events`;
+    
+    // El timestamp debe estar en segundos.
+    const eventTime = Math.floor(Date.now() / 1000);
+    
+    // Preparamos los datos del usuario. El número de teléfono es el dato más valioso aquí.
+    const userData = {
+        ph: [contactInfo.wa_id], // ph = phone, sin el '+' y solo números
+        fn: contactInfo.profile.name, // fn = first name
+    };
+
+    const payload = {
+        data: [
+            {
+                event_name: 'Lead',
+                event_time: eventTime,
+                action_source: 'whatsapp',
+                user_data: userData,
+                custom_data: {
+                    lead_source: 'WhatsApp Ad',
+                    ad_headline: referralInfo.headline,
+                    ad_id: referralInfo.source_id
+                }
+            }
+        ],
+        // Opcional: Para depuración en el Administrador de Eventos. Eliminar en producción.
+        // test_event_code: 'TESTXXXXX' 
+    };
+
+    try {
+        await axios.post(url, payload, {
+            headers: {
+                'Authorization': `Bearer ${META_CAPI_ACCESS_TOKEN}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        console.log(`✅ Evento 'Lead' enviado a Meta para el usuario ${contactInfo.wa_id}. Proveniente del anuncio: ${referralInfo.source_id}`);
+    } catch (error) {
+        console.error("❌ Error al enviar evento de conversión a Meta:", error.response ? error.response.data : error.message);
+    }
+};
+
 
 // --- RUTAS DE LA API ---
 app.get('/', (req, res) => {
@@ -58,6 +119,16 @@ app.post('/webhook', async (req, res) => {
             const message = value.messages[0];
             const contactInfo = value.contacts[0];
             const from = message.from;
+            
+            // --- MODIFICADO: Lógica de detección de anuncios ---
+            // Si el mensaje viene de un anuncio, `message.referral` existirá.
+            if (message.referral && message.referral.source_type === 'ad') {
+                console.log(`📬 Mensaje recibido de un anuncio de Meta. ID del Anuncio: ${message.referral.source_id}`);
+                // Enviamos el evento de conversión a Meta en segundo plano.
+                // No usamos await aquí para no retrasar la respuesta al webhook.
+                sendLeadConversionEvent(contactInfo, message.referral);
+            }
+
             const timestamp = admin.firestore.FieldValue.serverTimestamp();
             const contactRef = db.collection('contacts_whatsapp').doc(from);
             
