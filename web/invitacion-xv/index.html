@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0B0B0B" />
+    <title>Valentina Sofía · Mis XV Años</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Inter:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="invitacion">
+      <!-- ============ PORTADA ============ -->
+      <section class="portada" aria-label="Portada">
+        <!-- Slot de foto: reemplaza ./assets/portada.jpg cuando tengas la imagen -->
+        <div class="portada__foto" role="img" aria-label="Foto de Valentina Sofía"></div>
+
+        <!-- Veladura para legibilidad -->
+        <div class="portada__velo" aria-hidden="true"></div>
+
+        <!-- Marco fino premium -->
+        <div class="portada__marco" aria-hidden="true"></div>
+
+        <header class="portada__contenido">
+          <p class="portada__kicker">
+            <span>X</span><span>V</span><span class="sep">·</span><span>A</span><span>Ñ</span><span>O</span><span>S</span>
+          </p>
+
+          <h1 class="portada__nombre">
+            <span class="linea">Valentina</span>
+            <span class="amp">&amp;</span>
+            <span class="linea linea--alt">Sofía</span>
+          </h1>
+
+          <p class="portada__fecha">
+            <span>15</span>
+            <span class="punto">·</span>
+            <span>Noviembre</span>
+            <span class="punto">·</span>
+            <span>2026</span>
+          </p>
+        </header>
+
+        <button class="portada__scroll" type="button" aria-label="Desliza para continuar">
+          <span class="portada__scroll-label">Desliza</span>
+          <span class="portada__scroll-line" aria-hidden="true"></span>
+        </button>
+      </section>
+    </main>
+
+    <script src="./script.js" defer></script>
+  </body>
+</html>
