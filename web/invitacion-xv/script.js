@@ -27,16 +27,16 @@ const STORAGE_PREFIX = "inv-xv:pos:";
 const TAP_COUNT_TO_ENTER = 5;
 const TAP_WINDOW_MS = 600;
 const SNAP_THRESHOLD = 10; // px de tolerancia para encajar al centro
+const MIN_SCALE = 0.4;
+const MAX_SCALE = 3.0;
+const SCALE_SNAP = 0.05; // tolerancia para encajar a escala 1.0
 
 function initEditorMode() {
   const editBar = document.querySelector(".edit-bar");
   const movibles = document.querySelectorAll(".movible");
 
-  // Restaurar posiciones guardadas en cualquier modo (visitas previas)
-  movibles.forEach(restorePosition);
-
-  // Configurar arrastre para cada elemento
-  movibles.forEach(setupDraggable);
+  // Configurar cada elemento editable (restaura + arrastrar + escalar)
+  movibles.forEach(setupEditable);
 
   // Detección de 5 taps
   let tapCount = 0;
@@ -92,108 +92,217 @@ function initEditorMode() {
       localStorage.removeItem(STORAGE_PREFIX + id);
       el.style.setProperty("--tx", "0px");
       el.style.setProperty("--ty", "0px");
+      el.style.setProperty("--scale", "1");
     });
   }
 }
 
-function restorePosition(el) {
-  const id = el.dataset.editable;
-  if (!id) return;
-  try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_PREFIX + id) || "null");
-    if (saved && typeof saved.x === "number" && typeof saved.y === "number") {
-      el.style.setProperty("--tx", saved.x + "px");
-      el.style.setProperty("--ty", saved.y + "px");
-    }
-  } catch {
-    // Ignorar errores de parseo
-  }
-}
-
-function setupDraggable(el) {
+// =========================================================
+// Por cada elemento editable: drag, pinch (2 dedos) y handle
+// =========================================================
+function setupEditable(el) {
   const id = el.dataset.editable;
   if (!id) return;
 
-  const state = { x: 0, y: 0 };
+  const state = { x: 0, y: 0, scale: 1 };
   const saved = readSaved(id);
   if (saved) {
-    state.x = saved.x;
-    state.y = saved.y;
+    if (typeof saved.x === "number") state.x = saved.x;
+    if (typeof saved.y === "number") state.y = saved.y;
+    if (typeof saved.scale === "number") state.scale = saved.scale;
   }
+  apply();
 
+  // Inyectar handle de resize y badge de escala
+  const handle = document.createElement("span");
+  handle.className = "movible__handle";
+  handle.setAttribute("aria-hidden", "true");
+  el.appendChild(handle);
+
+  const badge = document.createElement("span");
+  badge.className = "movible__scale-badge";
+  badge.setAttribute("aria-hidden", "true");
+  el.appendChild(badge);
+
+  const pointers = new Map();
   let drag = null;
+  let pinch = null;
+  let resize = null;
   let lastSnap = { x: false, y: false };
 
+  function apply() {
+    el.style.setProperty("--tx", state.x + "px");
+    el.style.setProperty("--ty", state.y + "px");
+    el.style.setProperty("--scale", state.scale.toString());
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(
+        STORAGE_PREFIX + id,
+        JSON.stringify({ x: state.x, y: state.y, scale: state.scale })
+      );
+    } catch {
+      // ignorar
+    }
+  }
+
+  function flashBadge() {
+    badge.textContent = Math.round(state.scale * 100) + "%";
+    badge.classList.add("movible__scale-badge--visible");
+    clearTimeout(badge._timer);
+    badge._timer = setTimeout(() => {
+      badge.classList.remove("movible__scale-badge--visible");
+    }, 700);
+  }
+
+  // -------- drag + pinch en el elemento --------
   el.addEventListener("pointerdown", (e) => {
     if (!document.body.classList.contains("edit-mode")) return;
+    if (e.target === handle) return; // handle tiene su propio flujo
     e.preventDefault();
     el.setPointerCapture(e.pointerId);
-    drag = {
-      pointerId: e.pointerId,
-      offsetX: e.clientX - state.x,
-      offsetY: e.clientY - state.y,
-    };
-    lastSnap = { x: false, y: false };
-    el.classList.add("movible--dragging");
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pointers.size === 1) {
+      drag = {
+        pointerId: e.pointerId,
+        offsetX: e.clientX - state.x,
+        offsetY: e.clientY - state.y,
+      };
+      lastSnap = { x: false, y: false };
+      el.classList.add("movible--dragging");
+    } else if (pointers.size === 2) {
+      // Segundo dedo → iniciar pinch, cancelar drag
+      const [a, b] = [...pointers.values()];
+      pinch = {
+        startDist: Math.hypot(a.x - b.x, a.y - b.y) || 1,
+        startScale: state.scale,
+      };
+      drag = null;
+      document.body.classList.remove("snap-vcenter", "snap-hcenter");
+      el.classList.remove("movible--dragging");
+    }
   });
 
   el.addEventListener("pointermove", (e) => {
-    if (!drag || drag.pointerId !== e.pointerId) return;
+    if (!pointers.has(e.pointerId)) return;
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
-    let newX = e.clientX - drag.offsetX;
-    let newY = e.clientY - drag.offsetY;
-
-    // ---- Snap a la línea central ----
-    let snapX = false;
-    let snapY = false;
-
-    // Centro vertical: la posición natural del elemento ya está centrada en X
-    // (el flex padre lo centra), por lo que --tx = 0 ⇒ centro horizontal exacto.
-    if (Math.abs(newX) < SNAP_THRESHOLD) {
-      newX = 0;
-      snapX = true;
+    if (pinch && pointers.size >= 2) {
+      const [a, b] = [...pointers.values()];
+      const dist = Math.hypot(a.x - b.x, a.y - b.y);
+      let next = clamp(
+        pinch.startScale * (dist / pinch.startDist),
+        MIN_SCALE,
+        MAX_SCALE
+      );
+      if (Math.abs(next - 1) < SCALE_SNAP) next = 1;
+      const wasOne = Math.abs(state.scale - 1) < 0.001;
+      state.scale = next;
+      apply();
+      flashBadge();
+      const isOne = Math.abs(next - 1) < 0.001;
+      if (isOne && !wasOne) hapticFeedback(10);
+      return;
     }
 
-    // Centro horizontal: calcular el offset Y que pondría el centro del
-    // elemento exactamente en el centro vertical de la ventana.
-    const rect = el.getBoundingClientRect();
-    const naturalCenterY = rect.top + rect.height / 2 - state.y;
-    const desiredY = window.innerHeight / 2 - naturalCenterY;
-    if (Math.abs(newY - desiredY) < SNAP_THRESHOLD) {
-      newY = desiredY;
-      snapY = true;
+    if (drag && drag.pointerId === e.pointerId) {
+      let newX = e.clientX - drag.offsetX;
+      let newY = e.clientY - drag.offsetY;
+
+      let snapX = false;
+      let snapY = false;
+
+      if (Math.abs(newX) < SNAP_THRESHOLD) {
+        newX = 0;
+        snapX = true;
+      }
+
+      const rect = el.getBoundingClientRect();
+      const naturalCenterY = rect.top + rect.height / 2 - state.y;
+      const desiredY = window.innerHeight / 2 - naturalCenterY;
+      if (Math.abs(newY - desiredY) < SNAP_THRESHOLD) {
+        newY = desiredY;
+        snapY = true;
+      }
+
+      state.x = newX;
+      state.y = newY;
+      apply();
+
+      document.body.classList.toggle("snap-vcenter", snapX);
+      document.body.classList.toggle("snap-hcenter", snapY);
+      if (snapX && !lastSnap.x) hapticFeedback(10);
+      if (snapY && !lastSnap.y) hapticFeedback(10);
+      lastSnap = { x: snapX, y: snapY };
     }
-
-    state.x = newX;
-    state.y = newY;
-    el.style.setProperty("--tx", state.x + "px");
-    el.style.setProperty("--ty", state.y + "px");
-
-    // Iluminar la línea correspondiente y vibrar al "encajar"
-    document.body.classList.toggle("snap-vcenter", snapX);
-    document.body.classList.toggle("snap-hcenter", snapY);
-    if (snapX && !lastSnap.x) hapticFeedback(10);
-    if (snapY && !lastSnap.y) hapticFeedback(10);
-    lastSnap = { x: snapX, y: snapY };
   });
 
   ["pointerup", "pointercancel"].forEach((evt) => {
     el.addEventListener(evt, (e) => {
-      if (!drag || drag.pointerId !== e.pointerId) return;
-      drag = null;
-      el.classList.remove("movible--dragging");
-      document.body.classList.remove("snap-vcenter", "snap-hcenter");
-      lastSnap = { x: false, y: false };
-      try {
-        localStorage.setItem(
-          STORAGE_PREFIX + id,
-          JSON.stringify({ x: state.x, y: state.y })
-        );
-      } catch {
-        // localStorage podría estar lleno o bloqueado
+      if (!pointers.has(e.pointerId)) return;
+      pointers.delete(e.pointerId);
+
+      if (pointers.size < 2) pinch = null;
+      if (pointers.size === 0) {
+        drag = null;
+        el.classList.remove("movible--dragging");
+        document.body.classList.remove("snap-vcenter", "snap-hcenter");
+        lastSnap = { x: false, y: false };
+        save();
       }
     });
   });
+
+  // -------- handle de resize --------
+  handle.addEventListener("pointerdown", (e) => {
+    if (!document.body.classList.contains("edit-mode")) return;
+    e.preventDefault();
+    e.stopPropagation();
+    handle.setPointerCapture(e.pointerId);
+    const rect = el.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    resize = {
+      pointerId: e.pointerId,
+      cx,
+      cy,
+      startDist: Math.hypot(e.clientX - cx, e.clientY - cy) || 1,
+      startScale: state.scale,
+    };
+    el.classList.add("movible--resizing");
+  });
+
+  handle.addEventListener("pointermove", (e) => {
+    if (!resize || resize.pointerId !== e.pointerId) return;
+    const dist = Math.hypot(e.clientX - resize.cx, e.clientY - resize.cy);
+    let next = clamp(
+      resize.startScale * (dist / resize.startDist),
+      MIN_SCALE,
+      MAX_SCALE
+    );
+    if (Math.abs(next - 1) < SCALE_SNAP) next = 1;
+    const wasOne = Math.abs(state.scale - 1) < 0.001;
+    state.scale = next;
+    apply();
+    flashBadge();
+    const isOne = Math.abs(next - 1) < 0.001;
+    if (isOne && !wasOne) hapticFeedback(10);
+  });
+
+  ["pointerup", "pointercancel"].forEach((evt) => {
+    handle.addEventListener(evt, (e) => {
+      if (!resize || resize.pointerId !== e.pointerId) return;
+      resize = null;
+      el.classList.remove("movible--resizing");
+      save();
+    });
+  });
+}
+
+function clamp(v, min, max) {
+  return Math.max(min, Math.min(max, v));
 }
 
 function readSaved(id) {

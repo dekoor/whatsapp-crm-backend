@@ -452,7 +452,9 @@ body.snap-vcenter .guia--vcenter::after {
   display: block;
   width: fit-content;
   margin-inline: auto;
-  transform: translate(var(--tx, 0px), var(--ty, 0px));
+  position: relative;
+  transform: translate(var(--tx, 0px), var(--ty, 0px)) scale(var(--scale, 1));
+  transform-origin: center center;
   transition: outline-color 0.2s var(--ease);
 }
 
@@ -471,8 +473,74 @@ body.edit-mode .movible--dragging {
   outline-style: solid;
 }
 
-body.edit-mode .movible--dragging {
+body.edit-mode .movible--dragging,
+body.edit-mode .movible--resizing {
   cursor: grabbing;
+  outline-color: var(--c-rose-gold);
+  outline-style: solid;
+}
+
+/* Handle de redimensionar (esquina inferior-derecha) */
+.movible__handle {
+  position: absolute;
+  right: -22px;
+  bottom: -22px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--c-rose-gold);
+  border: 2px solid #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(0, 0, 0, 0.25);
+  display: none;
+  z-index: 5;
+  touch-action: none;
+  cursor: nwse-resize;
+}
+
+.movible__handle::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-right: 1.5px solid #fff;
+  border-bottom: 1.5px solid #fff;
+  border-radius: 0 0 6px 0;
+  opacity: 0.85;
+}
+
+body.edit-mode .movible__handle {
+  display: block;
+  animation: handleIn 0.25s var(--ease);
+}
+
+@keyframes handleIn {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Badge de porcentaje de escala */
+.movible__scale-badge {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translate(-50%, -100%);
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--c-rose-gold);
+  color: #0b0b0b;
+  font-family: var(--f-sans);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s var(--ease);
+  z-index: 6;
+}
+
+.movible__scale-badge--visible {
+  opacity: 1;
 }
 
 /* Pista breve al entrar al modo */
