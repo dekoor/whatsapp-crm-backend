@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
 const STORAGE_PREFIX = "inv-xv:pos:";
 const TAP_COUNT_TO_ENTER = 5;
 const TAP_WINDOW_MS = 600;
+const SNAP_THRESHOLD = 10; // px de tolerancia para encajar al centro
 
 function initEditorMode() {
   const editBar = document.querySelector(".edit-bar");
@@ -121,6 +122,7 @@ function setupDraggable(el) {
   }
 
   let drag = null;
+  let lastSnap = { x: false, y: false };
 
   el.addEventListener("pointerdown", (e) => {
     if (!document.body.classList.contains("edit-mode")) return;
@@ -131,15 +133,48 @@ function setupDraggable(el) {
       offsetX: e.clientX - state.x,
       offsetY: e.clientY - state.y,
     };
+    lastSnap = { x: false, y: false };
     el.classList.add("movible--dragging");
   });
 
   el.addEventListener("pointermove", (e) => {
     if (!drag || drag.pointerId !== e.pointerId) return;
-    state.x = e.clientX - drag.offsetX;
-    state.y = e.clientY - drag.offsetY;
+
+    let newX = e.clientX - drag.offsetX;
+    let newY = e.clientY - drag.offsetY;
+
+    // ---- Snap a la línea central ----
+    let snapX = false;
+    let snapY = false;
+
+    // Centro vertical: la posición natural del elemento ya está centrada en X
+    // (el flex padre lo centra), por lo que --tx = 0 ⇒ centro horizontal exacto.
+    if (Math.abs(newX) < SNAP_THRESHOLD) {
+      newX = 0;
+      snapX = true;
+    }
+
+    // Centro horizontal: calcular el offset Y que pondría el centro del
+    // elemento exactamente en el centro vertical de la ventana.
+    const rect = el.getBoundingClientRect();
+    const naturalCenterY = rect.top + rect.height / 2 - state.y;
+    const desiredY = window.innerHeight / 2 - naturalCenterY;
+    if (Math.abs(newY - desiredY) < SNAP_THRESHOLD) {
+      newY = desiredY;
+      snapY = true;
+    }
+
+    state.x = newX;
+    state.y = newY;
     el.style.setProperty("--tx", state.x + "px");
     el.style.setProperty("--ty", state.y + "px");
+
+    // Iluminar la línea correspondiente y vibrar al "encajar"
+    document.body.classList.toggle("snap-vcenter", snapX);
+    document.body.classList.toggle("snap-hcenter", snapY);
+    if (snapX && !lastSnap.x) hapticFeedback(10);
+    if (snapY && !lastSnap.y) hapticFeedback(10);
+    lastSnap = { x: snapX, y: snapY };
   });
 
   ["pointerup", "pointercancel"].forEach((evt) => {
@@ -147,6 +182,8 @@ function setupDraggable(el) {
       if (!drag || drag.pointerId !== e.pointerId) return;
       drag = null;
       el.classList.remove("movible--dragging");
+      document.body.classList.remove("snap-vcenter", "snap-hcenter");
+      lastSnap = { x: false, y: false };
       try {
         localStorage.setItem(
           STORAGE_PREFIX + id,

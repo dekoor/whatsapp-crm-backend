@@ -337,6 +337,111 @@ img {
    MODO EDITOR
    ========================================================= */
 
+/* Líneas guía (solo visibles cuando body.edit-mode) */
+.guias {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  opacity: 0;
+  transition: opacity 0.35s var(--ease);
+}
+
+body.edit-mode .guias {
+  opacity: 1;
+}
+
+.guia {
+  position: absolute;
+  transition: background 0.18s var(--ease), box-shadow 0.18s var(--ease),
+    opacity 0.18s var(--ease);
+}
+
+/* Tercios — muy sutiles, para composición */
+.guia--tercio {
+  background: rgba(255, 255, 255, 0.06);
+  opacity: 0.7;
+}
+
+.guia--vt1,
+.guia--vt2 {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+.guia--vt1 { left: 33.333%; }
+.guia--vt2 { left: 66.666%; }
+
+.guia--ht1,
+.guia--ht2 {
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+.guia--ht1 { top: 33.333%; }
+.guia--ht2 { top: 66.666%; }
+
+/* Centros — protagonistas */
+.guia--centro {
+  background: rgba(217, 167, 173, 0.35);
+}
+
+.guia--vcenter {
+  top: 6%;
+  bottom: 6%;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-0.5px);
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(217, 167, 173, 0.55) 15%,
+    rgba(217, 167, 173, 0.55) 85%,
+    transparent 100%
+  );
+}
+
+.guia--hcenter {
+  left: 8%;
+  right: 8%;
+  top: 50%;
+  height: 1px;
+  transform: translateY(-0.5px);
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(217, 167, 173, 0.35) 15%,
+    rgba(217, 167, 173, 0.35) 85%,
+    transparent 100%
+  );
+}
+
+/* Estado snap — la línea se ilumina */
+body.snap-vcenter .guia--vcenter {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--c-rose-gold) 12%,
+    var(--c-rose-gold) 88%,
+    transparent 100%
+  );
+  box-shadow: 0 0 14px rgba(183, 110, 121, 0.65),
+    0 0 32px rgba(183, 110, 121, 0.35);
+}
+
+body.snap-hcenter .guia--hcenter {
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--c-rose-gold) 12%,
+    var(--c-rose-gold) 88%,
+    transparent 100%
+  );
+  box-shadow: 0 0 14px rgba(183, 110, 121, 0.65),
+    0 0 32px rgba(183, 110, 121, 0.35);
+}
+
+
 .movible {
   display: block;
   width: fit-content;
