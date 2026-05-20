@@ -36,24 +36,30 @@
 
         <header class="portada__contenido">
           <div class="portada__top">
-            <p class="portada__kicker">
-              <span>X</span><span>V</span><span class="sep">·</span><span>A</span><span>Ñ</span><span>O</span><span>S</span>
-            </p>
+            <div class="movible" data-editable="kicker">
+              <p class="portada__kicker">
+                <span>X</span><span>V</span><span class="sep">·</span><span>A</span><span>Ñ</span><span>O</span><span>S</span>
+              </p>
+            </div>
 
-            <h1 class="portada__nombre">
-              <span class="linea">Valentina</span>
-              <span class="divisor" aria-hidden="true"></span>
-              <span class="linea linea--alt">Sofía</span>
-            </h1>
+            <div class="movible" data-editable="nombre">
+              <h1 class="portada__nombre">
+                <span class="linea">Valentina</span>
+                <span class="divisor" aria-hidden="true"></span>
+                <span class="linea linea--alt">Sofía</span>
+              </h1>
+            </div>
           </div>
 
-          <p class="portada__fecha">
-            <span>15</span>
-            <span class="punto">·</span>
-            <span>Noviembre</span>
-            <span class="punto">·</span>
-            <span>2026</span>
-          </p>
+          <div class="movible" data-editable="fecha">
+            <p class="portada__fecha">
+              <span>15</span>
+              <span class="punto">·</span>
+              <span>Noviembre</span>
+              <span class="punto">·</span>
+              <span>2026</span>
+            </p>
+          </div>
         </header>
 
         <button class="portada__scroll" type="button" aria-label="Desliza para continuar">
@@ -62,6 +68,13 @@
         </button>
       </section>
     </main>
+
+    <!-- Barra del modo editor (oculta hasta activarse con 5 taps) -->
+    <div class="edit-bar" hidden role="toolbar" aria-label="Modo editor">
+      <span class="edit-bar__label">Modo editor · arrastra los elementos</span>
+      <button type="button" class="edit-bar__btn" data-action="reset">Resetear</button>
+      <button type="button" class="edit-bar__btn edit-bar__btn--primary" data-action="exit">Salir</button>
+    </div>
 
     <script src="./script.js" defer></script>
   </body>
