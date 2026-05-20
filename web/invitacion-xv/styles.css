@@ -21,8 +21,6 @@
   --f-sans: "Inter", system-ui, sans-serif;
 
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
-
-  --portada-foto: url("./assets/portada.jpg");
 }
 
 * {
@@ -66,12 +64,10 @@ img {
 .portada__foto {
   position: absolute;
   inset: 0;
-  background-image: var(--portada-foto),
-    /* Fallback premium si la foto aún no existe */
-      radial-gradient(120% 80% at 50% 20%, #2a1c1f 0%, #0b0b0b 60%, #000 100%);
-  background-size: cover;
-  background-position: center 35%;
-  background-repeat: no-repeat;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 35%;
   filter: contrast(1.04) saturate(1.05);
   transform: scale(1.08);
   animation: portadaZoom 8s var(--ease) forwards;

@@ -20,7 +20,13 @@
       <!-- ============ PORTADA ============ -->
       <section class="portada" aria-label="Portada">
         <!-- Slot de foto: reemplaza ./assets/portada.jpg cuando tengas la imagen -->
-        <div class="portada__foto" role="img" aria-label="Foto de Valentina Sofía"></div>
+        <img
+          class="portada__foto"
+          src="./assets/portada.jpg?v=3"
+          alt="Foto de Valentina Sofía"
+          decoding="async"
+          fetchpriority="high"
+        />
 
         <!-- Veladura para legibilidad -->
         <div class="portada__velo" aria-hidden="true"></div>
