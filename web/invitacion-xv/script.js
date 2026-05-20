@@ -74,11 +74,15 @@ function initEditorMode() {
   function enterEditMode() {
     document.body.classList.add("edit-mode");
     editBar?.removeAttribute("hidden");
+    hapticFeedback([30, 60, 30]);
+    showToast("Modo editor activado");
   }
 
   function exitEditMode() {
     document.body.classList.remove("edit-mode");
     editBar?.setAttribute("hidden", "");
+    hapticFeedback(20);
+    showToast("Modo editor desactivado");
   }
 
   function resetPositions() {
@@ -160,5 +164,37 @@ function readSaved(id) {
     return JSON.parse(localStorage.getItem(STORAGE_PREFIX + id) || "null");
   } catch {
     return null;
+  }
+}
+
+// Aviso central temporal
+let toastTimer = null;
+function showToast(message) {
+  const toast = document.querySelector(".edit-toast");
+  if (!toast) return;
+  const text = toast.querySelector(".edit-toast__text");
+  if (text) text.textContent = message;
+
+  toast.removeAttribute("hidden");
+  // Forzar reflow para que la transición se aplique
+  // eslint-disable-next-line no-unused-expressions
+  toast.offsetHeight;
+  toast.classList.add("edit-toast--visible");
+
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toast.classList.remove("edit-toast--visible");
+    setTimeout(() => toast.setAttribute("hidden", ""), 350);
+  }, 1600);
+}
+
+// Vibración si el dispositivo lo soporta (Android Chrome, etc.)
+function hapticFeedback(pattern) {
+  if (navigator.vibrate) {
+    try {
+      navigator.vibrate(pattern);
+    } catch {
+      // Ignorar si no se permite
+    }
   }
 }
