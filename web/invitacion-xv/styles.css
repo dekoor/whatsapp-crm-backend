@@ -22,7 +22,7 @@
 
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 
-  --portada-foto: url("./assets/portada.png");
+  --portada-foto: url("./assets/portada.jpg");
 }
 
 * {
