@@ -382,63 +382,69 @@ body.edit-mode .guias {
 .guia--ht2 { top: 66.666%; }
 
 /* Centros — protagonistas */
-.guia--centro {
-  background: rgba(217, 167, 173, 0.35);
-}
-
 .guia--vcenter {
-  top: 6%;
-  bottom: 6%;
+  top: 0;
+  bottom: 0;
   left: 50%;
-  width: 1px;
-  transform: translateX(-0.5px);
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(217, 167, 173, 0.55) 15%,
-    rgba(217, 167, 173, 0.55) 85%,
-    transparent 100%
-  );
+  width: 2px;
+  margin-left: -1px;
+  background: var(--c-rose-gold-soft);
+  opacity: 0.85;
+  box-shadow: 0 0 8px rgba(217, 167, 173, 0.55),
+    0 0 1px rgba(0, 0, 0, 0.5);
+  mix-blend-mode: screen;
 }
 
 .guia--hcenter {
-  left: 8%;
-  right: 8%;
+  left: 0;
+  right: 0;
   top: 50%;
-  height: 1px;
-  transform: translateY(-0.5px);
-  background: linear-gradient(
-    to right,
-    transparent 0%,
-    rgba(217, 167, 173, 0.35) 15%,
-    rgba(217, 167, 173, 0.35) 85%,
-    transparent 100%
-  );
+  height: 2px;
+  margin-top: -1px;
+  background: var(--c-rose-gold-soft);
+  opacity: 0.7;
+  box-shadow: 0 0 8px rgba(217, 167, 173, 0.45),
+    0 0 1px rgba(0, 0, 0, 0.5);
+  mix-blend-mode: screen;
 }
 
-/* Estado snap — la línea se ilumina */
-body.snap-vcenter .guia--vcenter {
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    var(--c-rose-gold) 12%,
-    var(--c-rose-gold) 88%,
-    transparent 100%
-  );
-  box-shadow: 0 0 14px rgba(183, 110, 121, 0.65),
-    0 0 32px rgba(183, 110, 121, 0.35);
+/* Marcador en el centro exacto (cruce de líneas) */
+.guia--centro::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--c-rose-gold-soft);
+  background: rgba(11, 11, 11, 0.4);
+  transform: rotate(45deg);
+  box-shadow: 0 0 6px rgba(217, 167, 173, 0.6);
 }
 
+.guia--vcenter::after {
+  top: 50%;
+  left: 50%;
+  margin: -7px 0 0 -7px;
+}
+
+/* (el marcador del centro lo mostramos solo en la línea vertical para no duplicarlo) */
+.guia--hcenter::after {
+  display: none;
+}
+
+/* Estado snap — la línea se vuelve oro rosado intenso */
+body.snap-vcenter .guia--vcenter,
 body.snap-hcenter .guia--hcenter {
-  background: linear-gradient(
-    to right,
-    transparent 0%,
-    var(--c-rose-gold) 12%,
-    var(--c-rose-gold) 88%,
-    transparent 100%
-  );
-  box-shadow: 0 0 14px rgba(183, 110, 121, 0.65),
-    0 0 32px rgba(183, 110, 121, 0.35);
+  opacity: 1;
+  background: var(--c-rose-gold);
+  box-shadow: 0 0 14px rgba(183, 110, 121, 0.9),
+    0 0 32px rgba(183, 110, 121, 0.45),
+    0 0 1px rgba(0, 0, 0, 0.4);
+}
+
+body.snap-vcenter .guia--vcenter::after {
+  background: var(--c-rose-gold);
+  border-color: #fff;
+  box-shadow: 0 0 12px rgba(183, 110, 121, 0.9);
 }
 
 
