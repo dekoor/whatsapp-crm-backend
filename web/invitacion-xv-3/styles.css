@@ -250,14 +250,22 @@ img {
 .portada__velo {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
+  /* xv-3 v2: velo más oscuro en la mitad superior izquierda para que
+     el grafiti "MIS XV" tenga máximo contraste sobre la foto */
+  background:
+    linear-gradient(
       180deg,
-      rgba(11, 11, 11, 0.55) 0%,
-      rgba(11, 11, 11, 0.05) 30%,
-      rgba(11, 11, 11, 0.05) 55%,
-      rgba(11, 11, 11, 0.85) 100%
+      rgba(0, 0, 0, 0.75) 0%,
+      rgba(0, 0, 0, 0.55) 40%,
+      rgba(0, 0, 0, 0.3) 65%,
+      rgba(0, 0, 0, 0.85) 100%
     ),
-    radial-gradient(90% 60% at 50% 95%, rgba(164, 139, 255, 0.22), transparent 70%);
+    linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.6) 0%,
+      rgba(0, 0, 0, 0.2) 60%,
+      rgba(0, 0, 0, 0) 100%
+    );
   z-index: 1;
 }
 
@@ -389,42 +397,60 @@ img {
 .portada__kicker span:nth-child(6) { animation-delay: 0.6s; }
 .portada__kicker span:nth-child(7) { animation-delay: 0.68s; }
 
-/* Nombre — script con efecto oro rosa metálico premium + brillo */
+/* xv-3 v2: contenedor del XV — relative para anclar corona y corazón
+   como absolute. El SVG ocupa el lugar del texto. */
 .portada__nombre {
-  font-family: var(--f-brush);
-  font-weight: 400;
-  font-size: clamp(120px, 32vw, 220px);
-  line-height: 0.9;
-  letter-spacing: -0.02em;
-  text-align: center;
   position: relative;
   display: inline-block;
   margin: 0;
-  padding: 0.1em 0;
-  transform: rotate(-2deg);
+  padding: 0;
+  line-height: 0;
 }
 
-/* xv-3 v2: "XV" brush gigante blanco */
-.portada__nombre--brush {
-  display: inline-block;
+/* SVG "XV" gigante con drips. Ancho controlado por clamp para
+   responsive. height auto preserva aspect ratio del viewBox. */
+.portada__xv {
+  display: block;
+  width: clamp(180px, 52vw, 320px);
+  height: auto;
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.55));
+  transform: rotate(-2deg);
+  transform-origin: left center;
+  opacity: 0;
+  animation: nombreIn 1.2s var(--ease) 0.9s forwards;
 }
 
 /* Corona doodle verde lima encima del XV (arriba-derecha) */
 .portada__corona {
   position: absolute;
-  top: -0.05em;
-  right: -0.1em;
-  width: clamp(60px, 16vw, 100px);
+  top: -0.4em;
+  right: -0.6em;
+  width: clamp(54px, 14vw, 88px);
   height: auto;
-  transform: rotate(12deg);
-  filter: drop-shadow(0 4px 12px rgba(199, 255, 69, 0.35));
+  transform: rotate(8deg);
+  filter: drop-shadow(0 3px 10px rgba(199, 255, 69, 0.4));
   pointer-events: none;
   opacity: 0;
   animation: nombreIn 0.9s var(--ease) 1.5s forwards;
 }
 
-/* Corazoncitos lavender al lado derecho del XV (centro-vertical) */
+/* Un corazón outline lavender, abajo-derecha del XV (referencia: solo uno) */
+.portada__corazon {
+  position: absolute;
+  bottom: 12%;
+  right: -1.4em;
+  width: clamp(26px, 7vw, 42px);
+  height: auto;
+  transform: rotate(-8deg);
+  pointer-events: none;
+  opacity: 0;
+  animation: nombreIn 0.9s var(--ease) 1.7s forwards;
+}
+
+/* Legacy hook (corazones plural) — ocultado ya que la referencia
+   muestra solo un corazón ahora */
 .portada__corazones {
+  display: none;
   position: absolute;
   top: 35%;
   right: -0.45em;
@@ -491,52 +517,53 @@ img {
   }
 }
 
-/* xv-3 v2: subtítulo a dos líneas, mayúsculas, bold sans
-   La primera línea blanca, la segunda verde lima con subrayado. */
+/* xv-3 v2: subtítulo a dos bloques. Línea 1 blanca, línea 2 verde
+   lima italic con un brush stroke lavender (SVG) debajo. */
 .portada__invita {
   font-family: var(--f-sans);
-  font-weight: 700;
-  font-size: clamp(0.9rem, 2.4vw, 1.05rem);
-  letter-spacing: 0.04em;
+  font-weight: 800;
+  font-size: clamp(1.05rem, 3.2vw, 1.4rem);
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   color: #fff;
   text-align: left;
-  line-height: 1.4;
-  margin-top: clamp(8px, 2vh, 18px);
+  line-height: 1.1;
+  margin-top: clamp(18px, 4vh, 32px);
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: clamp(6px, 1.5vh, 12px);
   opacity: 0;
   transform: translateY(12px);
   animation: nombreIn 1s var(--ease) 1.9s forwards;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
 .portada__invita-l1 {
   color: #fff;
+  display: block;
+}
+
+.portada__invita-l2-wrap {
+  display: inline-block;
+  position: relative;
+  align-self: flex-start;
+  padding-bottom: 14px;
 }
 
 .portada__invita-l2 {
   color: var(--c-lime);
   font-style: italic;
-  position: relative;
   display: inline-block;
-  align-self: flex-start;
-  padding-bottom: 4px;
 }
 
-/* Subrayado a mano alzada verde lima debajo de "Es mi momento" */
-.portada__invita-l2::after {
-  content: "";
+/* Brush stroke lavender (SVG ondulado) debajo del "Es mi momento" */
+.portada__invita-brush {
   position: absolute;
   left: 0;
-  right: 0;
   bottom: -2px;
-  height: 3px;
-  background: var(--c-lime);
-  border-radius: 2px;
-  transform: skewX(-12deg);
-  box-shadow: 0 0 8px rgba(199, 255, 69, 0.4);
+  width: 100%;
+  height: clamp(10px, 2.4vw, 14px);
+  filter: drop-shadow(0 2px 6px rgba(164, 139, 255, 0.35));
 }
 
 /* Bloques laterales: fecha (izquierda) + hora (derecha) */

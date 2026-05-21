@@ -15,7 +15,7 @@
 
     <link rel="preload" as="image" href="./assets/portada.webp?v=2" fetchpriority="high" />
 
-    <link rel="stylesheet" href="./styles.css?b=20260521A3f" />
+    <link rel="stylesheet" href="./styles.css?b=20260521A3g" />
   </head>
   <body>
     <div class="atmosfera" aria-hidden="true"></div>
@@ -74,30 +74,52 @@
 
             <div class="movible" data-editable="nombre-valentina">
               <h1 class="portada__nombre">
-                <span class="linea portada__nombre--brush">XV</span>
-                <!-- Corona doodle verde lima encima del XV -->
-                <svg class="portada__corona" viewBox="0 0 64 40" fill="none" aria-hidden="true">
-                  <path d="M4 36 L4 14 L16 24 L24 6 L32 22 L40 6 L48 24 L60 14 L60 36 Z"
-                        fill="#c7ff45" stroke="#c7ff45" stroke-width="2.5" stroke-linejoin="round"/>
-                  <circle cx="4" cy="14" r="2.5" fill="#c7ff45"/>
-                  <circle cx="24" cy="6" r="2.5" fill="#c7ff45"/>
-                  <circle cx="40" cy="6" r="2.5" fill="#c7ff45"/>
-                  <circle cx="60" cy="14" r="2.5" fill="#c7ff45"/>
+                <!-- "XV" como SVG inline con drips estilo spray paint -->
+                <svg class="portada__xv" viewBox="0 0 240 320" fill="none" aria-hidden="true">
+                  <g>
+                    <path d="M14 20 L106 150" stroke="#a48bff" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M106 20 L14 150" stroke="#a48bff" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M22 150 L22 220" stroke="#a48bff" stroke-width="8" stroke-linecap="round"/>
+                    <circle cx="22" cy="226" r="9" fill="#a48bff"/>
+                    <path d="M98 150 L98 198" stroke="#a48bff" stroke-width="7" stroke-linecap="round"/>
+                    <circle cx="98" cy="204" r="7" fill="#a48bff"/>
+                    <path d="M60 110 L60 144" stroke="#a48bff" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+                  </g>
+                  <g transform="translate(132, 0)">
+                    <path d="M4 20 L52 150 L100 20" stroke="#a48bff" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M52 150 L52 226" stroke="#a48bff" stroke-width="9" stroke-linecap="round"/>
+                    <circle cx="52" cy="232" r="10" fill="#a48bff"/>
+                    <path d="M14 60 L14 100" stroke="#a48bff" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+                    <path d="M88 80 L88 118" stroke="#a48bff" stroke-width="5" stroke-linecap="round" opacity="0.65"/>
+                  </g>
                 </svg>
-                <!-- Corazones doodle lavender al lado del XV -->
-                <svg class="portada__corazones" viewBox="0 0 40 60" fill="none" aria-hidden="true">
-                  <path d="M8 18 Q4 13 8 9 Q12 6 14 11 Q16 6 20 9 Q24 13 20 18 L14 25 Z"
-                        stroke="#a48bff" stroke-width="2.2" stroke-linejoin="round" fill="none"/>
-                  <path d="M22 42 Q18 38 21 35 Q24 33 25 37 Q26 33 29 35 Q32 38 28 42 L25 48 Z"
-                        stroke="#a48bff" stroke-width="2.2" stroke-linejoin="round" fill="none"/>
+                <!-- Corona doodle verde lima — encima a la derecha del MIS/XV -->
+                <svg class="portada__corona" viewBox="0 0 80 56" fill="none" aria-hidden="true">
+                  <path d="M6 50 L12 18 L26 38 L40 8 L54 38 L68 18 L74 50 Z"
+                        fill="#c7ff45" stroke="#c7ff45" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+                  <circle cx="12" cy="18" r="4" fill="#c7ff45"/>
+                  <circle cx="40" cy="8" r="4" fill="#c7ff45"/>
+                  <circle cx="68" cy="18" r="4" fill="#c7ff45"/>
+                </svg>
+                <!-- Corazón outline lavender al lado-derecho del XV -->
+                <svg class="portada__corazon" viewBox="0 0 50 50" fill="none" aria-hidden="true">
+                  <path d="M25 44 Q8 30 8 18 Q8 8 17 8 Q22 8 25 14 Q28 8 33 8 Q42 8 42 18 Q42 30 25 44 Z"
+                        stroke="#a48bff" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
                 </svg>
               </h1>
             </div>
 
             <div class="movible movible--invita" data-editable="invita">
               <p class="portada__invita">
-                <span class="portada__invita-l1">No es solo una fiesta,</span>
-                <span class="portada__invita-l2">Es mi momento.</span>
+                <span class="portada__invita-l1">No es solo<br/>una fiesta,</span>
+                <span class="portada__invita-l2-wrap">
+                  <span class="portada__invita-l2">Es mi momento.</span>
+                  <!-- Brush stroke decorativo lavender debajo de "Es mi momento" -->
+                  <svg class="portada__invita-brush" viewBox="0 0 220 18" fill="none" aria-hidden="true" preserveAspectRatio="none">
+                    <path d="M4 10 Q40 4 80 9 Q120 14 160 8 Q190 4 216 9"
+                          stroke="#a48bff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
               </p>
             </div>
           </div>
