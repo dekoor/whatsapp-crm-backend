@@ -2327,10 +2327,12 @@ body.edit-mode .galeria__pista {
 }
 
 .logo-badge__img {
-  width: 52%;
-  height: 52%;
-  max-width: 52%;
-  max-height: 52%;
+  /* Tamaño absoluto en lugar de porcentaje para que no compita con el
+     tamaño intrínseco del PNG/WebP (256x256) cuando grid hace su layout */
+  width: clamp(48px, 11vw, 62px);
+  height: clamp(48px, 11vw, 62px);
+  max-width: clamp(48px, 11vw, 62px);
+  max-height: clamp(48px, 11vw, 62px);
   object-fit: contain;
   display: block;
 }
