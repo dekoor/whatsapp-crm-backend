@@ -9,13 +9,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Allura&family=Caveat:wght@400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Great+Vibes&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Allura&family=Caveat:wght@400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Great+Vibes&family=Inter:wght@300;400;500;600&family=Permanent+Marker&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
       rel="stylesheet"
     />
 
     <link rel="preload" as="image" href="./assets/portada.webp?v=2" fetchpriority="high" />
 
-    <link rel="stylesheet" href="./styles.css?b=20260521A3e" />
+    <link rel="stylesheet" href="./styles.css?b=20260521A3f" />
   </head>
   <body>
     <div class="atmosfera" aria-hidden="true"></div>
@@ -69,23 +69,42 @@
         <header class="portada__contenido">
           <div class="portada__top">
             <div class="movible" data-editable="kicker">
-              <p class="portada__kicker">
-                <span>M</span><span>I</span><span>S</span><span class="sep">·</span><span>X</span><span>V</span>
-              </p>
+              <p class="portada__kicker portada__kicker--brush">MIS</p>
             </div>
 
             <div class="movible" data-editable="nombre-valentina">
               <h1 class="portada__nombre">
-                <span class="linea">Nombre</span>
+                <span class="linea portada__nombre--brush">XV</span>
+                <!-- Corona doodle verde lima encima del XV -->
+                <svg class="portada__corona" viewBox="0 0 64 40" fill="none" aria-hidden="true">
+                  <path d="M4 36 L4 14 L16 24 L24 6 L32 22 L40 6 L48 24 L60 14 L60 36 Z"
+                        fill="#c7ff45" stroke="#c7ff45" stroke-width="2.5" stroke-linejoin="round"/>
+                  <circle cx="4" cy="14" r="2.5" fill="#c7ff45"/>
+                  <circle cx="24" cy="6" r="2.5" fill="#c7ff45"/>
+                  <circle cx="40" cy="6" r="2.5" fill="#c7ff45"/>
+                  <circle cx="60" cy="14" r="2.5" fill="#c7ff45"/>
+                </svg>
+                <!-- Corazones doodle lavender al lado del XV -->
+                <svg class="portada__corazones" viewBox="0 0 40 60" fill="none" aria-hidden="true">
+                  <path d="M8 18 Q4 13 8 9 Q12 6 14 11 Q16 6 20 9 Q24 13 20 18 L14 25 Z"
+                        stroke="#a48bff" stroke-width="2.2" stroke-linejoin="round" fill="none"/>
+                  <path d="M22 42 Q18 38 21 35 Q24 33 25 37 Q26 33 29 35 Q32 38 28 42 L25 48 Z"
+                        stroke="#a48bff" stroke-width="2.2" stroke-linejoin="round" fill="none"/>
+                </svg>
               </h1>
             </div>
 
             <div class="movible movible--invita" data-editable="invita">
-              <p class="portada__invita">¡Estás invitado a mi fiesta de XV años!</p>
+              <p class="portada__invita">
+                <span class="portada__invita-l1">No es solo una fiesta,</span>
+                <span class="portada__invita-l2">Es mi momento.</span>
+              </p>
             </div>
           </div>
 
-          <div class="portada__detalles">
+          <!-- Bloques fecha/hora ocultos visualmente por ahora (se mantienen
+               en el DOM para que el customizer pueda seguir editándolos) -->
+          <div class="portada__detalles" hidden>
             <div class="movible movible--fecha-bloque" data-editable="fecha">
               <p class="portada__bloque portada__bloque--fecha">
                 <span class="portada__bloque-top">SÁBADO</span>
