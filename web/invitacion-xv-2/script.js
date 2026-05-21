@@ -4,7 +4,7 @@
 
 // Scroll suave al tocar el indicador de la portada.
 document.addEventListener("DOMContentLoaded", () => {
-  const btn = document.querySelector(".portada__scroll");
+  const btn = document.querySelector(".portada__heart");
   if (btn) {
     btn.addEventListener("click", (e) => {
       // En modo editor lo estamos arrastrando, no hacer scroll

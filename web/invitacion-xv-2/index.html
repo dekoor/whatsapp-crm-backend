@@ -15,7 +15,7 @@
 
     <link rel="preload" as="image" href="./assets/portada.webp" fetchpriority="high" />
 
-    <link rel="stylesheet" href="./styles.css?b=20260522a" />
+    <link rel="stylesheet" href="./styles.css?b=20260522b" />
   </head>
   <body>
     <div class="atmosfera" aria-hidden="true"></div>
@@ -67,41 +67,73 @@
         <div class="portada__marco" aria-hidden="true"></div>
 
         <header class="portada__contenido">
-          <div class="portada__top">
-            <div class="movible" data-editable="kicker">
-              <p class="portada__kicker">
-                <span>X</span><span>V</span><span class="sep">·</span><span>A</span><span>Ñ</span><span>O</span><span>S</span>
-              </p>
+          <div class="portada__hero">
+            <div class="movible" data-editable="portada-mis">
+              <p class="portada__mis">Mis</p>
             </div>
 
-            <div class="movible" data-editable="nombre-valentina">
+            <div class="movible" data-editable="portada-xv">
+              <div class="portada__xv-wrap">
+                <p class="portada__xv" aria-label="quince">XV</p>
+                <svg class="portada__bow" viewBox="0 0 120 160" aria-hidden="true">
+                  <defs>
+                    <linearGradient id="bowFill" x1="10%" y1="0%" x2="90%" y2="100%">
+                      <stop offset="0%" stop-color="#fbe1e6" />
+                      <stop offset="45%" stop-color="#e8a4b1" />
+                      <stop offset="100%" stop-color="#a8606e" />
+                    </linearGradient>
+                    <linearGradient id="bowKnot" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stop-color="#c47987" />
+                      <stop offset="100%" stop-color="#7d4856" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M56 64 C50 92 38 122 26 150 L48 142 L62 74 Z" fill="url(#bowFill)" />
+                  <path d="M64 64 C70 92 82 122 94 150 L72 142 L58 74 Z" fill="url(#bowFill)" />
+                  <path d="M56 64 C50 92 38 122 26 150 L34 144 L60 74 Z" fill="rgba(120,55,70,0.20)" />
+                  <path d="M64 64 C70 92 82 122 94 150 L86 144 L60 74 Z" fill="rgba(120,55,70,0.20)" />
+                  <path d="M60 52 C28 26 4 40 10 60 C16 80 42 72 60 62 Z" fill="url(#bowFill)" />
+                  <path d="M60 52 C92 26 116 40 110 60 C104 80 78 72 60 62 Z" fill="url(#bowFill)" />
+                  <path d="M58 58 C42 54 24 56 16 62 C26 66 42 64 58 64 Z" fill="rgba(120,55,70,0.16)" />
+                  <path d="M62 58 C78 54 96 56 104 62 C94 66 78 64 62 64 Z" fill="rgba(120,55,70,0.16)" />
+                  <rect x="52" y="46" width="16" height="24" rx="3" fill="url(#bowKnot)" />
+                  <rect x="54.5" y="48.5" width="11" height="19" rx="2" fill="#d68b96" />
+                  <path d="M55 52 C58 54 62 54 65 52" stroke="rgba(255,240,242,0.55)" stroke-width="0.9" fill="none" stroke-linecap="round" />
+                </svg>
+              </div>
+            </div>
+
+            <div class="movible" data-editable="portada-nombre-1">
               <h1 class="portada__nombre">
                 <span class="linea">Camila</span>
               </h1>
             </div>
 
-            <div class="movible movible--sofia" data-editable="nombre-sofia">
-              <p class="portada__nombre">
+            <div class="movible" data-editable="portada-nombre-2">
+              <p class="portada__nombre portada__nombre--alt">
                 <span class="linea linea--alt">Renata</span>
               </p>
             </div>
-          </div>
 
-          <div class="movible" data-editable="fecha">
-            <p class="portada__fecha">
-              <span>08</span>
-              <span class="punto">·</span>
-              <span>Agosto</span>
-              <span class="punto">·</span>
-              <span>2026</span>
-            </p>
+            <div class="movible" data-editable="portada-frase">
+              <p class="portada__frase">
+                <span>Estás invitado a celebrar</span>
+                <span>mis quince años</span>
+              </p>
+            </div>
           </div>
         </header>
 
-        <div class="movible movible--scroll" data-editable="scroll">
-          <button class="portada__scroll" type="button" aria-label="Desliza para continuar">
-            <span class="portada__scroll-label">Desliza</span>
-            <span class="portada__scroll-line" aria-hidden="true"></span>
+        <div class="movible movible--scroll" data-editable="portada-heart">
+          <button class="portada__heart" type="button" aria-label="Desliza para continuar">
+            <svg viewBox="0 0 32 28" aria-hidden="true">
+              <path
+                d="M16 25 C16 25 3 17 3 9 C3 4.5 6.5 1.5 10.5 1.5 C13 1.5 15.2 3 16 5 C16.8 3 19 1.5 21.5 1.5 C25.5 1.5 29 4.5 29 9 C29 17 16 25 16 25 Z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linejoin="round"
+              />
+            </svg>
           </button>
         </div>
       </section>
@@ -759,6 +791,6 @@
       <button type="button" class="edit-bar__btn edit-bar__btn--primary" data-action="exit">Salir</button>
     </div>
 
-    <script src="./script.js?b=20260521D" defer></script>
+    <script src="./script.js?b=20260522b" defer></script>
   </body>
 </html>
