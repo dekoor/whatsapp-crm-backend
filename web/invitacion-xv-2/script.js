@@ -425,7 +425,7 @@ function initCountdown() {
     diff -= minutos * 60000;
     const segundos = Math.floor(diff / 1000);
 
-    setNum(els.dias, String(dias).padStart(3, "0"));
+    setNum(els.dias, String(dias));
     setNum(els.horas, String(horas).padStart(2, "0"));
     setNum(els.minutos, String(minutos).padStart(2, "0"));
     setNum(els.segundos, String(segundos).padStart(2, "0"));
