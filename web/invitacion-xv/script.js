@@ -283,13 +283,20 @@ function fitNameLines() {
 
   // Una vez que el browser aplicó el reset, medimos
   requestAnimationFrame(() => {
-    // El contenedor que queremos que NO sobrepase es el contenido
-    // central de la portada (que respeta el padding del section)
     const container =
       document.querySelector(".portada__contenido") || elV.parentElement;
     if (!container) return;
 
-    const maxWidth = container.clientWidth * 0.94; // 6% de aire a los lados
+    // clientWidth incluye el padding del contenedor, pero el texto
+    // sólo dispone del content-box. Restamos padding y dejamos
+    // margen extra porque el text-shadow del nombre extiende el
+    // halo unos 22 px a cada lado, además del letter-spacing
+    const cs = getComputedStyle(container);
+    const padL = parseFloat(cs.paddingLeft) || 0;
+    const padR = parseFloat(cs.paddingRight) || 0;
+    const usable = container.clientWidth - padL - padR;
+    const maxWidth = usable * 0.9; // 10% extra para el glow del shadow
+
     const wV = elV.scrollWidth;
     const wS = hasSecond ? elS.scrollWidth : 0;
     const widest = Math.max(wV, wS);
