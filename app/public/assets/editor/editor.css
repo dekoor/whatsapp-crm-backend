@@ -1,0 +1,197 @@
+/* ============================================================
+   EDITOR — modo edicion secreto
+   Se activa con 5 taps consecutivos (ventana 1.5s) en cualquier
+   zona no interactiva. Permite mover y redimensionar los
+   elementos marcados con [data-editable] en el HTML. Linea guia
+   vertical en el centro del phone, snap a centro automatico.
+   ============================================================ */
+
+/* En modo editor: el transform inline (via CSS vars) toma control
+   del elemento. Forzamos !important para sobrescribir los
+   transforms de reveal/breathing. */
+body.is-editor [data-editable] {
+  transform:
+    translate(var(--editor-x, 0px), var(--editor-y, 0px))
+    scale(var(--editor-scale, 1)) !important;
+  animation: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  outline: 1px dashed rgba(255, 43, 214, 0.55);
+  outline-offset: 5px;
+  cursor: grab;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  position: relative;
+  transform-origin: center center;
+  z-index: 1;
+}
+
+body.is-editor [data-editable]:active {
+  cursor: grabbing;
+  outline-color: var(--rosa-neon);
+  box-shadow: 0 0 22px rgba(255, 43, 214, 0.35);
+}
+
+/* Handle de resize: esquina inferior derecha */
+.editor-handle {
+  position: absolute;
+  right: -10px;
+  bottom: -10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--rosa-neon);
+  border: 2px solid var(--blanco-glow);
+  box-shadow:
+    0 0 12px rgba(255, 43, 214, 0.7),
+    0 0 24px rgba(138, 43, 255, 0.4);
+  cursor: nwse-resize;
+  touch-action: none;
+  z-index: 10001;
+}
+.editor-handle::before {
+  /* Punto de mira interno */
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* Overlay del editor (barra + linea guia) — vive dentro del .phone */
+.editor-ui {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Barra superior con label + boton salir */
+.editor-bar {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0.4rem 0.35rem 0.95rem;
+  background: rgba(10, 6, 18, 0.85);
+  border: 1px solid rgba(255, 43, 214, 0.5);
+  border-radius: 999px;
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  box-shadow:
+    0 0 16px rgba(255, 43, 214, 0.35),
+    0 4px 14px rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
+}
+
+.editor-bar__label {
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: 0.62rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--rosa-neon-soft);
+  text-shadow: 0 0 10px rgba(255, 43, 214, 0.5);
+}
+
+.editor-bar__exit {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 43, 214, 0.15);
+  border: 1px solid rgba(255, 43, 214, 0.55);
+  border-radius: 50%;
+  color: var(--blanco-glow);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  transition: background .25s ease, transform .25s ease, box-shadow .25s ease;
+}
+.editor-bar__exit:hover,
+.editor-bar__exit:focus-visible {
+  background: rgba(255, 43, 214, 0.35);
+  box-shadow: 0 0 14px rgba(255, 43, 214, 0.55);
+  transform: scale(1.06);
+  outline: none;
+}
+
+/* Linea guia vertical — centro del phone */
+.editor-guide {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  pointer-events: none;
+  transition: opacity .2s ease, background .2s ease, box-shadow .2s ease;
+}
+.editor-guide--v {
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(255, 43, 214, 0.32) 18%,
+    rgba(255, 43, 214, 0.32) 82%,
+    transparent 100%
+  );
+  opacity: 0.6;
+}
+.editor-guide--v.is-snap {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--rosa-neon) 18%,
+    var(--rosa-neon) 82%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 8px rgba(255, 43, 214, 0.75),
+    0 0 18px rgba(138, 43, 255, 0.5);
+  opacity: 1;
+}
+
+/* Mini indicador de progreso de taps (esquina inferior) — solo visible
+   en cuanto el primer tap arranca el contador */
+.editor-taps {
+  position: fixed;
+  bottom: 18px;
+  right: 18px;
+  display: flex;
+  gap: 5px;
+  padding: 6px 8px;
+  background: rgba(10, 6, 18, 0.7);
+  border: 1px solid rgba(255, 43, 214, 0.35);
+  border-radius: 999px;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  z-index: 10000;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .25s ease, transform .25s ease;
+  pointer-events: none;
+}
+.editor-taps.is-on {
+  opacity: 1;
+  transform: translateY(0);
+}
+.editor-taps__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  transition: background .2s ease, box-shadow .2s ease;
+}
+.editor-taps__dot.is-active {
+  background: var(--rosa-neon);
+  box-shadow: 0 0 8px rgba(255, 43, 214, 0.7);
+}
