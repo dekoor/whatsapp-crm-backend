@@ -212,9 +212,10 @@ img {
   align-items: center;
   gap: clamp(2px, 0.8vh, 10px);
   padding: 0.08em 0; /* espacio para los descenders del script */
-  /* sombra del bloque entero para despegar del fondo */
-  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.55))
-    drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
+  /* Sombras en capas para profundidad + perímetro sutil rose-gold */
+  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.5))
+    drop-shadow(0 1px 0 rgba(125, 73, 81, 0.55))
+    drop-shadow(0 0 1px rgba(255, 244, 234, 0.4));
 }
 
 .portada__nombre .linea {
@@ -224,22 +225,17 @@ img {
   animation: nombreIn 1.2s var(--ease) forwards;
 
   /* === Gradiente metálico oro rosado ===
-     Bandas oscuras → claras → highlight central → claras → oscuras
-     simulan un cilindro de metal pulido reflejando luz */
+     Top casi blanco → peach → rose-gold → rose-gold profundo.
+     Imita un oro rosado pulido con la luz cayendo desde arriba. */
   background: linear-gradient(
     180deg,
-    #5e2f39 0%,
-    #8a4a55 8%,
-    #b06974 17%,
-    #d49aa2 27%,
-    #f3d6c5 36%,
-    #fff5e8 45%,
-    #fff5e8 50%,
-    #f3d6c5 56%,
-    #e3b3b9 64%,
-    #b87681 75%,
-    #8a4a55 87%,
-    #5e2f39 100%
+    #fff4ea 0%,
+    /* highlight superior casi blanco */ #fadfca 16%,
+    /* peach claro */ #f0c2c6 34%,
+    /* rose-gold luminoso */ #dba2ab 52%,
+    /* rose-gold medio */ #c08490 70%,
+    /* rose-gold deeper */ #a26571 86%,
+    /* sombra rosada */ #7d4951 100% /* base profunda */
   );
   -webkit-background-clip: text;
   background-clip: text;
@@ -247,22 +243,18 @@ img {
   color: transparent;
 }
 
-/* Variante alterna para "Sofía" — desplaza el highlight para que las
-   dos líneas no parezcan calcadas */
+/* Variante "Sofía" — desplaza el highlight para diferenciar las dos
+   líneas y simular reflejo distinto en cada palabra */
 .portada__nombre .linea--alt {
   background: linear-gradient(
     180deg,
-    #5e2f39 0%,
-    #8a4a55 10%,
-    #b87681 22%,
-    #e3b3b9 32%,
-    #f3d6c5 42%,
-    #fff5e8 50%,
-    #f3d6c5 58%,
-    #d49aa2 68%,
-    #b06974 80%,
-    #8a4a55 90%,
-    #5e2f39 100%
+    #fff8f0 0%,
+    #f8d5bf 20%,
+    #ebb5b9 40%,
+    #d099a1 58%,
+    #b67682 76%,
+    #8a505a 92%,
+    #6b3b44 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
@@ -279,11 +271,13 @@ img {
   background: linear-gradient(
     to right,
     transparent 0%,
-    #8a4a55 18%,
-    #d49aa2 38%,
-    #fff5e8 50%,
-    #d49aa2 62%,
-    #8a4a55 82%,
+    #a26571 14%,
+    #dba2ab 32%,
+    #fadfca 46%,
+    #fff4ea 50%,
+    #fadfca 54%,
+    #dba2ab 68%,
+    #a26571 86%,
     transparent 100%
   );
   margin: clamp(8px, 1.6vh, 16px) 0;
@@ -291,7 +285,7 @@ img {
   transform: scaleX(0);
   transform-origin: center;
   animation: divisorIn 1s var(--ease) 1.25s forwards;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
 }
 
 @keyframes divisorIn {
