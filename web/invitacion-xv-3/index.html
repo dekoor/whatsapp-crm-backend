@@ -15,7 +15,7 @@
 
     <link rel="preload" as="image" href="./assets/portada.webp?v=2" fetchpriority="high" />
 
-    <link rel="stylesheet" href="./styles.css?b=20260521A3g" />
+    <link rel="stylesheet" href="./styles.css?b=20260521A3h" />
   </head>
   <body>
     <div class="atmosfera" aria-hidden="true"></div>
@@ -68,38 +68,70 @@
 
         <header class="portada__contenido">
           <div class="portada__top">
-            <div class="movible" data-editable="kicker">
-              <p class="portada__kicker portada__kicker--brush">MIS</p>
+            <div class="movible portada__mis-wrap" data-editable="kicker">
+              <!-- "MIS" como SVG inline con filtro de pincelada irregular -->
+              <svg class="portada__mis" viewBox="0 0 300 120" fill="none" aria-label="Mis">
+                <defs>
+                  <filter id="brush-mis" x="-10%" y="-10%" width="120%" height="120%">
+                    <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="2" seed="7" result="t"/>
+                    <feDisplacementMap in="SourceGraphic" in2="t" scale="10" xChannelSelector="R" yChannelSelector="G"/>
+                  </filter>
+                </defs>
+                <g stroke="#fff" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#brush-mis)">
+                  <!-- M -->
+                  <path d="M14 106 L22 14 L62 70 L102 14 L110 106"/>
+                  <!-- I -->
+                  <path d="M148 14 L148 106"/>
+                  <!-- S -->
+                  <path d="M280 28 Q224 14 220 40 Q218 58 252 60 Q286 62 286 84 Q286 108 228 102"/>
+                </g>
+                <!-- Drip pequeño de la S -->
+                <g stroke="#fff" stroke-width="4" stroke-linecap="round" fill="#fff" filter="url(#brush-mis)">
+                  <path d="M232 100 L232 116"/>
+                </g>
+              </svg>
+              <!-- Corona verde lima encima de la S del MIS -->
+              <svg class="portada__corona" viewBox="0 0 80 56" fill="none" aria-hidden="true">
+                <path d="M6 50 L12 18 L26 38 L40 8 L54 38 L68 18 L74 50 Z"
+                      fill="#c7ff45" stroke="#c7ff45" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+                <circle cx="12" cy="18" r="4" fill="#c7ff45"/>
+                <circle cx="40" cy="8" r="4" fill="#c7ff45"/>
+                <circle cx="68" cy="18" r="4" fill="#c7ff45"/>
+              </svg>
             </div>
 
             <div class="movible" data-editable="nombre-valentina">
               <h1 class="portada__nombre">
-                <!-- "XV" como SVG inline con drips estilo spray paint -->
-                <svg class="portada__xv" viewBox="0 0 240 320" fill="none" aria-hidden="true">
-                  <g>
-                    <path d="M14 20 L106 150" stroke="#a48bff" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M106 20 L14 150" stroke="#a48bff" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M22 150 L22 220" stroke="#a48bff" stroke-width="8" stroke-linecap="round"/>
-                    <circle cx="22" cy="226" r="9" fill="#a48bff"/>
-                    <path d="M98 150 L98 198" stroke="#a48bff" stroke-width="7" stroke-linecap="round"/>
-                    <circle cx="98" cy="204" r="7" fill="#a48bff"/>
-                    <path d="M60 110 L60 144" stroke="#a48bff" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+                <!-- "XV" como SVG inline con filtro de pincelada irregular -->
+                <svg class="portada__xv" viewBox="0 0 260 340" fill="none" aria-label="XV">
+                  <defs>
+                    <filter id="brush-xv" x="-8%" y="-8%" width="116%" height="116%">
+                      <feTurbulence type="fractalNoise" baseFrequency="0.022" numOctaves="2" seed="3" result="t"/>
+                      <feDisplacementMap in="SourceGraphic" in2="t" scale="12" xChannelSelector="R" yChannelSelector="G"/>
+                    </filter>
+                  </defs>
+                  <g stroke="#a48bff" stroke-width="36" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#brush-xv)">
+                    <!-- X -->
+                    <path d="M14 20 L106 150"/>
+                    <path d="M106 20 L14 150"/>
+                    <!-- V -->
+                    <path d="M136 20 L184 150 L232 20"/>
                   </g>
-                  <g transform="translate(132, 0)">
-                    <path d="M4 20 L52 150 L100 20" stroke="#a48bff" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M52 150 L52 226" stroke="#a48bff" stroke-width="9" stroke-linecap="round"/>
-                    <circle cx="52" cy="232" r="10" fill="#a48bff"/>
-                    <path d="M14 60 L14 100" stroke="#a48bff" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
-                    <path d="M88 80 L88 118" stroke="#a48bff" stroke-width="5" stroke-linecap="round" opacity="0.65"/>
+                  <!-- Drips (también con filter para que se vean orgánicos) -->
+                  <g stroke="#a48bff" stroke-width="8" stroke-linecap="round" fill="#a48bff" filter="url(#brush-xv)">
+                    <path d="M22 150 L22 232"/>
+                    <circle cx="22" cy="238" r="10"/>
+                    <path d="M98 150 L98 208"/>
+                    <circle cx="98" cy="214" r="8"/>
+                    <path d="M184 150 L184 240"/>
+                    <circle cx="184" cy="246" r="11"/>
                   </g>
-                </svg>
-                <!-- Corona doodle verde lima — encima a la derecha del MIS/XV -->
-                <svg class="portada__corona" viewBox="0 0 80 56" fill="none" aria-hidden="true">
-                  <path d="M6 50 L12 18 L26 38 L40 8 L54 38 L68 18 L74 50 Z"
-                        fill="#c7ff45" stroke="#c7ff45" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-                  <circle cx="12" cy="18" r="4" fill="#c7ff45"/>
-                  <circle cx="40" cy="8" r="4" fill="#c7ff45"/>
-                  <circle cx="68" cy="18" r="4" fill="#c7ff45"/>
+                  <!-- Drips secundarios (más finos) -->
+                  <g stroke="#a48bff" stroke-width="5" stroke-linecap="round" opacity="0.75" filter="url(#brush-xv)">
+                    <path d="M60 110 L60 152"/>
+                    <path d="M146 70 L146 116"/>
+                    <path d="M220 84 L220 128"/>
+                  </g>
                 </svg>
                 <!-- Corazón outline lavender al lado-derecho del XV -->
                 <svg class="portada__corazon" viewBox="0 0 50 50" fill="none" aria-hidden="true">

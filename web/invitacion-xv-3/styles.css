@@ -358,23 +358,29 @@ img {
   padding-left: 0.5em;
 }
 
-/* xv-3 v2: kicker brush "MIS" estilo marker blanco */
-.portada__kicker--brush {
+/* xv-3 v2: "MIS" como SVG con filtro de pincelada — el contenedor
+   posiciona y rota; el SVG hijo es width: 100% del wrapper. */
+.portada__mis-wrap {
   display: inline-block;
-  font-family: var(--f-brush);
-  font-weight: 400;
-  font-size: clamp(2.4rem, 9vw, 3.6rem);
-  letter-spacing: 0;
-  text-transform: none;
-  color: #fff;
-  padding: 0;
-  line-height: 1;
-  text-shadow:
-    0 2px 0 rgba(0, 0, 0, 0.4),
-    0 8px 24px rgba(0, 0, 0, 0.5);
+  position: relative;
+  width: clamp(170px, 48vw, 280px);
   transform: rotate(-3deg);
+  margin-bottom: clamp(-20px, -4vh, -6px);
   opacity: 0;
   animation: nombreIn 0.9s var(--ease) 0.5s forwards;
+}
+
+.portada__mis {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.55));
+}
+
+/* Legacy hook (texto del kicker original) — escondido por completo */
+.portada__kicker--brush,
+.portada__kicker {
+  display: none;
 }
 
 .portada__kicker span {
@@ -407,41 +413,44 @@ img {
   line-height: 0;
 }
 
-/* SVG "XV" gigante con drips. Ancho controlado por clamp para
-   responsive. height auto preserva aspect ratio del viewBox. */
+/* SVG "XV" gigante con drips y filtro de pincelada. Ancho controlado
+   por clamp; el viewBox 260x340 preserva proporciones. */
 .portada__xv {
   display: block;
-  width: clamp(180px, 52vw, 320px);
+  width: clamp(240px, 70vw, 380px);
   height: auto;
-  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.55));
+  filter: drop-shadow(0 8px 22px rgba(0, 0, 0, 0.65));
   transform: rotate(-2deg);
   transform-origin: left center;
   opacity: 0;
   animation: nombreIn 1.2s var(--ease) 0.9s forwards;
 }
 
-/* Corona doodle verde lima encima del XV (arriba-derecha) */
+/* Corona verde lima: ahora vive dentro de .portada__mis-wrap y se
+   posiciona absolute sobre la "S" del MIS (lado derecho-superior). */
 .portada__corona {
   position: absolute;
-  top: -0.4em;
-  right: -0.6em;
-  width: clamp(54px, 14vw, 88px);
+  top: -42%;
+  right: -8%;
+  width: 38%;
   height: auto;
   transform: rotate(8deg);
   filter: drop-shadow(0 3px 10px rgba(199, 255, 69, 0.4));
   pointer-events: none;
   opacity: 0;
-  animation: nombreIn 0.9s var(--ease) 1.5s forwards;
+  animation: nombreIn 0.9s var(--ease) 1.4s forwards;
 }
 
-/* Un corazón outline lavender, abajo-derecha del XV (referencia: solo uno) */
+/* Un corazón outline lavender al lado-derecho del XV, a la altura de
+   la "V" (referencia muestra solo uno). */
 .portada__corazon {
   position: absolute;
-  bottom: 12%;
-  right: -1.4em;
-  width: clamp(26px, 7vw, 42px);
+  top: 38%;
+  right: -10%;
+  width: clamp(32px, 8vw, 50px);
   height: auto;
-  transform: rotate(-8deg);
+  transform: rotate(-10deg);
+  filter: drop-shadow(0 2px 6px rgba(164, 139, 255, 0.4));
   pointer-events: none;
   opacity: 0;
   animation: nombreIn 0.9s var(--ease) 1.7s forwards;
