@@ -673,18 +673,27 @@ img {
 
 /* Grid de 2 filas (cards arriba, labels abajo) con 7 columnas
    (4 números + 3 separadores). align-items: center centra los `:`
-   verticalmente contra las cards sin trucos de margin. */
+   verticalmente contra las cards sin trucos de margin.
+   minmax(0, 1fr) permite que las columnas se compriman bajo el
+   ancho intrínseco de las cards para evitar overflow horizontal
+   en pantallas estrechas. */
 .countdown__grid {
   display: grid;
-  grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+  grid-template-columns:
+    minmax(0, 1fr) auto
+    minmax(0, 1fr) auto
+    minmax(0, 1fr) auto
+    minmax(0, 1fr);
   grid-template-areas:
     "nd s1 nh s2 nm s3 ns"
     "ld .  lh .  lm .  ls";
-  column-gap: clamp(6px, 2vw, 16px);
+  column-gap: clamp(4px, 1.4vw, 12px);
   row-gap: clamp(8px, 1.6vh, 14px);
   align-items: center;
-  justify-items: center;
+  justify-items: stretch;
   width: 100%;
+  max-width: 540px;
+  margin-inline: auto;
 }
 
 .countdown__num[data-cd="dias"]     { grid-area: nd; }
@@ -694,25 +703,28 @@ img {
 .countdown__sep:nth-of-type(1) { grid-area: s1; }
 .countdown__sep:nth-of-type(2) { grid-area: s2; }
 .countdown__sep:nth-of-type(3) { grid-area: s3; }
-.countdown__label:nth-of-type(1) { grid-area: ld; }
-.countdown__label:nth-of-type(2) { grid-area: lh; }
-.countdown__label:nth-of-type(3) { grid-area: lm; }
-.countdown__label:nth-of-type(4) { grid-area: ls; }
+.countdown__label:nth-of-type(1) { grid-area: ld; justify-self: center; }
+.countdown__label:nth-of-type(2) { grid-area: lh; justify-self: center; }
+.countdown__label:nth-of-type(3) { grid-area: lm; justify-self: center; }
+.countdown__label:nth-of-type(4) { grid-area: ls; justify-self: center; }
 
 /* Card rosa 3D: highlight interior arriba, sombra inferior interna,
    "lip" sólido bajo el borde inferior para profundidad, y drop
-   shadow exterior para asentar la pieza sobre el fondo. */
+   shadow exterior para asentar la pieza sobre el fondo.
+   min-width: 0 + width: 100% permiten que la card respete el ancho
+   de su columna y no fuerce overflow. */
 .countdown__num {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  min-width: clamp(58px, 17vw, 100px);
-  padding: clamp(12px, 2.6vh, 22px) clamp(10px, 2.4vw, 18px);
-  border-radius: clamp(14px, 3vw, 22px);
+  width: 100%;
+  min-width: 0;
+  padding: clamp(10px, 2.2vh, 20px) clamp(4px, 1.2vw, 12px);
+  border-radius: clamp(12px, 2.8vw, 20px);
 
   font-family: var(--f-display);
   font-weight: 500;
-  font-size: clamp(1.85rem, 8.5vw, 3.6rem);
+  font-size: clamp(1.55rem, 7.2vw, 3.2rem);
   line-height: 1;
   letter-spacing: 0.01em;
   font-variant-numeric: tabular-nums;
@@ -723,7 +735,7 @@ img {
     inset 0 2px 0 rgba(255, 255, 255, 0.55),
     inset 0 -3px 6px rgba(120, 50, 65, 0.20),
     0 4px 0 #a8606e,
-    0 14px 24px rgba(140, 70, 88, 0.32);
+    0 12px 22px rgba(140, 70, 88, 0.30);
 
   text-shadow:
     0 1px 0 rgba(140, 70, 88, 0.45),
@@ -739,20 +751,21 @@ img {
 .countdown__label {
   font-family: var(--f-sans);
   font-weight: 400;
-  font-size: clamp(0.62rem, 1.5vw, 0.78rem);
-  letter-spacing: 0.32em;
+  font-size: clamp(0.6rem, 1.5vw, 0.78rem);
+  letter-spacing: 0.28em;
   text-transform: uppercase;
   color: rgba(122, 86, 93, 0.85);
-  padding-left: 0.32em;
+  padding-left: 0.28em;
+  white-space: nowrap;
 }
 
 .countdown__sep {
   font-family: var(--f-display);
   font-weight: 300;
-  font-size: clamp(1.6rem, 6vw, 2.8rem);
+  font-size: clamp(1.1rem, 4vw, 2rem);
   line-height: 1;
   color: var(--c-rose-gold-deep);
-  opacity: 0.6;
+  opacity: 0.55;
   animation: sepBlink 2s ease-in-out infinite;
 }
 
@@ -784,13 +797,6 @@ img {
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
-}
-
-/* En pantallas estrechas, reducimos el gap del grid */
-@media (max-width: 380px) {
-  .countdown__grid {
-    gap: 4px;
-  }
 }
 
 /* =========================================================
