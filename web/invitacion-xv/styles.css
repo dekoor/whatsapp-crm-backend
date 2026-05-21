@@ -211,7 +211,7 @@ img {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(2px, 0.8vh, 10px);
+  gap: clamp(12px, 2.5vh, 28px);
   margin: 0;
   padding: 0.08em 0;
 }
@@ -287,36 +287,6 @@ img {
   }
 }
 
-
-.portada__nombre .divisor {
-  width: 96px;
-  height: 2px;
-  background: linear-gradient(
-    to right,
-    transparent 0%,
-    #a26571 14%,
-    #dba2ab 32%,
-    #fadfca 46%,
-    #fff4ea 50%,
-    #fadfca 54%,
-    #dba2ab 68%,
-    #a26571 86%,
-    transparent 100%
-  );
-  margin: clamp(8px, 1.6vh, 16px) 0;
-  opacity: 0;
-  transform: scaleX(0);
-  transform-origin: center;
-  animation: divisorIn 1s var(--ease) 1.25s forwards;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
-}
-
-@keyframes divisorIn {
-  to {
-    opacity: 1;
-    transform: scaleX(1);
-  }
-}
 
 @keyframes nombreIn {
   to {
@@ -927,7 +897,6 @@ body.edit-mode .portada::after {
   .portada__marco::after,
   .portada__kicker span,
   .portada__nombre .linea,
-  .portada__nombre .divisor,
   .portada__fecha,
   .portada__scroll,
   .portada__scroll-line::after {
