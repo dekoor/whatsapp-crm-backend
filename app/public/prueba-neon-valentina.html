@@ -1806,6 +1806,204 @@
       }
       .portada__bg { animation: none; }
     }
+
+    /* ============================================================
+       EDITOR — modo edicion secreto
+       Se activa con 5 taps consecutivos (ventana 1.5s) en cualquier
+       zona no interactiva. Permite mover y redimensionar los
+       elementos marcados con [data-editor] via JS. Linea guia
+       vertical en el centro del phone, snap a centro automatico.
+       ============================================================ */
+
+    /* En modo editor: el transform inline (via CSS vars) toma control
+       del elemento. Forzamos !important para sobrescribir los
+       transforms de reveal/breathing. */
+    body.is-editor [data-editor] {
+      transform:
+        translate(var(--editor-x, 0px), var(--editor-y, 0px))
+        scale(var(--editor-scale, 1)) !important;
+      animation: none !important;
+      filter: none !important;
+      opacity: 1 !important;
+      outline: 1px dashed rgba(255, 43, 214, 0.55);
+      outline-offset: 5px;
+      cursor: grab;
+      touch-action: none;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-user-drag: none;
+      -webkit-touch-callout: none;
+      position: relative;
+      transform-origin: center center;
+      z-index: 1;
+    }
+
+    body.is-editor [data-editor]:active {
+      cursor: grabbing;
+      outline-color: var(--rosa-neon);
+      box-shadow: 0 0 22px rgba(255, 43, 214, 0.35);
+    }
+
+    /* Handle de resize: esquina inferior derecha */
+    .editor-handle {
+      position: absolute;
+      right: -10px;
+      bottom: -10px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--rosa-neon);
+      border: 2px solid var(--blanco-glow);
+      box-shadow:
+        0 0 12px rgba(255, 43, 214, 0.7),
+        0 0 24px rgba(138, 43, 255, 0.4);
+      cursor: nwse-resize;
+      touch-action: none;
+      z-index: 10001;
+    }
+    .editor-handle::before {
+      /* Punto de mira interno */
+      content: '';
+      position: absolute;
+      inset: 5px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.85);
+    }
+
+    /* Overlay del editor (barra + linea guia) — vive dentro del .phone */
+    .editor-ui {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Barra superior con label + boton salir */
+    .editor-bar {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.35rem 0.4rem 0.35rem 0.95rem;
+      background: rgba(10, 6, 18, 0.85);
+      border: 1px solid rgba(255, 43, 214, 0.5);
+      border-radius: 999px;
+      -webkit-backdrop-filter: blur(14px) saturate(140%);
+      backdrop-filter: blur(14px) saturate(140%);
+      box-shadow:
+        0 0 16px rgba(255, 43, 214, 0.35),
+        0 4px 14px rgba(0, 0, 0, 0.5);
+      pointer-events: auto;
+    }
+
+    .editor-bar__label {
+      font-family: var(--font-ui);
+      font-weight: 400;
+      font-size: 0.62rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--rosa-neon-soft);
+      text-shadow: 0 0 10px rgba(255, 43, 214, 0.5);
+    }
+
+    .editor-bar__exit {
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 43, 214, 0.15);
+      border: 1px solid rgba(255, 43, 214, 0.55);
+      border-radius: 50%;
+      color: var(--blanco-glow);
+      font-family: var(--font-ui);
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0;
+      transition: background .25s ease, transform .25s ease, box-shadow .25s ease;
+    }
+    .editor-bar__exit:hover,
+    .editor-bar__exit:focus-visible {
+      background: rgba(255, 43, 214, 0.35);
+      box-shadow: 0 0 14px rgba(255, 43, 214, 0.55);
+      transform: scale(1.06);
+      outline: none;
+    }
+
+    /* Linea guia vertical — centro del phone */
+    .editor-guide {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      pointer-events: none;
+      transition: opacity .2s ease, background .2s ease, box-shadow .2s ease;
+    }
+    .editor-guide--v {
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(255, 43, 214, 0.32) 18%,
+        rgba(255, 43, 214, 0.32) 82%,
+        transparent 100%
+      );
+      opacity: 0.6;
+    }
+    .editor-guide--v.is-snap {
+      background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        var(--rosa-neon) 18%,
+        var(--rosa-neon) 82%,
+        transparent 100%
+      );
+      box-shadow:
+        0 0 8px rgba(255, 43, 214, 0.75),
+        0 0 18px rgba(138, 43, 255, 0.5);
+      opacity: 1;
+    }
+
+    /* Mini indicador de progreso de taps (esquina inferior) — solo visible
+       en cuanto el primer tap arranca el contador */
+    .editor-taps {
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      display: flex;
+      gap: 5px;
+      padding: 6px 8px;
+      background: rgba(10, 6, 18, 0.7);
+      border: 1px solid rgba(255, 43, 214, 0.35);
+      border-radius: 999px;
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      z-index: 10000;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity .25s ease, transform .25s ease;
+      pointer-events: none;
+    }
+    .editor-taps.is-on {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .editor-taps__dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.18);
+      transition: background .2s ease, box-shadow .2s ease;
+    }
+    .editor-taps__dot.is-active {
+      background: var(--rosa-neon);
+      box-shadow: 0 0 8px rgba(255, 43, 214, 0.7);
+    }
   </style>
 </head>
 <body>
@@ -2219,6 +2417,306 @@
       } else {
         // Fallback navegadores antiguos — mostrar directamente
         revealTargets.forEach(function (el) { el.classList.add('is-visible'); });
+      }
+    })();
+
+    /* ============================================================
+       EDITOR — modo secreto activado con 5 taps consecutivos.
+       IIFE aislada: no toca el resto del codigo. Toda la logica
+       de drag / resize / snap vive aqui.
+       ============================================================ */
+    (function () {
+      'use strict';
+
+      // Configuracion
+      var TAPS_REQUIRED  = 5;
+      var TAP_WINDOW_MS  = 1500;   // tiempo maximo entre taps
+      var SNAP_PX        = 10;     // distancia para activar snap
+      var SCALE_MIN      = 0.4;
+      var SCALE_MAX      = 3.0;
+      var SCALE_SPEED    = 250;    // px de arrastre para +1.0x
+
+      // Selectores de objetos editables (arrancamos con el hero)
+      var EDITABLE_SELECTORS = [
+        '.portada__sub',
+        '.portada__nombre',
+        '.portada__fecha',
+        '.portada__cta'
+      ];
+
+      // Estado
+      var tapCount   = 0;
+      var lastTapAt  = 0;
+      var tapTimer   = null;
+      var editorOn   = false;
+      var tapsBar    = null;   // indicador visual de taps
+      var phoneEl    = document.querySelector('.phone') || document.body;
+      var editables  = [];
+
+      // ----- INICIALIZACION -----
+      EDITABLE_SELECTORS.forEach(function (sel) {
+        var el = document.querySelector(sel);
+        if (el) {
+          el.setAttribute('data-editor', '');
+          editables.push(el);
+        }
+      });
+
+      buildTapsIndicator();
+
+      // ----- DETECCION DE 5 TAPS -----
+      document.addEventListener('pointerdown', function (e) {
+        if (editorOn) return;
+        // Ignorar taps sobre elementos interactivos y dentro del editor mismo
+        if (e.target.closest('a, button, input, textarea, select')) return;
+        if (e.target.closest('.editor-ui, .editor-taps')) return;
+
+        var now = Date.now();
+        if (now - lastTapAt > TAP_WINDOW_MS) {
+          tapCount = 1;
+        } else {
+          tapCount += 1;
+        }
+        lastTapAt = now;
+
+        updateTapsIndicator(tapCount);
+
+        if (tapCount >= TAPS_REQUIRED) {
+          tapCount = 0;
+          hideTapsIndicator();
+          enableEditor();
+          return;
+        }
+
+        // Auto-reset si pasa la ventana sin nuevo tap
+        clearTimeout(tapTimer);
+        tapTimer = setTimeout(function () {
+          tapCount = 0;
+          hideTapsIndicator();
+        }, TAP_WINDOW_MS);
+      }, true);
+
+      // ESC para salir (desktop)
+      document.addEventListener('keydown', function (e) {
+        if (editorOn && (e.key === 'Escape' || e.key === 'Esc')) {
+          disableEditor();
+        }
+      });
+
+      // ----- INDICADOR VISUAL DE TAPS (progreso) -----
+      function buildTapsIndicator() {
+        tapsBar = document.createElement('div');
+        tapsBar.className = 'editor-taps';
+        tapsBar.setAttribute('aria-hidden', 'true');
+        for (var i = 0; i < TAPS_REQUIRED; i++) {
+          var dot = document.createElement('span');
+          dot.className = 'editor-taps__dot';
+          tapsBar.appendChild(dot);
+        }
+        document.body.appendChild(tapsBar);
+      }
+
+      function updateTapsIndicator(count) {
+        if (!tapsBar) return;
+        tapsBar.classList.add('is-on');
+        var dots = tapsBar.querySelectorAll('.editor-taps__dot');
+        for (var i = 0; i < dots.length; i++) {
+          dots[i].classList.toggle('is-active', i < count);
+        }
+      }
+
+      function hideTapsIndicator() {
+        if (!tapsBar) return;
+        tapsBar.classList.remove('is-on');
+        var dots = tapsBar.querySelectorAll('.editor-taps__dot');
+        dots.forEach(function (d) { d.classList.remove('is-active'); });
+      }
+
+      // ----- ENABLE / DISABLE -----
+      function enableEditor() {
+        if (editorOn) return;
+        editorOn = true;
+        document.body.classList.add('is-editor');
+        phoneEl.appendChild(buildEditorUI());
+        editables.forEach(setupElement);
+
+        // Bloquear navegacion de <a> mientras editor esta activo
+        document.addEventListener('click', blockClickInEditor, true);
+      }
+
+      function disableEditor() {
+        if (!editorOn) return;
+        editorOn = false;
+        document.body.classList.remove('is-editor');
+        var ui = phoneEl.querySelector('.editor-ui');
+        if (ui) ui.remove();
+        editables.forEach(teardownElement);
+        document.removeEventListener('click', blockClickInEditor, true);
+      }
+
+      function blockClickInEditor(e) {
+        if (e.target.closest('[data-editor]')) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }
+
+      // ----- UI: barra + linea guia centro -----
+      function buildEditorUI() {
+        var ui = document.createElement('div');
+        ui.className = 'editor-ui';
+
+        var bar = document.createElement('div');
+        bar.className = 'editor-bar';
+
+        var label = document.createElement('span');
+        label.className = 'editor-bar__label';
+        label.textContent = 'Editor';
+
+        var exit = document.createElement('button');
+        exit.type = 'button';
+        exit.className = 'editor-bar__exit';
+        exit.setAttribute('aria-label', 'Salir del editor');
+        exit.textContent = '×'; // ×
+        exit.addEventListener('click', disableEditor);
+
+        bar.appendChild(label);
+        bar.appendChild(exit);
+
+        var guide = document.createElement('div');
+        guide.className = 'editor-guide editor-guide--v';
+        guide.setAttribute('aria-hidden', 'true');
+
+        ui.appendChild(bar);
+        ui.appendChild(guide);
+        return ui;
+      }
+
+      // ----- SETUP / TEARDOWN POR ELEMENTO -----
+      function setupElement(el) {
+        // Estado persistido en data-* para sobrevivir toggles del editor
+        var state = {
+          x:     parseFloat(el.dataset.editorX)     || 0,
+          y:     parseFloat(el.dataset.editorY)     || 0,
+          scale: parseFloat(el.dataset.editorScale) || 1
+        };
+        applyState(el, state);
+        el._editorState = state;
+
+        // Handle de resize
+        var handle = document.createElement('span');
+        handle.className = 'editor-handle';
+        handle.setAttribute('aria-hidden', 'true');
+        el.appendChild(handle);
+        el._editorHandle = handle;
+
+        // Listeners
+        el._onDragStart   = function (e) { onDragStart(e, el); };
+        el._onResizeStart = function (e) { onResizeStart(e, el); };
+        el.addEventListener('pointerdown', el._onDragStart);
+        handle.addEventListener('pointerdown', el._onResizeStart);
+      }
+
+      function teardownElement(el) {
+        if (el._editorHandle) el._editorHandle.remove();
+        if (el._onDragStart)  el.removeEventListener('pointerdown', el._onDragStart);
+        el._editorHandle   = null;
+        el._onDragStart    = null;
+        el._onResizeStart  = null;
+      }
+
+      // ----- DRAG -----
+      function onDragStart(e, el) {
+        if (e.target === el._editorHandle) return;  // resize handle prioriza
+        e.preventDefault();
+        e.stopPropagation();
+
+        var state  = el._editorState;
+        var startX = e.clientX;
+        var startY = e.clientY;
+        var baseX  = state.x;
+        var baseY  = state.y;
+        var guide  = document.querySelector('.editor-guide--v');
+
+        try { el.setPointerCapture(e.pointerId); } catch (err) {}
+
+        function move(ev) {
+          var dx = ev.clientX - startX;
+          var dy = ev.clientY - startY;
+          state.x = baseX + dx;
+          state.y = baseY + dy;
+          applyState(el, state);
+
+          // Snap a centro horizontal del phone
+          var phoneRect = phoneEl.getBoundingClientRect();
+          var phoneCx   = phoneRect.left + phoneRect.width / 2;
+          var elRect    = el.getBoundingClientRect();
+          var elCx      = elRect.left + elRect.width / 2;
+          var diff      = phoneCx - elCx;
+
+          if (Math.abs(diff) < SNAP_PX) {
+            state.x += diff;
+            applyState(el, state);
+            if (guide) guide.classList.add('is-snap');
+          } else {
+            if (guide) guide.classList.remove('is-snap');
+          }
+        }
+
+        function up() {
+          document.removeEventListener('pointermove', move);
+          document.removeEventListener('pointerup', up);
+          document.removeEventListener('pointercancel', up);
+          if (guide) guide.classList.remove('is-snap');
+          persistState(el, state);
+        }
+
+        document.addEventListener('pointermove', move);
+        document.addEventListener('pointerup', up);
+        document.addEventListener('pointercancel', up);
+      }
+
+      // ----- RESIZE (escala) -----
+      function onResizeStart(e, el) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var state  = el._editorState;
+        var startX = e.clientX;
+        var baseScale = state.scale;
+
+        function move(ev) {
+          var dx = ev.clientX - startX;
+          var next = baseScale + dx / SCALE_SPEED;
+          if (next < SCALE_MIN) next = SCALE_MIN;
+          if (next > SCALE_MAX) next = SCALE_MAX;
+          state.scale = next;
+          applyState(el, state);
+        }
+
+        function up() {
+          document.removeEventListener('pointermove', move);
+          document.removeEventListener('pointerup', up);
+          document.removeEventListener('pointercancel', up);
+          persistState(el, state);
+        }
+
+        document.addEventListener('pointermove', move);
+        document.addEventListener('pointerup', up);
+        document.addEventListener('pointercancel', up);
+      }
+
+      // ----- APLICAR ESTADO via CSS vars -----
+      function applyState(el, state) {
+        el.style.setProperty('--editor-x',     state.x + 'px');
+        el.style.setProperty('--editor-y',     state.y + 'px');
+        el.style.setProperty('--editor-scale', state.scale);
+      }
+
+      function persistState(el, state) {
+        el.dataset.editorX     = state.x;
+        el.dataset.editorY     = state.y;
+        el.dataset.editorScale = state.scale;
       }
     })();
   </script>
