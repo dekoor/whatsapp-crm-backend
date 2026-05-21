@@ -15,10 +15,28 @@
 
     <link rel="preload" as="image" href="./assets/portada.webp" fetchpriority="high" />
 
-    <link rel="stylesheet" href="./styles.css?b=20260521y" />
+    <link rel="stylesheet" href="./styles.css?b=20260521A" />
   </head>
   <body>
     <div class="atmosfera" aria-hidden="true"></div>
+
+    <!-- Reproductor de YouTube oculto (audio de fondo) -->
+    <div class="yt-host" aria-hidden="true">
+      <div id="yt-player"></div>
+    </div>
+
+    <!-- Botón flotante de música (play/pause) -->
+    <button class="music-toggle" type="button" aria-label="Pausar música" data-state="off">
+      <svg class="music-toggle__icon music-toggle__icon--off" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 00-2.5-4.03v8.06A4.5 4.5 0 0016.5 12z"/>
+        <line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <svg class="music-toggle__icon music-toggle__icon--on" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 00-2.5-4.03v8.06A4.5 4.5 0 0016.5 12zM14 3.23v2.06a7 7 0 010 13.42v2.06a9 9 0 000-17.54z"/>
+      </svg>
+      <span class="music-toggle__pulse" aria-hidden="true"></span>
+    </button>
+
     <main class="invitacion">
       <!-- ============ PORTADA ============ -->
       <section class="portada" aria-label="Portada" data-particles="10">
@@ -740,6 +758,6 @@
       <button type="button" class="edit-bar__btn edit-bar__btn--primary" data-action="exit">Salir</button>
     </div>
 
-    <script src="./script.js?b=20260521z" defer></script>
+    <script src="./script.js?b=20260521A" defer></script>
   </body>
 </html>

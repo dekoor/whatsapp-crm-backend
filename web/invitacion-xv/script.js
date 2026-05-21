@@ -28,7 +28,124 @@ document.addEventListener("DOMContentLoaded", () => {
   initParticles();
   initPhotoSlots();
   initPolaroidTap();
+  initBackgroundMusic();
 });
+
+// =========================================================
+// Música de fondo (YouTube IFrame API)
+// - El reproductor vive oculto fuera del viewport
+// - Autoplay con sonido está bloqueado por los navegadores hasta que
+//   haya un gesto del usuario, así que enganchamos el primer tap en
+//   cualquier parte y arrancamos ahí
+// - Botón flotante para silenciar/reanudar; la preferencia se guarda
+// =========================================================
+const MUSIC_VIDEO_ID = "6Yq_YFDL-jQ";
+const MUSIC_PREF_KEY = "inv-xv:sound";
+
+let ytPlayer = null;
+let ytReady = false;
+let musicPlaying = false;
+let firstTapBound = false;
+
+function initBackgroundMusic() {
+  const btn = document.querySelector(".music-toggle");
+  if (!btn) return;
+
+  // Cargar YouTube IFrame API una sola vez
+  if (!window.YT) {
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
+  }
+
+  window.onYouTubeIframeAPIReady = function () {
+    ytPlayer = new YT.Player("yt-player", {
+      height: "0",
+      width: "0",
+      videoId: MUSIC_VIDEO_ID,
+      playerVars: {
+        autoplay: 0,
+        controls: 0,
+        disablekb: 1,
+        modestbranding: 1,
+        playsinline: 1,
+        rel: 0,
+        loop: 1,
+        playlist: MUSIC_VIDEO_ID,
+      },
+      events: {
+        onReady: () => {
+          ytReady = true;
+          bindFirstTap();
+        },
+        onStateChange: onYTStateChange,
+      },
+    });
+  };
+
+  // Click del usuario en el botón
+  btn.addEventListener("click", () => {
+    toggleMusic();
+  });
+}
+
+function bindFirstTap() {
+  if (firstTapBound) return;
+  if (localStorage.getItem(MUSIC_PREF_KEY) === "off") {
+    // Usuario ya pidió silencio antes → no arrancamos solos
+    return;
+  }
+  firstTapBound = true;
+  const onFirstTap = () => {
+    if (!ytReady || musicPlaying) return;
+    try {
+      ytPlayer.playVideo();
+    } catch {
+      /* ignore */
+    }
+  };
+  // pointerdown captura tanto touch como click; pasiva para no afectar scroll
+  document.addEventListener("pointerdown", onFirstTap, {
+    once: true,
+    passive: true,
+  });
+}
+
+function toggleMusic() {
+  if (!ytReady || !ytPlayer) return;
+  if (musicPlaying) {
+    ytPlayer.pauseVideo();
+    localStorage.setItem(MUSIC_PREF_KEY, "off");
+  } else {
+    ytPlayer.playVideo();
+    localStorage.setItem(MUSIC_PREF_KEY, "on");
+  }
+}
+
+function onYTStateChange(event) {
+  const btn = document.querySelector(".music-toggle");
+  if (!btn) return;
+
+  // YT.PlayerState: -1 unstarted, 0 ended, 1 playing, 2 paused, 3 buffering, 5 cued
+  if (event.data === 1) {
+    musicPlaying = true;
+    btn.dataset.state = "on";
+    btn.setAttribute("aria-label", "Pausar música");
+  } else if (event.data === 2 || event.data === 0) {
+    musicPlaying = false;
+    btn.dataset.state = "off";
+    btn.setAttribute("aria-label", "Reproducir música");
+    // YouTube a veces no respeta el loop=1; lo forzamos
+    if (event.data === 0) {
+      try {
+        ytPlayer.seekTo(0);
+        ytPlayer.playVideo();
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+}
 
 // =========================================================
 // Tap en polaroid: la trae al frente y la agranda un poco.
