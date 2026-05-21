@@ -2324,6 +2324,28 @@ body.edit-mode .galeria__pista {
   color: #f4eae6;
 }
 
+/* Badge circular con el logo de WhatsApp (espejo del de Instagram en hashtag) */
+.rsvp__logo {
+  position: relative;
+  width: clamp(82px, 18vw, 110px);
+  height: clamp(82px, 18vw, 110px);
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(11, 11, 11, 0.55);
+  border: 1px solid rgba(217, 167, 173, 0.4);
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 220, 200, 0.12),
+    0 0 40px rgba(217, 167, 173, 0.18);
+}
+
+.rsvp__logo-img {
+  width: 56%;
+  height: 56%;
+  display: block;
+}
+
 /* Contenedor de los dos botones: apilados en móvil, lado a lado >=560px */
 .rsvp__botones {
   width: 100%;
