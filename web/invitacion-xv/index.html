@@ -15,7 +15,7 @@
 
     <link rel="preload" as="image" href="./assets/portada.webp" fetchpriority="high" />
 
-    <link rel="stylesheet" href="./styles.css?b=20260521F" />
+    <link rel="stylesheet" href="./styles.css?b=20260521G" />
   </head>
   <body>
     <div class="atmosfera" aria-hidden="true"></div>
@@ -759,6 +759,114 @@
       <button type="button" class="edit-bar__btn edit-bar__btn--primary" data-action="exit">Salir</button>
     </div>
 
-    <script src="./script.js?b=20260521D" defer></script>
+    <!-- ====== Personalizar plantilla ====== -->
+    <button class="cust-toggle" type="button" aria-haspopup="dialog" aria-controls="cust-drawer">
+      <svg class="cust-toggle__icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M14.06 4.94l3 3M3 21l3.5-1 11-11-3-3-11 11L3 21z"
+        />
+      </svg>
+      <span class="cust-toggle__label">Personalizar plantilla</span>
+    </button>
+
+    <div class="cust-overlay" data-state="closed" hidden></div>
+
+    <aside
+      id="cust-drawer"
+      class="cust-drawer"
+      data-state="closed"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="cust-title"
+      hidden
+    >
+      <header class="cust-drawer__head">
+        <div>
+          <p class="cust-drawer__kicker">Tus datos</p>
+          <h2 id="cust-title" class="cust-drawer__title">Personalizar invitación</h2>
+        </div>
+        <button class="cust-drawer__close" type="button" aria-label="Cerrar">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              d="M6 6l12 12M18 6L6 18"
+            />
+          </svg>
+        </button>
+      </header>
+
+      <form class="cust-form" id="cust-form" novalidate>
+        <fieldset class="cust-form__group">
+          <legend class="cust-form__legend">Portada</legend>
+
+          <label class="cust-field">
+            <span class="cust-field__label">Línea superior</span>
+            <input
+              class="cust-field__input"
+              name="kicker"
+              type="text"
+              value="XV AÑOS"
+              maxlength="22"
+              autocomplete="off"
+            />
+            <span class="cust-field__hint">Los espacios se mostrarán como “·”</span>
+          </label>
+
+          <label class="cust-field">
+            <span class="cust-field__label">Nombre — primera línea</span>
+            <input
+              class="cust-field__input"
+              name="nombre1"
+              type="text"
+              value="Valentina"
+              maxlength="22"
+              autocomplete="off"
+            />
+          </label>
+
+          <label class="cust-field">
+            <span class="cust-field__label">Nombre — segunda línea</span>
+            <input
+              class="cust-field__input"
+              name="nombre2"
+              type="text"
+              value="Sofía"
+              maxlength="22"
+              autocomplete="off"
+            />
+            <span class="cust-field__hint">Déjala vacía si sólo usas un nombre</span>
+          </label>
+
+          <label class="cust-field">
+            <span class="cust-field__label">Fecha del evento</span>
+            <input
+              class="cust-field__input"
+              name="fecha"
+              type="date"
+              value="2026-11-15"
+            />
+          </label>
+        </fieldset>
+
+        <div class="cust-form__actions">
+          <button type="button" class="cust-btn cust-btn--ghost" data-action="reset">
+            Restablecer
+          </button>
+          <button type="button" class="cust-btn cust-btn--primary" data-action="close">
+            Listo
+          </button>
+        </div>
+      </form>
+    </aside>
+
+    <script src="./script.js?b=20260521E" defer></script>
   </body>
 </html>

@@ -29,7 +29,206 @@ document.addEventListener("DOMContentLoaded", () => {
   initPhotoSlots();
   initPolaroidTap();
   initBackgroundMusic();
+  initCustomizer();
 });
+
+// =========================================================
+// Personalizar plantilla
+// Drawer modal con formulario que reescribe en vivo los datos
+// de la portada. Lo que el cliente teclea se persiste en
+// localStorage para sobrevivir recargas.
+// =========================================================
+const CUST_KEY = "inv-xv:cust";
+const MESES_ES = [
+  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
+];
+
+const CUST_DEFAULTS = {
+  kicker: "XV AÑOS",
+  nombre1: "Valentina",
+  nombre2: "Sofía",
+  fecha: "2026-11-15",
+};
+
+function initCustomizer() {
+  const toggle = document.querySelector(".cust-toggle");
+  const drawer = document.querySelector(".cust-drawer");
+  const overlay = document.querySelector(".cust-overlay");
+  const form = document.querySelector("#cust-form");
+  const closeBtn = drawer?.querySelector(".cust-drawer__close");
+  if (!toggle || !drawer || !overlay || !form) return;
+
+  // Cargar valores guardados sobre los defaults del HTML
+  const stored = readCustom();
+  for (const key of Object.keys(CUST_DEFAULTS)) {
+    const input = form.elements[key];
+    if (!input) continue;
+    if (stored[key] !== undefined) {
+      input.value = stored[key];
+    }
+  }
+  applyCustom(readCurrentValues(form));
+
+  // Abrir / cerrar drawer
+  toggle.addEventListener("click", () => openDrawer(drawer, overlay));
+  closeBtn?.addEventListener("click", () => closeDrawer(drawer, overlay));
+  overlay.addEventListener("click", () => closeDrawer(drawer, overlay));
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && drawer.dataset.state === "open") {
+      closeDrawer(drawer, overlay);
+    }
+  });
+
+  // Cambios en vivo
+  form.addEventListener("input", () => {
+    const data = readCurrentValues(form);
+    applyCustom(data);
+    saveCustom(data);
+  });
+
+  // Botones de acción dentro del form
+  form.addEventListener("click", (e) => {
+    const action = e.target.closest("[data-action]")?.dataset.action;
+    if (!action) return;
+    e.preventDefault();
+    if (action === "reset") {
+      for (const key of Object.keys(CUST_DEFAULTS)) {
+        const input = form.elements[key];
+        if (input) input.value = CUST_DEFAULTS[key];
+      }
+      applyCustom(CUST_DEFAULTS);
+      saveCustom(CUST_DEFAULTS);
+    } else if (action === "close") {
+      closeDrawer(drawer, overlay);
+    }
+  });
+}
+
+function openDrawer(drawer, overlay) {
+  drawer.hidden = false;
+  overlay.hidden = false;
+  // Permite que el browser registre el display: block antes de transicionar
+  requestAnimationFrame(() => {
+    drawer.dataset.state = "open";
+    overlay.dataset.state = "open";
+    document.body.classList.add("cust-open");
+  });
+}
+
+function closeDrawer(drawer, overlay) {
+  drawer.dataset.state = "closed";
+  overlay.dataset.state = "closed";
+  document.body.classList.remove("cust-open");
+  // Esperar a que termine la animación antes de aria-hide
+  setTimeout(() => {
+    if (drawer.dataset.state === "closed") {
+      drawer.hidden = true;
+      overlay.hidden = true;
+    }
+  }, 450);
+}
+
+function readCurrentValues(form) {
+  return {
+    kicker: form.elements.kicker?.value ?? CUST_DEFAULTS.kicker,
+    nombre1: form.elements.nombre1?.value ?? CUST_DEFAULTS.nombre1,
+    nombre2: form.elements.nombre2?.value ?? CUST_DEFAULTS.nombre2,
+    fecha: form.elements.fecha?.value ?? CUST_DEFAULTS.fecha,
+  };
+}
+
+function readCustom() {
+  try {
+    const raw = localStorage.getItem(CUST_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveCustom(data) {
+  try {
+    localStorage.setItem(CUST_KEY, JSON.stringify(data));
+  } catch {
+    /* cuota llena, ignorar */
+  }
+}
+
+function applyCustom(data) {
+  renderKicker(data.kicker);
+  renderNombres(data.nombre1, data.nombre2);
+  renderFecha(data.fecha);
+  updateTitle(data.nombre1, data.nombre2);
+}
+
+function renderKicker(text) {
+  const el = document.querySelector(".portada__kicker");
+  if (!el) return;
+  const chars = (text || "").trim().toUpperCase().split("");
+  el.innerHTML = chars
+    .map((ch, i) => {
+      const isSep = ch === " " || ch === "·";
+      const display = isSep ? "·" : ch;
+      const cls = isSep ? "sep" : "";
+      // Reasignamos animation-delay para que cualquier número de letras
+      // entre con cascada bonita (las reglas nth-child del CSS asumen 7).
+      const delay = (0.2 + i * 0.08).toFixed(2);
+      return `<span class="${cls}" style="animation-delay:${delay}s">${escapeHtml(
+        display
+      )}</span>`;
+    })
+    .join("");
+}
+
+function renderNombres(linea1, linea2) {
+  const elV = document.querySelector(
+    '[data-editable="nombre-valentina"] .linea'
+  );
+  const elS = document.querySelector(
+    '[data-editable="nombre-sofia"] .linea'
+  );
+  if (elV) elV.textContent = linea1 || "";
+  if (elS) elS.textContent = linea2 || "";
+
+  // Si la segunda línea está vacía, ocultamos su wrapper para que no
+  // deje un hueco con margen
+  const wrapS = document.querySelector('[data-editable="nombre-sofia"]');
+  if (wrapS) {
+    wrapS.style.display = linea2 && linea2.trim() ? "" : "none";
+  }
+}
+
+function renderFecha(iso) {
+  const el = document.querySelector(".portada__fecha");
+  if (!el || !iso) return;
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  if (!m) return;
+  const [, year, month, day] = m;
+  const mesIdx = parseInt(month, 10) - 1;
+  const mesNombre = MESES_ES[mesIdx] || "";
+  const dia = String(parseInt(day, 10)).padStart(2, "0");
+  el.innerHTML =
+    `<span>${dia}</span>` +
+    `<span class="punto">·</span>` +
+    `<span>${escapeHtml(mesNombre)}</span>` +
+    `<span class="punto">·</span>` +
+    `<span>${year}</span>`;
+}
+
+function updateTitle(n1, n2) {
+  const partes = [n1, n2].filter((s) => s && s.trim());
+  if (partes.length) {
+    document.title = `${partes.join(" ")} · Mis XV Años`;
+  }
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
 
 // =========================================================
 // Música de fondo (YouTube IFrame API)
