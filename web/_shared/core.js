@@ -69,26 +69,40 @@ function initNameRefit() {
 // más fluido en mobile sin que el usuario perciba el corte.
 // =========================================================
 function initScrollPause() {
-  let timeout = null;
   let scrolling = false;
-  const ANIM_RESUME_MS = 160;
+  let lastScroll = 0;
+  let rafScheduled = false;
+  const ANIM_RESUME_MS = 150;
 
+  // El listener solo registra el timestamp. Toda la decisión sobre
+  // entrar/salir del estado is-scrolling vive dentro de un loop de
+  // requestAnimationFrame, así no hacemos setTimeout/clearTimeout
+  // en cada uno de los 60+ scroll events por segundo.
   function onScroll() {
+    lastScroll = performance.now();
     if (!scrolling) {
       scrolling = true;
       document.body.classList.add("is-scrolling");
     }
-    if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(() => {
-      scrolling = false;
-      document.body.classList.remove("is-scrolling");
-    }, ANIM_RESUME_MS);
+    if (!rafScheduled) {
+      rafScheduled = true;
+      requestAnimationFrame(checkEnd);
+    }
   }
 
-  // passive: true es crítico — sin él el browser no puede optimizar
-  // el scroll porque sabría que podríamos llamar preventDefault
+  function checkEnd() {
+    if (performance.now() - lastScroll >= ANIM_RESUME_MS) {
+      scrolling = false;
+      rafScheduled = false;
+      document.body.classList.remove("is-scrolling");
+      return;
+    }
+    requestAnimationFrame(checkEnd);
+  }
+
+  // Solo scroll, no touchmove. En mobile el scroll por touch dispara
+  // scroll events igualmente; tener touchmove duplicaba el trabajo.
   window.addEventListener("scroll", onScroll, { passive: true });
-  window.addEventListener("touchmove", onScroll, { passive: true });
 }
 
 // =========================================================
@@ -852,8 +866,8 @@ function compressImageToWebP(file, maxSide, quality) {
 // en un contenedor fixed, las pinceladas son las mismas para todas las
 // secciones y el lienzo se siente continuo sin franjas vacías al
 // pasar de una sección a otra.
-const GLOBAL_BRUSH_COUNT = 10;
-const GLOBAL_PARTICLE_COUNT = 24;
+const GLOBAL_BRUSH_COUNT = 8;
+const GLOBAL_PARTICLE_COUNT = 14;
 
 function initBrushes() {
   const canvas = document.querySelector(".canvas-fx");

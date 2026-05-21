@@ -75,13 +75,12 @@ body {
   overflow: hidden;
 }
 
-/* Mientras el usuario está scrolleando pausamos animaciones caras
-   (filter:blur + mix-blend-mode + transform), así el browser libera
-   el GPU para repintar el contenido fluido. Reactivan ~150ms después
-   de la última señal de scroll, así que nadie nota la pausa. */
-body.is-scrolling .brush,
-body.is-scrolling .particles__p {
-  animation-play-state: paused;
+/* Mientras el usuario está scrolleando ocultamos completamente la
+   capa de pinceladas + partículas. visibility: hidden hace que el
+   browser deje de rasterizar (~30 capas GPU desaparecen) sin afectar
+   layout. Vuelven ~150ms después del último scroll. */
+body.is-scrolling .canvas-fx {
+  visibility: hidden;
 }
 
 /* Necesario para que el main + secciones se pinten encima del
@@ -645,7 +644,9 @@ body.edit-mode .portada::after {
   );
   border-radius: 50% 50% 40% 60% / 60% 40% 60% 40%;
   filter: blur(14px);
-  mix-blend-mode: screen;
+  /* mix-blend-mode: screen quitado para ahorrar costoso readback del
+     fondo. El gradient ya tiene transparent edges asi que se mezcla
+     suave por opacity sin necesidad del blend mode. */
   animation: brushBreathe var(--breathe, 18s) ease-in-out var(--breathe-delay, 0s) infinite;
 }
 
@@ -667,7 +668,6 @@ body.edit-mode .portada::after {
     transparent 78%
   );
   filter: blur(17px);
-  mix-blend-mode: screen;
 }
 
 @keyframes brushBreathe {
