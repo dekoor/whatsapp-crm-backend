@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#0B0B0B" />
-    <title>Valentina Sofía · Mis XV Años</title>
+    <title>Mis XV Años · Plantilla</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,7 +15,7 @@
 
     <link rel="preload" as="image" href="./assets/portada.webp" fetchpriority="high" />
 
-    <link rel="stylesheet" href="./styles.css?b=20260521A3" />
+    <link rel="stylesheet" href="./styles.css?b=20260521A3b" />
   </head>
   <body>
     <div class="atmosfera" aria-hidden="true"></div>
@@ -55,7 +55,7 @@
         <img
           class="portada__foto"
           src="./assets/portada.webp"
-          alt="Foto de Valentina Sofía"
+          alt="Foto de la quinceañera"
           decoding="async"
           fetchpriority="high"
         />
@@ -70,31 +70,38 @@
           <div class="portada__top">
             <div class="movible" data-editable="kicker">
               <p class="portada__kicker">
-                <span>X</span><span>V</span><span class="sep">·</span><span>A</span><span>Ñ</span><span>O</span><span>S</span>
+                <span>M</span><span>I</span><span>S</span><span class="sep">·</span><span>X</span><span>V</span>
               </p>
             </div>
 
             <div class="movible" data-editable="nombre-valentina">
               <h1 class="portada__nombre">
-                <span class="linea">Valentina</span>
+                <span class="linea">Nombre</span>
               </h1>
             </div>
 
-            <div class="movible movible--sofia" data-editable="nombre-sofia">
-              <p class="portada__nombre">
-                <span class="linea linea--alt">Sofía</span>
-              </p>
+            <div class="movible movible--invita" data-editable="invita">
+              <p class="portada__invita">¡Estás invitado a mi fiesta de XV años!</p>
             </div>
           </div>
 
-          <div class="movible" data-editable="fecha">
-            <p class="portada__fecha">
-              <span>15</span>
-              <span class="punto">·</span>
-              <span>Noviembre</span>
-              <span class="punto">·</span>
-              <span>2026</span>
-            </p>
+          <div class="portada__detalles">
+            <div class="movible movible--fecha-bloque" data-editable="fecha">
+              <p class="portada__bloque portada__bloque--fecha">
+                <span class="portada__bloque-top">SÁBADO</span>
+                <span class="portada__bloque-num">28</span>
+                <span class="portada__bloque-bot">JUNIO</span>
+                <span class="portada__bloque-bot portada__bloque-bot--anio">2025</span>
+              </p>
+            </div>
+
+            <div class="movible movible--hora-bloque" data-editable="hora">
+              <p class="portada__bloque portada__bloque--hora">
+                <span class="portada__bloque-top">INICIA A LAS</span>
+                <span class="portada__bloque-num">06:00</span>
+                <span class="portada__bloque-bot">PM</span>
+              </p>
+            </div>
           </div>
         </header>
 

@@ -315,8 +315,8 @@ img {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: clamp(18px, 4vh, 36px);
+  justify-content: flex-start;
+  gap: clamp(20px, 5vh, 44px);
 }
 
 /* Bloque superior: kicker + nombre */
@@ -364,16 +364,16 @@ img {
 .portada__nombre {
   font-family: var(--f-script);
   font-weight: 400;
-  font-size: clamp(72px, 18vw, 110px);
-  line-height: 1.35;
+  font-size: clamp(82px, 20vw, 132px);
+  line-height: 1.1;
   letter-spacing: 0.005em;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(40px, 8vh, 80px);
+  gap: 0;
   margin: 0;
-  padding: 0.3em 0;
+  padding: 0.1em 0;
 }
 
 .portada__nombre .linea {
@@ -465,26 +465,77 @@ img {
   }
 }
 
-/* Fecha */
-.portada__fecha {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.9em;
+/* Subtítulo "¡Estás invitado a mi fiesta de XV años!" debajo del nombre */
+.portada__invita {
   font-family: var(--f-sans);
   font-weight: 300;
-  font-size: clamp(0.85rem, 2vw, 1rem);
-  letter-spacing: 0.35em;
+  font-size: clamp(0.8rem, 2.2vw, 1rem);
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: #f4eae6;
-  padding-top: clamp(8px, 2vh, 16px);
-  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  color: var(--c-rose-gold);
+  text-align: center;
+  line-height: 1.5;
+  margin-top: clamp(-12px, -1vh, -6px);
   opacity: 0;
   transform: translateY(12px);
-  animation: nombreIn 1s var(--ease) 2s forwards;
+  animation: nombreIn 1s var(--ease) 1.9s forwards;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
-.portada__fecha .punto {
+/* Bloques laterales: fecha (izquierda) + hora (derecha) */
+.portada__detalles {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: clamp(20px, 6vw, 48px);
+  padding: 0 clamp(8px, 3vw, 24px);
+  margin-top: clamp(8px, 2vh, 18px);
+}
+
+.portada__bloque {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  font-family: var(--f-sans);
+  color: var(--c-ink);
+  opacity: 0;
+  transform: translateY(12px);
+  animation: nombreIn 1s var(--ease) 2.2s forwards;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+}
+
+.portada__bloque--hora {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.portada__bloque-top,
+.portada__bloque-bot {
+  font-size: clamp(0.7rem, 1.8vw, 0.85rem);
+  font-weight: 300;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
   color: var(--c-rose-gold);
+  line-height: 1.25;
+}
+
+.portada__bloque-bot--anio {
+  color: var(--c-ink-soft);
+  font-size: clamp(0.62rem, 1.5vw, 0.75rem);
+  letter-spacing: 0.28em;
+  margin-top: 2px;
+}
+
+.portada__bloque-num {
+  font-family: var(--f-display);
+  font-weight: 300;
+  font-size: clamp(2.8rem, 9vw, 4.2rem);
+  line-height: 0.95;
+  color: var(--c-rose-gold);
+  letter-spacing: 0;
+  margin: 4px 0;
 }
 
 /* Wrapper del scroll indicator (movible) */
