@@ -2,6 +2,13 @@
 // Invitación XV — interacciones
 // =========================================================
 
+// =========================================================
+// CAMBIA AQUÍ LA FECHA DEL EVENTO
+// Formato ISO 8601 con offset de zona horaria.
+// Ej: "2026-08-08T19:00:00-06:00" = 8 Ago 2026, 7:00 PM (CDMX/Querétaro)
+// =========================================================
+const eventDate = new Date("2026-08-08T19:00:00-06:00");
+
 // Scroll suave al tocar el indicador de la portada.
 document.addEventListener("DOMContentLoaded", () => {
   const btn = document.querySelector(".portada__heart");
@@ -384,10 +391,7 @@ function initParticles() {
 // =========================================================
 function initCountdown() {
   const section = document.querySelector(".countdown");
-  if (!section) return;
-
-  const target = new Date(section.dataset.evento);
-  if (isNaN(target)) return;
+  if (!section || isNaN(eventDate)) return;
 
   const els = {
     dias: section.querySelector('[data-cd="dias"]'),
@@ -407,10 +411,11 @@ function initCountdown() {
   }
 
   function tick() {
-    let diff = target.getTime() - Date.now();
+    let diff = eventDate.getTime() - Date.now();
 
     if (diff <= 0) {
-      setNum(els.dias, "000");
+      // Fecha ya pasó: todos a 00 (días sin padding extra).
+      setNum(els.dias, "00");
       setNum(els.horas, "00");
       setNum(els.minutos, "00");
       setNum(els.segundos, "00");
@@ -425,7 +430,8 @@ function initCountdown() {
     diff -= minutos * 60000;
     const segundos = Math.floor(diff / 1000);
 
-    setNum(els.dias, String(dias));
+    // Días: 2 o 3 dígitos (no pad si ≥ 10, sino 2 dígitos).
+    setNum(els.dias, dias < 10 ? String(dias).padStart(2, "0") : String(dias));
     setNum(els.horas, String(horas).padStart(2, "0"));
     setNum(els.minutos, String(minutos).padStart(2, "0"));
     setNum(els.segundos, String(segundos).padStart(2, "0"));
