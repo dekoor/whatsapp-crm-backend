@@ -230,8 +230,28 @@
   }
 
   // ----- SETUP / TEARDOWN POR ELEMENTO -----
+  // Tipos soportados:
+  //   - <img> con [data-editable] -> PAN dentro del recuadro (object-position)
+  //   - cualquier otro [data-editable] -> MOVE + SCALE via transform
   function setupElement(el) {
-    // Estado persistido en data-* para sobrevivir toggles del editor
+    if (el.tagName === 'IMG') {
+      setupImageElement(el);
+    } else {
+      setupTransformElement(el);
+    }
+  }
+
+  function teardownElement(el) {
+    if (el._editorHandle)  el._editorHandle.remove();
+    if (el._onDragStart)   el.removeEventListener('pointerdown', el._onDragStart);
+    el._editorHandle  = null;
+    el._onDragStart   = null;
+    el._onResizeStart = null;
+    el._editorIsImage = false;
+  }
+
+  // ----- SETUP: elemento generico (texto, boton, etc.) -----
+  function setupTransformElement(el) {
     var state = {
       x:     parseFloat(el.dataset.editorX)     || 0,
       y:     parseFloat(el.dataset.editorY)     || 0,
@@ -240,26 +260,104 @@
     applyState(el, state);
     el._editorState = state;
 
-    // Handle de resize
+    // Handle de resize en esquina inferior derecha
     var handle = document.createElement('span');
     handle.className = 'editor-handle';
     handle.setAttribute('aria-hidden', 'true');
     el.appendChild(handle);
     el._editorHandle = handle;
 
-    // Listeners
     el._onDragStart   = function (e) { onDragStart(e, el); };
     el._onResizeStart = function (e) { onResizeStart(e, el); };
     el.addEventListener('pointerdown', el._onDragStart);
     handle.addEventListener('pointerdown', el._onResizeStart);
   }
 
-  function teardownElement(el) {
-    if (el._editorHandle) el._editorHandle.remove();
-    if (el._onDragStart)  el.removeEventListener('pointerdown', el._onDragStart);
-    el._editorHandle   = null;
-    el._onDragStart    = null;
-    el._onResizeStart  = null;
+  // ----- SETUP: <img> -> pan dentro del recuadro -----
+  function setupImageElement(el) {
+    var state = {
+      objX: parseFloat(el.dataset.editorObjX),
+      objY: parseFloat(el.dataset.editorObjY)
+    };
+    if (isNaN(state.objX)) state.objX = 50;  // default center
+    if (isNaN(state.objY)) state.objY = 50;
+
+    applyImageState(el, state);
+    el._editorState   = state;
+    el._editorIsImage = true;
+
+    el._onDragStart = function (e) { onImagePanStart(e, el); };
+    el.addEventListener('pointerdown', el._onDragStart);
+  }
+
+  function applyImageState(el, state) {
+    el.style.setProperty('--editor-obj-x', state.objX + '%');
+    el.style.setProperty('--editor-obj-y', state.objY + '%');
+  }
+
+  function persistImageState(el, state) {
+    el.dataset.editorObjX = state.objX;
+    el.dataset.editorObjY = state.objY;
+  }
+
+  // Para un <img> con object-fit: cover, calcula cuanto sobresale (en px)
+  // del lado oculto en cada eje. Si el aspecto coincide con el contenedor,
+  // la sobresalida es 0 en ese eje (no hay nada que panear).
+  function getCoverOverflow(img) {
+    var cw = img.clientWidth;
+    var ch = img.clientHeight;
+    var iw = img.naturalWidth  || cw;
+    var ih = img.naturalHeight || ch;
+    if (!iw || !ih) return { x: 0, y: 0 };
+    var scale = Math.max(cw / iw, ch / ih);
+    var sw = iw * scale;
+    var sh = ih * scale;
+    return { x: Math.max(0, sw - cw), y: Math.max(0, sh - ch) };
+  }
+
+  function onImagePanStart(e, el) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    var state  = el._editorState;
+    var startX = e.clientX;
+    var startY = e.clientY;
+    var baseX  = state.objX;
+    var baseY  = state.objY;
+    var over   = getCoverOverflow(el);
+
+    try { el.setPointerCapture(e.pointerId); } catch (err) {}
+
+    function move(ev) {
+      var dx = ev.clientX - startX;
+      var dy = ev.clientY - startY;
+      // Convencion: arrastrar la imagen a la derecha muestra mas de su
+      // lado IZQUIERDO -> object-position-x decrece.
+      var dPctX = over.x > 0 ? -(dx / over.x) * 100 : 0;
+      var dPctY = over.y > 0 ? -(dy / over.y) * 100 : 0;
+
+      var nx = baseX + dPctX;
+      var ny = baseY + dPctY;
+      if (nx < 0)   nx = 0;
+      if (nx > 100) nx = 100;
+      if (ny < 0)   ny = 0;
+      if (ny > 100) ny = 100;
+
+      state.objX = nx;
+      state.objY = ny;
+      applyImageState(el, state);
+    }
+
+    function up() {
+      document.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerup', up);
+      document.removeEventListener('pointercancel', up);
+      persistImageState(el, state);
+    }
+
+    document.addEventListener('pointermove', move);
+    document.addEventListener('pointerup', up);
+    document.addEventListener('pointercancel', up);
   }
 
   // ----- DRAG -----

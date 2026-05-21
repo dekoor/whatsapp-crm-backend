@@ -6,33 +6,49 @@
    vertical en el centro del phone, snap a centro automatico.
    ============================================================ */
 
-/* En modo editor: el transform inline (via CSS vars) toma control
-   del elemento. Forzamos !important para sobrescribir los
-   transforms de reveal/breathing. */
+/* En modo editor: estilos comunes a TODOS los [data-editable] */
 body.is-editor [data-editable] {
-  transform:
-    translate(var(--editor-x, 0px), var(--editor-y, 0px))
-    scale(var(--editor-scale, 1)) !important;
   animation: none !important;
   filter: none !important;
   opacity: 1 !important;
   outline: 1px dashed rgba(255, 43, 214, 0.55);
-  outline-offset: 5px;
   cursor: grab;
   touch-action: none;
   -webkit-user-select: none;
   user-select: none;
   -webkit-user-drag: none;
   -webkit-touch-callout: none;
-  position: relative;
-  transform-origin: center center;
-  z-index: 1;
 }
 
 body.is-editor [data-editable]:active {
   cursor: grabbing;
   outline-color: var(--rosa-neon);
+}
+
+/* Elementos NO-imagen: drag + scale via transform (texto, botones, etc.) */
+body.is-editor :not(img)[data-editable] {
+  transform:
+    translate(var(--editor-x, 0px), var(--editor-y, 0px))
+    scale(var(--editor-scale, 1)) !important;
+  outline-offset: 5px;
+  position: relative;
+  transform-origin: center center;
+  z-index: 1;
+  box-shadow: 0 0 0 transparent;
+}
+
+body.is-editor :not(img)[data-editable]:active {
   box-shadow: 0 0 22px rgba(255, 43, 214, 0.35);
+}
+
+/* Imagenes: pan dentro del recuadro via object-position controlado por
+   CSS vars. NO aplicamos transform (la posicion del frame no cambia). */
+body.is-editor img[data-editable] {
+  object-position:
+    var(--editor-obj-x, 50%)
+    var(--editor-obj-y, 50%) !important;
+  /* Outline pegado al borde del recuadro (no fuera) */
+  outline-offset: -1px;
 }
 
 /* Handle de resize: esquina inferior derecha */
