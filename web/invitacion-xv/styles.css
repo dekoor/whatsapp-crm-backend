@@ -279,6 +279,12 @@ img {
     brilloOroRosa 5s ease-in-out -1s infinite;
 }
 
+/* Sofía como elemento movible independiente: mantenemos la separación
+   visual que daba el `gap` del antiguo wrapper conjunto */
+.movible--sofia {
+  margin-top: clamp(24px, 6vh, 58px);
+}
+
 @keyframes brilloOroRosa {
   0% {
     background-position: -180% center, center;
