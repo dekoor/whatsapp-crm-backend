@@ -821,9 +821,13 @@ img {
    MODO EDITOR
    ========================================================= */
 
-/* Líneas guía (solo visibles cuando body.edit-mode) */
+/* Líneas guía (solo visibles cuando body.edit-mode).
+   Position fixed para que cubran el viewport actual en cualquier
+   sección — el snap del drag es relativo al centro del viewport
+   (window.innerHeight/2 y newX === 0), así que las guías encajan
+   exactamente con el punto de snap sin importar dónde scrollee. */
 .guias {
-  position: absolute;
+  position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 40;

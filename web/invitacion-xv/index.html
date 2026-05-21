@@ -15,11 +15,21 @@
 
     <link rel="preload" as="image" href="./assets/portada.webp" fetchpriority="high" />
 
-    <link rel="stylesheet" href="./styles.css?b=20260521D" />
+    <link rel="stylesheet" href="./styles.css?b=20260521E" />
   </head>
   <body>
     <div class="atmosfera" aria-hidden="true"></div>
     <div class="canvas-fx" aria-hidden="true"></div>
+
+    <!-- Líneas guía globales (visibles sólo en modo editor) -->
+    <div class="guias guias--global" aria-hidden="true">
+      <span class="guia guia--tercio guia--vt1"></span>
+      <span class="guia guia--tercio guia--vt2"></span>
+      <span class="guia guia--tercio guia--ht1"></span>
+      <span class="guia guia--tercio guia--ht2"></span>
+      <span class="guia guia--centro guia--vcenter"></span>
+      <span class="guia guia--centro guia--hcenter"></span>
+    </div>
 
     <!-- Reproductor de YouTube oculto (audio de fondo) -->
     <div class="yt-host" aria-hidden="true">
@@ -49,16 +59,6 @@
           decoding="async"
           fetchpriority="high"
         />
-
-        <!-- Líneas guía (visibles solo en modo editor) -->
-        <div class="guias" aria-hidden="true">
-          <span class="guia guia--tercio guia--vt1"></span>
-          <span class="guia guia--tercio guia--vt2"></span>
-          <span class="guia guia--tercio guia--ht1"></span>
-          <span class="guia guia--tercio guia--ht2"></span>
-          <span class="guia guia--centro guia--vcenter"></span>
-          <span class="guia guia--centro guia--hcenter"></span>
-        </div>
 
         <!-- Veladura para legibilidad -->
         <div class="portada__velo" aria-hidden="true"></div>
