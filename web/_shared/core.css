@@ -1,0 +1,1124 @@
+/* =========================================================
+   ENGINE COMPARTIDO — Invitacion XV
+   Estilos que NO dependen del tema visual.
+   Editor, customizer, animaciones, layout estructural.
+   Los colores y tipografias viven en skin.css de cada plantilla.
+   ========================================================= */
+
+/* =========================================================
+   Invitación XV — Valentina Sofía
+   Estilo: Minimal moderno · Negro + Oro rosado
+   ========================================================= */
+
+:root {
+  --c-bg: #faf7f5;
+  --c-ink: #0b0b0b;
+  --c-ink-soft: #2a2624;
+  --c-mute: #8a807b;
+  --c-line: rgba(11, 11, 11, 0.12);
+
+  /* Oro rosado */
+  --c-rose-gold: #b76e79;
+  --c-rose-gold-soft: #d9a7ad;
+  --c-rose-gold-deep: #8a4a55;
+
+  --c-overlay: rgba(11, 11, 11, 0.42);
+
+  --f-display: "Cormorant Garamond", "Times New Roman", serif;
+  --f-script: "Great Vibes", "Allura", "Pinyon Script", cursive;
+  --f-sans: "Inter", system-ui, sans-serif;
+
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  background: #0a0908;
+  color: var(--c-ink);
+  font-family: var(--f-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Capa de atmósfera continua. Vive en su propia capa de compositing
+   (transform: translateZ(0)) y no se repinta al hacer scroll, a
+   diferencia de background-attachment: fixed que mata FPS en móvil.
+   Va primera en el DOM para que se pinte al fondo; sin z-index
+   negativo para evitar que algunos browsers la metan detrás del
+   background opaco del body. */
+.atmosfera {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 90% 65% at 50% 32%, rgba(183, 110, 121, 0.08), transparent 62%),
+    radial-gradient(ellipse 75% 55% at 50% 78%, rgba(155, 90, 100, 0.06), transparent 65%);
+  pointer-events: none;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Canvas global de pinceladas + partículas. Fixed para que sean
+   IDÉNTICAS en todas las secciones y no aparezcan cortes al pasar
+   de una a otra. Se ve a través porque las secciones tienen
+   background: transparent. */
+.canvas-fx {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Mientras el usuario está scrolleando pausamos animaciones caras
+   (filter:blur + mix-blend-mode + transform), así el browser libera
+   el GPU para repintar el contenido fluido. Reactivan ~150ms después
+   de la última señal de scroll, así que nadie nota la pausa. */
+body.is-scrolling .brush,
+body.is-scrolling .particles__p {
+  animation-play-state: paused;
+}
+
+/* Necesario para que el main + secciones se pinten encima del
+   canvas-fx fixed sin tener que pelear con z-index. */
+.invitacion {
+  position: relative;
+  z-index: 1;
+}
+
+/* =========================================================
+   MÚSICA DE FONDO — reproductor oculto + botón flotante
+   ========================================================= */
+
+.yt-host {
+  position: fixed;
+  bottom: -100px;
+  left: -100px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.music-toggle {
+  position: fixed;
+  top: max(env(safe-area-inset-top, 0px), 14px);
+  right: 14px;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(11, 11, 11, 0.88);
+  border: 1px solid rgba(217, 167, 173, 0.55);
+  color: var(--c-rose-gold-soft);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.5),
+    0 0 22px rgba(217, 167, 173, 0.22);
+  transition: transform 0.25s var(--ease), background 0.25s var(--ease),
+    color 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+
+.music-toggle:hover,
+.music-toggle:focus-visible {
+  background: var(--c-rose-gold);
+  color: #0b0b0b;
+  border-color: var(--c-rose-gold);
+  transform: scale(1.06);
+  outline: none;
+}
+
+.music-toggle__icon {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  transition: opacity 0.2s var(--ease);
+}
+
+.music-toggle[data-state="off"] .music-toggle__icon--on { opacity: 0; }
+.music-toggle[data-state="off"] .music-toggle__icon--off { opacity: 1; }
+.music-toggle[data-state="on"] .music-toggle__icon--on { opacity: 1; }
+.music-toggle[data-state="on"] .music-toggle__icon--off { opacity: 0; }
+
+/* Halo pulsante cuando suena la música */
+.music-toggle__pulse {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 0 0 rgba(217, 167, 173, 0.5);
+  opacity: 0;
+  transition: opacity 0.3s var(--ease);
+}
+
+.music-toggle[data-state="on"] .music-toggle__pulse {
+  opacity: 1;
+  animation: musicPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes musicPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(217, 167, 173, 0.45); }
+  70%  { box-shadow: 0 0 0 14px rgba(217, 167, 173, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(217, 167, 173, 0); }
+}
+
+/* "Pista" inicial: el botón hace un pequeño brinco un par de veces
+   hasta que el usuario interactúa, para invitar al primer tap */
+.music-toggle[data-state="off"] {
+  animation: musicHint 3s ease-in-out 1.2s 3;
+}
+
+@keyframes musicHint {
+  0%, 100% { transform: scale(1); }
+  10%, 30% { transform: scale(1.12); }
+  20%      { transform: scale(0.96); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .music-toggle[data-state="off"] { animation: none; }
+  .music-toggle__pulse             { animation: none; }
+}
+
+/* Performance: secciones fuera del viewport no se rasterizan hasta
+   que se acerquen. contain-intrinsic-size le da al browser un alto
+   estimado para que el scrollbar no salte.
+   La despedida queda fuera de esta lista porque sus .movible necesitan
+   hit-testing fiable y content-visibility auto a veces interfiere con
+   pointer events en secciones con min-height: 100svh. */
+.bienvenida,
+.countdown,
+.ubicacion,
+.galeria,
+.familia,
+.vestimenta,
+.regalos,
+.hashtag,
+.rsvp {
+  content-visibility: auto;
+  contain-intrinsic-size: 100vw 90vh;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* =========================================================
+   Reveal on scroll
+   ========================================================= */
+[data-reveal] {
+  opacity: 0;
+  transition: opacity 1s var(--ease), transform 1.1s var(--ease);
+}
+
+/* Slide-up sólo para elementos que NO son .movible. Los movibles ya
+   usan su transform (--tx/--ty/--scale) y un transform de reveal
+   encima los aplastaría, anulando el drag y el pinch. */
+[data-reveal]:not(.movible) {
+  transform: translateY(28px);
+}
+
+[data-reveal].is-revealed {
+  opacity: 1;
+}
+
+[data-reveal]:not(.movible).is-revealed {
+  transform: translateY(0);
+}
+
+[data-reveal][data-reveal-delay="1"] { transition-delay: 0.12s; }
+[data-reveal][data-reveal-delay="2"] { transition-delay: 0.24s; }
+[data-reveal][data-reveal-delay="3"] { transition-delay: 0.4s; }
+[data-reveal][data-reveal-delay="4"] { transition-delay: 0.56s; }
+[data-reveal][data-reveal-delay="5"] { transition-delay: 0.72s; }
+
+/* =========================================================
+   MODO EDITOR
+   ========================================================= */
+
+/* Líneas guía (solo visibles cuando body.edit-mode).
+   Position fixed para que cubran el viewport actual en cualquier
+   sección — el snap del drag es relativo al centro del viewport
+   (window.innerHeight/2 y newX === 0), así que las guías encajan
+   exactamente con el punto de snap sin importar dónde scrollee. */
+.guias {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  opacity: 0;
+  transition: opacity 0.35s var(--ease);
+}
+
+body.edit-mode .guias {
+  opacity: 1;
+}
+
+.guia {
+  position: absolute;
+  transition: background 0.18s var(--ease), box-shadow 0.18s var(--ease),
+    opacity 0.18s var(--ease);
+}
+
+/* Tercios — muy sutiles, para composición */
+.guia--tercio {
+  background: rgba(255, 255, 255, 0.06);
+  opacity: 0.7;
+}
+
+.guia--vt1,
+.guia--vt2 {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+.guia--vt1 { left: 33.333%; }
+.guia--vt2 { left: 66.666%; }
+
+.guia--ht1,
+.guia--ht2 {
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+.guia--ht1 { top: 33.333%; }
+.guia--ht2 { top: 66.666%; }
+
+/* Centros — protagonistas */
+.guia--vcenter {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--c-rose-gold-soft);
+  opacity: 0.85;
+  box-shadow: 0 0 8px rgba(217, 167, 173, 0.55),
+    0 0 1px rgba(0, 0, 0, 0.5);
+  mix-blend-mode: screen;
+}
+
+.guia--hcenter {
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  margin-top: -1px;
+  background: var(--c-rose-gold-soft);
+  opacity: 0.7;
+  box-shadow: 0 0 8px rgba(217, 167, 173, 0.45),
+    0 0 1px rgba(0, 0, 0, 0.5);
+  mix-blend-mode: screen;
+}
+
+/* Marcador en el centro exacto (cruce de líneas) */
+.guia--centro::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--c-rose-gold-soft);
+  background: rgba(11, 11, 11, 0.4);
+  transform: rotate(45deg);
+  box-shadow: 0 0 6px rgba(217, 167, 173, 0.6);
+}
+
+.guia--vcenter::after {
+  top: 50%;
+  left: 50%;
+  margin: -7px 0 0 -7px;
+}
+
+/* (el marcador del centro lo mostramos solo en la línea vertical para no duplicarlo) */
+.guia--hcenter::after {
+  display: none;
+}
+
+/* Estado snap — la línea se vuelve oro rosado intenso */
+body.snap-vcenter .guia--vcenter,
+body.snap-hcenter .guia--hcenter {
+  opacity: 1;
+  background: var(--c-rose-gold);
+  box-shadow: 0 0 14px rgba(183, 110, 121, 0.9),
+    0 0 32px rgba(183, 110, 121, 0.45),
+    0 0 1px rgba(0, 0, 0, 0.4);
+}
+
+body.snap-vcenter .guia--vcenter::after {
+  background: var(--c-rose-gold);
+  border-color: #fff;
+  box-shadow: 0 0 12px rgba(183, 110, 121, 0.9);
+}
+
+
+.movible {
+  display: block;
+  width: fit-content;
+  margin-inline: auto;
+  position: relative;
+  transform: translate(var(--tx, 0px), var(--ty, 0px)) scale(var(--scale, 1));
+  transform-origin: center center;
+  transition: outline-color 0.2s var(--ease);
+}
+
+body.edit-mode .movible {
+  outline: 1px dashed rgba(217, 167, 173, 0.55);
+  outline-offset: 10px;
+  cursor: grab;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body.edit-mode .movible:hover,
+body.edit-mode .movible--dragging {
+  outline-color: var(--c-rose-gold);
+  outline-style: solid;
+}
+
+body.edit-mode .movible--dragging,
+body.edit-mode .movible--resizing {
+  cursor: grabbing;
+  outline-color: var(--c-rose-gold);
+  outline-style: solid;
+}
+
+/* Handle de redimensionar (esquina inferior-derecha) */
+.movible__handle {
+  position: absolute;
+  right: -22px;
+  bottom: -22px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--c-rose-gold);
+  border: 2px solid #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(0, 0, 0, 0.25);
+  display: none;
+  z-index: 5;
+  touch-action: none;
+  cursor: nwse-resize;
+}
+
+.movible__handle::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-right: 1.5px solid #fff;
+  border-bottom: 1.5px solid #fff;
+  border-radius: 0 0 6px 0;
+  opacity: 0.85;
+}
+
+body.edit-mode .movible__handle {
+  display: block;
+  animation: handleIn 0.25s var(--ease);
+}
+
+@keyframes handleIn {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Badge de porcentaje de escala */
+.movible__scale-badge {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translate(-50%, -100%);
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--c-rose-gold);
+  color: #0b0b0b;
+  font-family: var(--f-sans);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s var(--ease);
+  z-index: 6;
+}
+
+.movible__scale-badge--visible {
+  opacity: 1;
+}
+
+/* Pista breve al entrar al modo */
+body.edit-mode .portada::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 0 2px var(--c-rose-gold);
+  pointer-events: none;
+  z-index: 50;
+  animation: editPulse 0.9s var(--ease) 1;
+}
+
+@keyframes editPulse {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Toast central de aviso */
+.edit-toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 110;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 22px 16px 20px;
+  background: rgba(11, 11, 11, 0.88);
+  border: 1px solid var(--c-rose-gold);
+  border-radius: 999px;
+  color: #fff;
+  font-family: var(--f-sans);
+  font-size: 0.82rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55),
+    0 0 0 4px rgba(183, 110, 121, 0.15);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transform: translate(-50%, -50%) scale(0.92);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s var(--ease), transform 0.35s var(--ease);
+}
+
+.edit-toast[hidden] {
+  display: none;
+}
+
+.edit-toast--visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.edit-toast__icon {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--c-rose-gold);
+  box-shadow: 0 0 0 4px rgba(183, 110, 121, 0.25);
+  animation: toastPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes toastPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 4px rgba(183, 110, 121, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(183, 110, 121, 0.1);
+  }
+}
+
+/* Barra flotante */
+.edit-bar {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(16px, 4vh, 28px);
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px 10px 18px;
+  background: rgba(11, 11, 11, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: #fff;
+  font-family: var(--f-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  animation: editBarIn 0.35s var(--ease) 1;
+}
+
+.edit-bar[hidden] {
+  display: none;
+}
+
+.edit-bar__label {
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.85);
+  white-space: nowrap;
+}
+
+.edit-bar__btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.edit-bar__btn:hover,
+.edit-bar__btn:focus-visible {
+  border-color: var(--c-rose-gold);
+  color: var(--c-rose-gold-soft);
+  outline: none;
+}
+
+.edit-bar__btn--primary {
+  background: var(--c-rose-gold);
+  border-color: var(--c-rose-gold);
+  color: #0b0b0b;
+}
+
+.edit-bar__btn--primary:hover,
+.edit-bar__btn--primary:focus-visible {
+  background: var(--c-rose-gold-soft);
+  border-color: var(--c-rose-gold-soft);
+  color: #0b0b0b;
+}
+
+@keyframes editBarIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 16px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@media (max-width: 420px) {
+  .edit-bar {
+    font-size: 0.65rem;
+    padding: 9px 10px 9px 14px;
+  }
+  .edit-bar__label {
+    display: none;
+  }
+}
+
+/* =========================================================
+   PINCELADAS DE FONDO — manchas oro rosa con blur
+   ========================================================= */
+
+.brushes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1; /* sobre el background-gradient de la sección, debajo del contenido */
+}
+
+.brush {
+  position: absolute;
+  background: radial-gradient(
+    ellipse 100% 55% at center,
+    rgba(183, 110, 121, 0.65) 0%,
+    rgba(217, 167, 173, 0.32) 38%,
+    rgba(217, 167, 173, 0.12) 65%,
+    transparent 82%
+  );
+  border-radius: 50% 50% 40% 60% / 60% 40% 60% 40%;
+  filter: blur(14px);
+  mix-blend-mode: screen;
+  animation: brushBreathe var(--breathe, 18s) ease-in-out var(--breathe-delay, 0s) infinite;
+}
+
+.brush--bright {
+  background: radial-gradient(
+    ellipse 100% 55% at center,
+    rgba(255, 210, 195, 0.55) 0%,
+    rgba(217, 167, 173, 0.32) 40%,
+    transparent 78%
+  );
+  filter: blur(16px);
+}
+
+.brush--soft {
+  background: radial-gradient(
+    ellipse 100% 55% at center,
+    rgba(155, 80, 95, 0.55) 0%,
+    rgba(183, 110, 121, 0.22) 45%,
+    transparent 78%
+  );
+  filter: blur(17px);
+  mix-blend-mode: screen;
+}
+
+@keyframes brushBreathe {
+  0%, 100% {
+    opacity: var(--op-from, 0.22);
+    transform: var(--base-transform, none) scale(1);
+  }
+  50% {
+    opacity: var(--op-to, 0.4);
+    transform: var(--base-transform, none) scale(1.05);
+  }
+}
+
+/* =========================================================
+   PARTÍCULAS — destellos champaña flotando
+   ========================================================= */
+
+.particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.portada .particles {
+  /* En la portada van sobre el velo (z:1) pero debajo del marco/contenido */
+  z-index: 2;
+}
+
+.particles__p {
+  position: absolute;
+  bottom: -20px;
+  width: var(--size, 3px);
+  height: var(--size, 3px);
+  background: radial-gradient(
+    circle,
+    #fff5e8 0%,
+    rgba(255, 220, 200, 0.85) 30%,
+    rgba(217, 167, 173, 0.55) 60%,
+    transparent 75%
+  );
+  border-radius: 50%;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: particleFloat var(--duration, 22s) linear var(--delay, 0s) infinite;
+  filter: blur(0.3px);
+}
+
+.particles__p--bright {
+  background: radial-gradient(
+    circle,
+    #ffffff 0%,
+    #fff5e8 25%,
+    rgba(255, 220, 200, 0.7) 55%,
+    transparent 75%
+  );
+  box-shadow: 0 0 6px rgba(255, 220, 200, 0.55);
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.8);
+    opacity: 0;
+  }
+  8% {
+    opacity: var(--opacity, 0.5);
+  }
+  50% {
+    transform: translate3d(calc(var(--drift, 0px) / 2), -55vh, 0) scale(1);
+  }
+  92% {
+    opacity: var(--opacity, 0.5);
+  }
+  100% {
+    transform: translate3d(var(--drift, 0px), -110vh, 0) scale(0.9);
+    opacity: 0;
+  }
+}
+
+/* Respeta usuarios con reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .portada__foto,
+  .portada__marco,
+  .portada__marco::before,
+  .portada__marco::after,
+  .portada__kicker span,
+  .portada__nombre .linea,
+  .portada__fecha,
+  .portada__scroll,
+  .portada__scroll-line::after {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .portada__marco::before,
+  .portada__marco::after {
+    width: 60% !important;
+  }
+
+  .particles {
+    display: none !important;
+  }
+
+  .brush {
+    animation: none !important;
+  }
+}
+
+/* =========================================================
+   PERSONALIZAR PLANTILLA — botón flotante + drawer modal
+   ========================================================= */
+
+.cust-toggle {
+  position: fixed;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: rgba(11, 11, 11, 0.92);
+  border: 1px solid var(--c-rose-gold);
+  color: var(--c-rose-gold-soft);
+  font-family: var(--f-sans);
+  font-weight: 400;
+  font-size: clamp(0.72rem, 1.7vw, 0.82rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  z-index: 800;
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.5),
+    0 0 22px rgba(217, 167, 173, 0.15);
+  transition: background 0.25s var(--ease), color 0.25s var(--ease),
+    transform 0.25s var(--ease), opacity 0.3s var(--ease);
+}
+
+.cust-toggle__icon {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
+
+.cust-toggle:hover,
+.cust-toggle:focus-visible {
+  background: var(--c-rose-gold);
+  color: #0b0b0b;
+  transform: translateX(-50%) translateY(-2px);
+  outline: none;
+}
+
+/* Se oculta mientras el drawer está abierto para no estorbar */
+body.cust-open .cust-toggle {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(20px);
+}
+
+/* Tambien se oculta en modo editor: la edit-bar vive abajo y se
+   solapaba con este boton */
+body.edit-mode .cust-toggle {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(20px);
+}
+
+/* Overlay oscuro detrás del drawer */
+.cust-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 900;
+  opacity: 0;
+  transition: opacity 0.3s var(--ease);
+}
+
+.cust-overlay[data-state="open"] {
+  opacity: 1;
+}
+
+/* Drawer modal con el formulario */
+.cust-drawer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 88vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  z-index: 901;
+  background:
+    linear-gradient(180deg, #1a1310 0%, #100c0a 100%);
+  border-top: 1px solid rgba(217, 167, 173, 0.4);
+  border-radius: 22px 22px 0 0;
+  padding: clamp(22px, 5vw, 36px) clamp(20px, 5vw, 32px)
+    calc(env(safe-area-inset-bottom, 0px) + clamp(24px, 5vw, 36px));
+  transform: translateY(100%);
+  transition: transform 0.42s cubic-bezier(0.2, 0.85, 0.2, 1);
+  box-shadow: 0 -22px 50px rgba(0, 0, 0, 0.55);
+}
+
+.cust-drawer[data-state="open"] {
+  transform: translateY(0);
+}
+
+.cust-drawer__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: clamp(20px, 4vw, 30px);
+}
+
+.cust-drawer__kicker {
+  font-family: var(--f-sans);
+  font-weight: 300;
+  font-size: 0.72rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--c-rose-gold-soft);
+  margin: 0 0 6px;
+  padding-left: 0.4em;
+}
+
+.cust-drawer__title {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(1.4rem, 4vw, 1.8rem);
+  color: #f4eae6;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.cust-drawer__close {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(217, 167, 173, 0.3);
+  color: var(--c-rose-gold-soft);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 0.2s var(--ease), color 0.2s var(--ease);
+}
+
+.cust-drawer__close svg {
+  width: 16px;
+  height: 16px;
+}
+
+.cust-drawer__close:hover,
+.cust-drawer__close:focus-visible {
+  background: var(--c-rose-gold);
+  color: #0b0b0b;
+  outline: none;
+}
+
+/* Stepper visual: una fila de puntos arriba del form */
+.cust-stepper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: clamp(18px, 3.5vw, 26px);
+}
+
+.cust-stepper__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(217, 167, 173, 0.22);
+  border: 1px solid rgba(217, 167, 173, 0.4);
+  transition: background 0.25s var(--ease), transform 0.25s var(--ease),
+    border-color 0.25s var(--ease), width 0.25s var(--ease);
+}
+
+.cust-stepper__dot.is-done {
+  background: var(--c-rose-gold-soft);
+  border-color: var(--c-rose-gold-soft);
+}
+
+.cust-stepper__dot.is-active {
+  background: var(--c-rose-gold);
+  border-color: var(--c-rose-gold);
+  width: 22px;
+  border-radius: 999px;
+  transform: scale(1.08);
+}
+
+/* Formulario */
+.cust-form__group {
+  border: none;
+  padding: 0;
+  margin: 0 0 clamp(22px, 4vw, 32px);
+}
+
+/* Cada cust-step es un fieldset que se muestra/oculta según el paso.
+   La transición suave da feedback de movimiento al avanzar/retroceder. */
+.cust-step[hidden] {
+  display: none;
+}
+
+.cust-step:not([hidden]) {
+  animation: stepIn 0.32s var(--ease);
+}
+
+@keyframes stepIn {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.cust-form__legend {
+  font-family: var(--f-sans);
+  font-weight: 300;
+  font-size: 0.7rem;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--c-rose-gold);
+  padding-left: 0.4em;
+  margin-bottom: 16px;
+}
+
+.cust-field {
+  display: block;
+  margin-bottom: clamp(14px, 3vw, 20px);
+}
+
+.cust-field:last-child {
+  margin-bottom: 0;
+}
+
+.cust-field__label {
+  display: block;
+  font-family: var(--f-sans);
+  font-weight: 400;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(244, 234, 230, 0.78);
+  margin-bottom: 8px;
+}
+
+.cust-field__input {
+  width: 100%;
+  padding: 13px 14px;
+  font-family: var(--f-display);
+  font-size: clamp(1rem, 2.6vw, 1.1rem);
+  color: #f4eae6;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(217, 167, 173, 0.25);
+  border-radius: 10px;
+  transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.cust-field__input::placeholder {
+  color: rgba(244, 234, 230, 0.4);
+}
+
+.cust-field__input:focus {
+  border-color: var(--c-rose-gold);
+  background: rgba(255, 255, 255, 0.07);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(217, 167, 173, 0.18);
+}
+
+/* Picker de fecha — iconito visible aunque sea sobre fondo oscuro */
+input[type="date"].cust-field__input::-webkit-calendar-picker-indicator {
+  filter: invert(0.85) sepia(0.3) saturate(2) hue-rotate(310deg);
+  cursor: pointer;
+}
+
+.cust-field__hint {
+  display: block;
+  font-family: var(--f-sans);
+  font-weight: 300;
+  font-size: 0.72rem;
+  color: rgba(244, 234, 230, 0.45);
+  margin-top: 6px;
+  letter-spacing: 0.03em;
+}
+
+.cust-form__actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.cust-btn {
+  flex: 1 1 auto;
+  min-width: 120px;
+  padding: 13px 22px;
+  border-radius: 999px;
+  font-family: var(--f-sans);
+  font-weight: 400;
+  font-size: clamp(0.74rem, 1.7vw, 0.84rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.22s var(--ease), color 0.22s var(--ease),
+    transform 0.22s var(--ease), border-color 0.22s var(--ease);
+}
+
+.cust-btn--ghost {
+  background: transparent;
+  border: 1px solid rgba(217, 167, 173, 0.35);
+  color: rgba(244, 234, 230, 0.78);
+}
+
+.cust-btn--ghost:hover,
+.cust-btn--ghost:focus-visible {
+  border-color: var(--c-rose-gold);
+  color: #f4eae6;
+  outline: none;
+}
+
+.cust-btn--primary {
+  background: var(--c-rose-gold);
+  border: 1px solid var(--c-rose-gold);
+  color: #0b0b0b;
+}
+
+.cust-btn--primary:hover,
+.cust-btn--primary:focus-visible {
+  background: var(--c-rose-gold-soft);
+  border-color: var(--c-rose-gold-soft);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cust-overlay,
+  .cust-drawer,
+  .cust-toggle {
+    transition: none;
+  }
+}

@@ -3,6 +3,13 @@
 // =========================================================
 
 // Scroll suave al tocar el indicador de la portada.
+// Namespace dinamico para que dos plantillas (xv, xv-2, xv-3...)
+// no pisen el localStorage entre si. La plantilla declara el id
+// con `<body data-template-id="xv-2">`. Default: "xv" para
+// preservar las claves originales de la primera invitacion.
+const TEMPLATE_ID = document.body?.dataset.templateId || "xv";
+const NS = `inv-${TEMPLATE_ID}`;
+
 document.addEventListener("DOMContentLoaded", () => {
   const btn = document.querySelector(".portada__scroll");
   if (btn) {
@@ -90,7 +97,7 @@ function initScrollPause() {
 // de la portada. Lo que el cliente teclea se persiste en
 // localStorage para sobrevivir recargas.
 // =========================================================
-const CUST_KEY = "inv-xv:cust";
+const CUST_KEY = `${NS}:cust`;
 const MESES_ES = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
@@ -582,7 +589,7 @@ function escapeHtml(s) {
 // - Botón flotante para silenciar/reanudar; la preferencia se guarda
 // =========================================================
 const MUSIC_VIDEO_ID = "6Yq_YFDL-jQ";
-const MUSIC_PREF_KEY = "inv-xv:sound";
+const MUSIC_PREF_KEY = `${NS}:sound`;
 
 let ytPlayer = null;
 let ytReady = false;
@@ -736,7 +743,7 @@ function initPolaroidTap() {
 // Slots de foto editables (galería polaroid)
 // Botón cámara → file picker → resize + compress a WebP → localStorage
 // =========================================================
-const PHOTO_PREFIX = "inv-xv:photo:";
+const PHOTO_PREFIX = `${NS}:photo:`;
 const PHOTO_MAX_SIDE = 900;
 const PHOTO_QUALITY = 0.82;
 
@@ -1020,7 +1027,7 @@ function initRevealOnScroll() {
 // Modo editor: 5 taps consecutivos → arrastrar elementos
 // =========================================================
 
-const STORAGE_PREFIX = "inv-xv:pos:";
+const STORAGE_PREFIX = `${NS}:pos:`;
 const TAP_COUNT_TO_ENTER = 5;
 const TAP_WINDOW_MS = 600;
 const SNAP_THRESHOLD = 10; // px de tolerancia para encajar al centro

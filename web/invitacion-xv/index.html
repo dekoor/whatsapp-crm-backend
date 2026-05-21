@@ -15,9 +15,12 @@
 
     <link rel="preload" as="image" href="./assets/portada.webp" fetchpriority="high" />
 
-    <link rel="stylesheet" href="./styles.css?b=20260521L" />
+    <!-- Engine compartido (editor, customizer, animaciones, layout estructural) -->
+    <link rel="stylesheet" href="../_shared/core.css?b=20260521L" />
+    <!-- Skin especifico de esta plantilla (paleta, tipografias, secciones) -->
+    <link rel="stylesheet" href="./skin.css?b=20260521L" />
   </head>
-  <body>
+  <body data-template-id="xv">
     <div class="atmosfera" aria-hidden="true"></div>
     <div class="canvas-fx" aria-hidden="true"></div>
 
@@ -598,7 +601,7 @@
 
           <!-- Logo Instagram (placeholder SVG hasta que llegue el PNG) -->
           <div class="hashtag__logo logo-badge" data-reveal data-reveal-delay="2">
-            <img class="logo-badge__img" src="./assets/instagram.webp" alt="Instagram" loading="lazy" decoding="async" />
+            <img class="logo-badge__img" src="../_shared/assets/instagram.webp" alt="Instagram" loading="lazy" decoding="async" />
           </div>
 
           <p class="hashtag__instruccion" data-reveal data-reveal-delay="3">
@@ -645,7 +648,7 @@
           </div>
 
           <div class="rsvp__logo logo-badge" data-reveal data-reveal-delay="2">
-            <img class="logo-badge__img" src="./assets/whatsapp.webp" alt="WhatsApp" loading="lazy" decoding="async" />
+            <img class="logo-badge__img" src="../_shared/assets/whatsapp.webp" alt="WhatsApp" loading="lazy" decoding="async" />
           </div>
 
           <p class="rsvp__frase" data-reveal data-reveal-delay="3">
@@ -999,6 +1002,6 @@
       </form>
     </aside>
 
-    <script src="./script.js?b=20260521L" defer></script>
+    <script src="../_shared/core.js?b=20260521L" defer></script>
   </body>
 </html>
