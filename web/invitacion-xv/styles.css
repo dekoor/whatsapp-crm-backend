@@ -278,13 +278,17 @@ img {
   color: var(--c-rose-gold);
 }
 
+/* Wrapper del scroll indicator (movible) */
+.movible--scroll {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(28px, 5vh, 56px);
+  z-index: 3;
+}
+
 /* Scroll indicator */
 .portada__scroll {
-  position: absolute;
-  left: 50%;
-  bottom: clamp(28px, 5vh, 56px);
-  transform: translateX(-50%);
-  z-index: 3;
   background: none;
   border: 0;
   color: rgba(255, 255, 255, 0.85);

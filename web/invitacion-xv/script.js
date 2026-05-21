@@ -6,7 +6,12 @@
 document.addEventListener("DOMContentLoaded", () => {
   const btn = document.querySelector(".portada__scroll");
   if (btn) {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", (e) => {
+      // En modo editor lo estamos arrastrando, no hacer scroll
+      if (document.body.classList.contains("edit-mode")) {
+        e.preventDefault();
+        return;
+      }
       const siguiente = document.querySelector(".portada")?.nextElementSibling;
       if (siguiente) {
         siguiente.scrollIntoView({ behavior: "smooth", block: "start" });
