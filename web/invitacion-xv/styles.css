@@ -1349,16 +1349,8 @@ body.edit-mode .portada::after {
 }
 
 /* Cuando una polaroid está activa (tap en lectura, no en editor):
-   se agranda 12% y se trae completamente al frente */
-.polaroid--active {
-  --pop: 1.12;
-  z-index: 20;
-  box-shadow:
-    0 32px 56px rgba(0, 0, 0, 0.7),
-    0 14px 28px rgba(0, 0, 0, 0.5),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.6),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.05);
-}
+   se levanta al frente del stack — definido al final para ganar
+   por orden a los .polaroid--1..4 que setean --rot/--ox/--oy. */
 
 /* En modo editor el cursor pasa a grab (drag) — definido más abajo en .movible */
 body.edit-mode .polaroid {
@@ -1422,6 +1414,22 @@ body.edit-mode .polaroid {
   --oy: -6%;
   --rot: 10deg;
   z-index: 4;
+}
+
+/* Polaroid activa: se centra en el stack, se endereza, crece y sube
+   por encima de todas las demás. Va después de los .polaroid--N para
+   ganar por orden de cascada (misma especificidad). */
+.polaroid--active {
+  --ox: -50%;
+  --oy: -50%;
+  --rot: 0deg;
+  --pop: 1.18;
+  z-index: 20;
+  box-shadow:
+    0 38px 64px rgba(0, 0, 0, 0.75),
+    0 18px 34px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.7),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.05);
 }
 
 /* Botón cámara para cambiar foto (visible solo en modo editor) */
