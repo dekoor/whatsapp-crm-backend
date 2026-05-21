@@ -32,12 +32,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // =========================================================
 // Tap en polaroid: la trae al frente y la agranda un poco.
-// Tap de nuevo (o en otra) la regresa a su sitio.
+// Vuelve sola a su sitio después de 2 s.
+// Tap de nuevo (o en otra, o fuera) también la cierra.
 // Ignorado en modo editor — ahí gana el drag.
 // =========================================================
+const POLAROID_AUTO_CLOSE_MS = 2000;
+
 function initPolaroidTap() {
   const polaroids = document.querySelectorAll(".polaroid");
   if (!polaroids.length) return;
+
+  let autoCloseTimer = null;
+
+  function closeAll() {
+    polaroids.forEach((other) => other.classList.remove("polaroid--active"));
+    clearTimeout(autoCloseTimer);
+    autoCloseTimer = null;
+  }
 
   polaroids.forEach((p) => {
     p.addEventListener("click", (e) => {
@@ -45,9 +56,13 @@ function initPolaroidTap() {
       if (e.target.closest(".polaroid__cambiar")) return;
 
       const wasActive = p.classList.contains("polaroid--active");
-      polaroids.forEach((other) => other.classList.remove("polaroid--active"));
+      closeAll();
       if (!wasActive) {
         p.classList.add("polaroid--active");
+        autoCloseTimer = setTimeout(() => {
+          p.classList.remove("polaroid--active");
+          autoCloseTimer = null;
+        }, POLAROID_AUTO_CLOSE_MS);
       }
     });
   });
@@ -56,7 +71,7 @@ function initPolaroidTap() {
   document.addEventListener("click", (e) => {
     if (document.body.classList.contains("edit-mode")) return;
     if (e.target.closest(".polaroid")) return;
-    polaroids.forEach((p) => p.classList.remove("polaroid--active"));
+    closeAll();
   });
 }
 
