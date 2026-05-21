@@ -83,3 +83,74 @@ invitación.
 Los refs a `core.css`, `core.js`, `skin.css` llevan `?b=YYYYMMDD<letra>`.
 Cada vez que modifiques alguno, incrementa la letra (o el día) en
 los `index.html` que lo usen para forzar al navegador a re-descargar.
+
+## Consumir el engine desde otro proyecto / otro repo
+
+`_shared/` está pensado para servirse como CDN: cualquier otro proyecto
+(en este repo o en otro repo público de GitHub) puede consumir el
+mismo `core.css` y `core.js`, y todo lo que cambies aquí se propaga
+automáticamente al pushear.
+
+### Para development (cambios al instante)
+
+Usa **raw.githack.com** que tiene caché muy corto:
+
+```html
+<link rel="stylesheet" href="https://raw.githack.com/dekoor/whatsapp-crm-backend/claude/create-web-page-D1aO6/web/_shared/core.css">
+<script src="https://raw.githack.com/dekoor/whatsapp-crm-backend/claude/create-web-page-D1aO6/web/_shared/core.js" defer></script>
+```
+
+### Para producción (estable, global, rápido)
+
+Usa **jsDelivr** apuntando a un tag de versión, no a la rama:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/dekoor/whatsapp-crm-backend@v1.0.0/web/_shared/core.css">
+<script src="https://cdn.jsdelivr.net/gh/dekoor/whatsapp-crm-backend@v1.0.0/web/_shared/core.js" defer></script>
+```
+
+Para crear un tag de versión cuando quieras estabilizar:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+jsDelivr cachea agresivo (12h+), así que tag por tag das saltos
+conscientes — el otro proyecto sube su ref al nuevo tag cuando esté
+listo, no antes.
+
+### Logos genéricos (Instagram, WhatsApp)
+
+```html
+<img src="https://raw.githack.com/dekoor/whatsapp-crm-backend/claude/create-web-page-D1aO6/web/_shared/assets/instagram.webp">
+<img src="https://raw.githack.com/dekoor/whatsapp-crm-backend/claude/create-web-page-D1aO6/web/_shared/assets/whatsapp.webp">
+```
+
+### HTML mínimo para una plantilla nueva en otro repo
+
+```html
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mi nueva plantilla XV</title>
+
+    <!-- Engine compartido -->
+    <link rel="stylesheet"
+          href="https://raw.githack.com/dekoor/whatsapp-crm-backend/claude/create-web-page-D1aO6/web/_shared/core.css">
+    <!-- Tu skin propio -->
+    <link rel="stylesheet" href="./skin.css">
+  </head>
+  <body data-template-id="mi-plantilla">
+    <!-- Misma estructura de secciones que invitacion-xv/index.html -->
+
+    <script src="https://raw.githack.com/dekoor/whatsapp-crm-backend/claude/create-web-page-D1aO6/web/_shared/core.js"
+            defer></script>
+  </body>
+</html>
+```
+
+El `data-template-id` único asegura que el localStorage de cada
+plantilla no se pise.
