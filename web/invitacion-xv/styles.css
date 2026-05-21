@@ -1040,6 +1040,66 @@ body.edit-mode .portada::after {
 }
 
 /* =========================================================
+   PINCELADAS DE FONDO — manchas oro rosa con blur
+   ========================================================= */
+
+.brushes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1; /* sobre el background-gradient de la sección, debajo del contenido */
+}
+
+.brush {
+  position: absolute;
+  background: radial-gradient(
+    ellipse 100% 55% at center,
+    rgba(183, 110, 121, 0.65) 0%,
+    rgba(217, 167, 173, 0.32) 38%,
+    rgba(217, 167, 173, 0.12) 65%,
+    transparent 82%
+  );
+  border-radius: 50% 50% 40% 60% / 60% 40% 60% 40%;
+  filter: blur(28px);
+  mix-blend-mode: screen;
+  will-change: transform;
+  animation: brushBreathe var(--breathe, 18s) ease-in-out var(--breathe-delay, 0s) infinite;
+}
+
+.brush--bright {
+  background: radial-gradient(
+    ellipse 100% 55% at center,
+    rgba(255, 210, 195, 0.55) 0%,
+    rgba(217, 167, 173, 0.32) 40%,
+    transparent 78%
+  );
+  filter: blur(32px);
+}
+
+.brush--soft {
+  background: radial-gradient(
+    ellipse 100% 55% at center,
+    rgba(155, 80, 95, 0.55) 0%,
+    rgba(183, 110, 121, 0.22) 45%,
+    transparent 78%
+  );
+  filter: blur(36px);
+  mix-blend-mode: screen;
+}
+
+@keyframes brushBreathe {
+  0%, 100% {
+    opacity: var(--op-from, 0.22);
+    transform: var(--base-transform, none) scale(1);
+  }
+  50% {
+    opacity: var(--op-to, 0.4);
+    transform: var(--base-transform, none) scale(1.05);
+  }
+}
+
+/* =========================================================
    PARTÍCULAS — destellos champaña flotando
    ========================================================= */
 
@@ -1129,5 +1189,9 @@ body.edit-mode .portada::after {
 
   .particles {
     display: none !important;
+  }
+
+  .brush {
+    animation: none !important;
   }
 }

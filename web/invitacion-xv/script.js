@@ -24,8 +24,59 @@ document.addEventListener("DOMContentLoaded", () => {
   initEditorMode();
   initRevealOnScroll();
   initCountdown();
+  initBrushes();
   initParticles();
 });
+
+// =========================================================
+// Pinceladas oro rosa de fondo
+// =========================================================
+function initBrushes() {
+  document.querySelectorAll("[data-brushes]").forEach((section) => {
+    const count = parseInt(section.dataset.brushes, 10) || 5;
+    const wrap = document.createElement("div");
+    wrap.className = "brushes";
+    wrap.setAttribute("aria-hidden", "true");
+
+    const variants = ["", "brush--bright", "brush--soft"];
+
+    for (let i = 0; i < count; i += 1) {
+      const b = document.createElement("span");
+      b.className = "brush";
+      const variant = variants[Math.floor(Math.random() * variants.length)];
+      if (variant) b.classList.add(variant);
+
+      const top = Math.random() * 100;
+      const left = Math.random() * 100;
+      const width = 280 + Math.random() * 360;
+      const height = 70 + Math.random() * 110;
+      const rot = -55 + Math.random() * 110;
+      const opFrom = (0.18 + Math.random() * 0.16).toFixed(2);
+      const opTo = (parseFloat(opFrom) + 0.1 + Math.random() * 0.15).toFixed(2);
+      const breathe = (14 + Math.random() * 12).toFixed(1);
+      const breatheDelay = (-Math.random() * 14).toFixed(1);
+
+      b.style.top = top + "%";
+      b.style.left = left + "%";
+      b.style.width = width + "px";
+      b.style.height = height + "px";
+      // base transform: centra y rota; el keyframe lo reusa con var
+      const baseTransform = `translate(-50%, -50%) rotate(${rot.toFixed(0)}deg)`;
+      b.style.setProperty("--base-transform", baseTransform);
+      b.style.transform = baseTransform;
+      b.style.setProperty("--op-from", opFrom);
+      b.style.setProperty("--op-to", opTo);
+      b.style.setProperty("--breathe", breathe + "s");
+      b.style.setProperty("--breathe-delay", breatheDelay + "s");
+      b.style.opacity = opFrom;
+
+      wrap.appendChild(b);
+    }
+
+    // Insertar al inicio del section para que esté detrás del contenido
+    section.insertBefore(wrap, section.firstChild);
+  });
+}
 
 // =========================================================
 // Partículas decorativas (destellos champagne)
