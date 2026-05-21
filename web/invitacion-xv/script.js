@@ -104,9 +104,13 @@ const CUST_DEFAULTS = {
   frase1: "Hay momentos",
   frase2: "que merecen ser",
   frase3: "recordados para siempre.",
+  ceremonia_hora: "17:00",
+  ceremonia_lugar: "Parroquia de San Francisco",
+  ceremonia_dir1: "Av. Hidalgo 123, Centro",
+  ceremonia_dir2: "Zapopan, Jalisco",
 };
 
-const CUST_TOTAL_STEPS = 2;
+const CUST_TOTAL_STEPS = 3;
 let custCurrentStep = 1;
 
 function initCustomizer() {
@@ -223,15 +227,11 @@ function closeDrawer(drawer, overlay) {
 }
 
 function readCurrentValues(form) {
-  return {
-    kicker: form.elements.kicker?.value ?? CUST_DEFAULTS.kicker,
-    nombre1: form.elements.nombre1?.value ?? CUST_DEFAULTS.nombre1,
-    nombre2: form.elements.nombre2?.value ?? CUST_DEFAULTS.nombre2,
-    fecha: form.elements.fecha?.value ?? CUST_DEFAULTS.fecha,
-    frase1: form.elements.frase1?.value ?? CUST_DEFAULTS.frase1,
-    frase2: form.elements.frase2?.value ?? CUST_DEFAULTS.frase2,
-    frase3: form.elements.frase3?.value ?? CUST_DEFAULTS.frase3,
-  };
+  const out = {};
+  for (const key of Object.keys(CUST_DEFAULTS)) {
+    out[key] = form.elements[key]?.value ?? CUST_DEFAULTS[key];
+  }
+  return out;
 }
 
 function readCustom() {
@@ -263,7 +263,62 @@ function applyCustom(data) {
   renderAlts(data.nombre1, data.nombre2);
   renderWhatsApp(data.nombre1, data.nombre2);
   renderFrase(data.frase1, data.frase2, data.frase3);
+  renderEvento("ceremonia", {
+    hora: data.ceremonia_hora,
+    lugar: data.ceremonia_lugar,
+    dir1: data.ceremonia_dir1,
+    dir2: data.ceremonia_dir2,
+  });
   updateTitle(data.nombre1, data.nombre2);
+}
+
+// Render compartido para ceremonia y recepción. La tarjeta de cada
+// evento tiene la misma estructura interna (.evento__hora, __lugar,
+// __direccion, __mapa), así que cambia sólo el selector base.
+function renderEvento(tipo, { hora, lugar, dir1, dir2 }) {
+  const evento = document.querySelector(`.evento--${tipo}`);
+  if (!evento) return;
+
+  const horaEl = evento.querySelector(".evento__hora");
+  if (horaEl) {
+    const { time, period } = formatHora12(hora);
+    horaEl.innerHTML = `${escapeHtml(time)} <span>${escapeHtml(period)}</span>`;
+  }
+
+  const lugarEl = evento.querySelector(".evento__lugar");
+  if (lugarEl) lugarEl.textContent = lugar || "";
+
+  const dirEl = evento.querySelector(".evento__direccion");
+  if (dirEl) {
+    const html = [dir1, dir2]
+      .filter((s) => s && s.trim())
+      .map(escapeHtml)
+      .join("<br />");
+    dirEl.innerHTML = html;
+  }
+
+  const mapaLink = evento.querySelector(".evento__mapa");
+  if (mapaLink) {
+    const query = [lugar, dir1, dir2]
+      .filter((s) => s && s.trim())
+      .join(", ");
+    if (query) {
+      mapaLink.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    }
+  }
+}
+
+// Convierte "HH:MM" 24h en partes 12h para el formato del template
+// (ej. "17:00" -> { time: "5:00", period: "PM" })
+function formatHora12(hhmm) {
+  const m = /^(\d{1,2}):(\d{2})$/.exec((hhmm || "").trim());
+  if (!m) return { time: "", period: "" };
+  let h = parseInt(m[1], 10);
+  const min = m[2];
+  if (isNaN(h)) return { time: "", period: "" };
+  const period = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 || 12;
+  return { time: `${hour12}:${min}`, period };
 }
 
 function renderFrase(f1, f2, f3) {

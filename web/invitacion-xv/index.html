@@ -15,7 +15,7 @@
 
     <link rel="preload" as="image" href="./assets/portada.webp" fetchpriority="high" />
 
-    <link rel="stylesheet" href="./styles.css?b=20260521K" />
+    <link rel="stylesheet" href="./styles.css?b=20260521L" />
   </head>
   <body>
     <div class="atmosfera" aria-hidden="true"></div>
@@ -183,7 +183,7 @@
             <span class="ornamento__linea"></span>
           </div>
 
-          <article class="evento" data-reveal data-reveal-delay="2">
+          <article class="evento evento--ceremonia" data-reveal data-reveal-delay="2">
             <p class="evento__tipo">Ceremonia</p>
             <p class="evento__hora">5:00 <span>PM</span></p>
             <h3 class="evento__lugar">Parroquia de San Francisco</h3>
@@ -212,7 +212,7 @@
             <span class="ubicacion__sep-linea"></span>
           </div>
 
-          <article class="evento" data-reveal data-reveal-delay="4">
+          <article class="evento evento--recepcion" data-reveal data-reveal-delay="4">
             <p class="evento__tipo">Recepción</p>
             <p class="evento__hora">7:30 <span>PM</span></p>
             <h3 class="evento__lugar">Jardín La Victoria</h3>
@@ -821,6 +821,7 @@
         <div class="cust-stepper" aria-hidden="true">
           <span class="cust-stepper__dot" data-step="1"></span>
           <span class="cust-stepper__dot" data-step="2"></span>
+          <span class="cust-stepper__dot" data-step="3"></span>
         </div>
 
         <fieldset class="cust-step cust-form__group" data-step="1">
@@ -915,6 +916,58 @@
           </label>
         </fieldset>
 
+        <fieldset class="cust-step cust-form__group" data-step="3" hidden>
+          <legend class="cust-form__legend">Lugar — Ceremonia</legend>
+
+          <label class="cust-field">
+            <span class="cust-field__label">Hora</span>
+            <input
+              class="cust-field__input"
+              name="ceremonia_hora"
+              type="time"
+              value="17:00"
+            />
+            <span class="cust-field__hint">Formato 24 h; se muestra como 5:00 PM en la invitación</span>
+          </label>
+
+          <label class="cust-field">
+            <span class="cust-field__label">Nombre del lugar</span>
+            <input
+              class="cust-field__input"
+              name="ceremonia_lugar"
+              type="text"
+              value="Parroquia de San Francisco"
+              maxlength="60"
+              autocomplete="off"
+            />
+          </label>
+
+          <label class="cust-field">
+            <span class="cust-field__label">Dirección — línea 1</span>
+            <input
+              class="cust-field__input"
+              name="ceremonia_dir1"
+              type="text"
+              value="Av. Hidalgo 123, Centro"
+              maxlength="60"
+              autocomplete="off"
+            />
+          </label>
+
+          <label class="cust-field">
+            <span class="cust-field__label">Dirección — línea 2</span>
+            <input
+              class="cust-field__input"
+              name="ceremonia_dir2"
+              type="text"
+              value="Zapopan, Jalisco"
+              maxlength="60"
+              autocomplete="off"
+            />
+            <span class="cust-field__hint">El botón “Ver en mapa” usa el nombre + dirección como búsqueda en Google Maps</span>
+          </label>
+        </fieldset>
+
         <div class="cust-form__actions">
           <button type="button" class="cust-btn cust-btn--ghost" data-action="reset">
             Restablecer
@@ -946,6 +999,6 @@
       </form>
     </aside>
 
-    <script src="./script.js?b=20260521K" defer></script>
+    <script src="./script.js?b=20260521L" defer></script>
   </body>
 </html>
