@@ -32,7 +32,7 @@
 
 html,
 body {
-  background: var(--c-bg);
+  background: #0b0b0b;
   color: var(--c-ink);
   font-family: var(--f-sans);
   -webkit-font-smoothing: antialiased;
@@ -392,8 +392,7 @@ img {
   aspect-ratio: 1 / 1;
   width: 100%;
   background:
-    radial-gradient(80% 60% at 50% 0%, rgba(183, 110, 121, 0.08), transparent 70%),
-    linear-gradient(180deg, #0b0b0b 0%, #14100f 50%, #0b0b0b 100%);
+    radial-gradient(75% 55% at 50% 50%, rgba(183, 110, 121, 0.1), transparent 70%);
   color: #f4eae6;
   display: grid;
   place-items: center;
@@ -508,8 +507,7 @@ img {
   aspect-ratio: 1 / 1;
   width: 100%;
   background:
-    radial-gradient(70% 50% at 50% 100%, rgba(183, 110, 121, 0.1), transparent 70%),
-    linear-gradient(180deg, #0b0b0b 0%, #181311 60%, #0b0b0b 100%);
+    radial-gradient(70% 55% at 50% 50%, rgba(183, 110, 121, 0.12), transparent 70%);
   color: #f4eae6;
   display: grid;
   place-items: center;
@@ -1047,8 +1045,7 @@ body.edit-mode .portada::after {
   position: relative;
   width: 100%;
   background:
-    radial-gradient(60% 40% at 50% 0%, rgba(183, 110, 121, 0.1), transparent 70%),
-    linear-gradient(180deg, #0b0b0b 0%, #15110f 50%, #0b0b0b 100%);
+    radial-gradient(70% 50% at 50% 50%, rgba(183, 110, 121, 0.1), transparent 70%);
   color: #f4eae6;
   display: grid;
   place-items: center;
@@ -1224,8 +1221,7 @@ body.edit-mode .portada::after {
   position: relative;
   width: 100%;
   background:
-    radial-gradient(60% 50% at 50% 50%, rgba(183, 110, 121, 0.1), transparent 70%),
-    linear-gradient(180deg, #0b0b0b 0%, #16110f 50%, #0b0b0b 100%);
+    radial-gradient(65% 50% at 50% 50%, rgba(183, 110, 121, 0.1), transparent 70%);
   color: #f4eae6;
   display: grid;
   place-items: center;
