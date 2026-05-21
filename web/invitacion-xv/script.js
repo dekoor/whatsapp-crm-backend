@@ -103,7 +103,7 @@ function initRevealOnScroll() {
         }
       });
     },
-    { threshold: 0.25, rootMargin: "0px 0px -8% 0px" }
+    { threshold: 0.1, rootMargin: "0px 0px -5% 0px" }
   );
 
   targets.forEach((el) => io.observe(el));
