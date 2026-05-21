@@ -137,19 +137,29 @@
     paint-order: stroke fill;
   }
   /* Mayúscula extendida en la "M" */
-  .quincea .swash-m{
+  .quincea .swash-m,
+  .quincea .swash-q{
     font-family:'Allura','Great Vibes', cursive;
+    display:inline-block;
+    background: linear-gradient(160deg,
+      #d6a9b1 0%,
+      #b9858f 38%,
+      #9a6b78 70%,
+      #7a4f5c 100%);
+    -webkit-background-clip:text;
+            background-clip:text;
+    -webkit-text-fill-color:transparent;
+            color:transparent;
+  }
+  .quincea .swash-m{
     font-size:1.18em;
     margin-right:-.04em;
-    display:inline-block;
     transform: translateY(.04em);
   }
   /* "Q" con curva extendida */
   .quincea .swash-q{
-    font-family:'Allura','Great Vibes', cursive;
     font-size:1.12em;
     margin-right:-.03em;
-    display:inline-block;
     transform: translateY(.05em);
   }
   .sublinea{
@@ -230,6 +240,15 @@
     margin-right:-.05em;
     display:inline-block;
     transform: translateY(.04em);
+    background: linear-gradient(155deg,
+      #d6a9b1 0%,
+      #b9858f 35%,
+      #9a6b78 65%,
+      #6f4654 100%);
+    -webkit-background-clip:text;
+            background-clip:text;
+    -webkit-text-fill-color:transparent;
+            color:transparent;
   }
   .nombre small{
     display:block;
