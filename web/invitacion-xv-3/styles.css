@@ -17,7 +17,7 @@
 
   --c-overlay: rgba(11, 11, 11, 0.55);
 
-  --f-display: "Cormorant Garamond", "Times New Roman", serif;
+  --f-display: "Playfair Display", "Cormorant Garamond", "Times New Roman", serif;
   --f-script: "Allura", "Pinyon Script", "Great Vibes", cursive;
   --f-sans: "Inter", system-ui, sans-serif;
 
@@ -49,9 +49,10 @@ body {
 .atmosfera {
   position: fixed;
   inset: 0;
+  /* Vignette dark + sutil glow coral central, look editorial nocturno */
   background:
-    radial-gradient(ellipse 90% 65% at 50% 32%, rgba(244, 168, 168, 0.08), transparent 62%),
-    radial-gradient(ellipse 75% 55% at 50% 78%, rgba(224, 133, 133, 0.06), transparent 65%);
+    radial-gradient(ellipse 60% 40% at 50% 25%, rgba(244, 168, 168, 0.06), transparent 70%),
+    radial-gradient(ellipse 120% 100% at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.55) 100%);
   pointer-events: none;
   transform: translateZ(0);
   will-change: transform;
@@ -675,39 +676,37 @@ img {
 }
 
 /* Ornamento: línea — diamante — línea */
+/* Ornamento minimal: una línea hairline coral, sin diamante.
+   Mantengo el HTML intacto y solo colapso el diamante a un punto
+   sutil para que la silueta sea más editorial y menos clásica. */
 .ornamento {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  width: clamp(160px, 40%, 240px);
+  gap: 14px;
+  width: clamp(80px, 22%, 140px);
+  opacity: 0.55;
 }
 
 .ornamento__linea {
   flex: 1;
   height: 1px;
-  background: linear-gradient(
-    to right,
-    transparent,
-    rgba(255, 207, 207, 0.85)
-  );
+  background: var(--c-rose-gold);
+  opacity: 0.55;
 }
 
 .ornamento__linea:last-child {
-  background: linear-gradient(
-    to left,
-    transparent,
-    rgba(255, 207, 207, 0.85)
-  );
+  background: var(--c-rose-gold);
+  opacity: 0.55;
 }
 
 .ornamento__diamante {
-  width: 8px;
-  height: 8px;
+  width: 3px;
+  height: 3px;
   background: var(--c-rose-gold);
-  transform: rotate(45deg);
-  box-shadow: 0 0 10px rgba(244, 168, 168, 0.65),
-    0 0 0 1px rgba(255, 244, 234, 0.25);
+  border-radius: 50%;
+  transform: none;
+  box-shadow: none;
   flex-shrink: 0;
 }
 
@@ -717,24 +716,34 @@ img {
 
 .countdown {
   position: relative;
-  aspect-ratio: 1 / 1;
   width: 100%;
   background: transparent;
-  color: #f4eae6;
+  color: var(--c-ink);
   display: grid;
   place-items: center;
-  padding: clamp(28px, 6vw, 60px) 20px;
+  padding: clamp(56px, 12vw, 110px) 20px;
   overflow: hidden;
 }
 
+/* Glass card prominente con backdrop blur, fondo dark translúcido
+   y borde coral muy sutil. Replica la estética de la referencia. */
 .countdown__contenido {
   width: 100%;
-  max-width: 720px;
+  max-width: 540px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(20px, 5vw, 44px);
+  gap: clamp(20px, 4vw, 32px);
+  padding: clamp(28px, 6vw, 44px) clamp(20px, 5vw, 36px);
+  background: rgba(15, 15, 15, 0.55);
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  border: 1px solid rgba(244, 168, 168, 0.18);
+  border-radius: 22px;
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .countdown__kicker {
@@ -767,24 +776,13 @@ img {
 
 .countdown__num {
   font-family: var(--f-display);
-  font-weight: 300;
-  font-size: clamp(2.6rem, 11vw, 5.5rem);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 10vw, 4.4rem);
   line-height: 1;
-  letter-spacing: 0.01em;
-  color: #fff;
+  letter-spacing: -0.01em;
+  color: var(--c-ink);
   font-variant-numeric: tabular-nums;
-  background: linear-gradient(
-    180deg,
-    #fff7f3 0%,
-    #ffe5db 35%,
-    #f1a89a 70%,
-    #c9796f 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.5));
+  text-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
   transition: opacity 0.18s var(--ease);
 }
 
@@ -804,11 +802,11 @@ img {
 
 .countdown__sep {
   font-family: var(--f-display);
-  font-weight: 300;
-  font-size: clamp(2.6rem, 11vw, 5.5rem);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 10vw, 4.4rem);
   line-height: 1;
   color: var(--c-rose-gold);
-  opacity: 0.85;
+  opacity: 0.95;
   align-self: flex-start;
   /* alineación vertical con los números */
   margin-top: -0.05em;
