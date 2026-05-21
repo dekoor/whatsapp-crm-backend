@@ -6,13 +6,17 @@
 <title>Mis XV Años · Portada</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Parisienne&family=Italiana&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Great+Vibes&family=Italiana&family=Pinyon+Script&display=swap" rel="stylesheet">
 <style>
   :root{
     --rosa-suave:#fbe5e8;
     --rosa-polvo:#f3c8cf;
     --rosa-medio:#e9a6b1;
     --rosa-oscuro:#b97481;
+    --dusty-1:#d6a9b1;   /* dusty pink claro */
+    --dusty-2:#b9858f;   /* dusty pink medio */
+    --mauve-1:#9a6b78;   /* mauve elegante */
+    --mauve-2:#7a4f5c;   /* mauve profundo */
     --crema:#fff7f4;
     --tinta:#5a3a40;
     --dorado:#c9a96b;
@@ -33,6 +37,9 @@
     justify-content:center;
     padding:24px;
     overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    text-rendering:optimizeLegibility;
   }
 
   /* Pétalos flotantes */
@@ -90,23 +97,60 @@
   .monograma{
     font-family:'Italiana', serif;
     letter-spacing:.6em;
-    font-size:12px;
-    color:var(--rosa-oscuro);
+    font-size:11px;
+    color:var(--mauve-1);
+    opacity:.85;
     text-transform:uppercase;
     margin-bottom:8px;
   }
   .moñito{
     display:inline-block;
-    color:var(--rosa-medio);
-    font-size:22px;
+    color:var(--dusty-2);
+    font-size:20px;
     transform:translateY(2px);
   }
   .quincea{
-    font-family:'Parisienne', cursive;
-    color:var(--rosa-oscuro);
-    font-size:42px;
-    line-height:1;
-    margin-top:6px;
+    font-family:'Great Vibes', 'Allura', cursive;
+    font-weight:400;
+    font-size:clamp(46px, 12vw, 58px);
+    line-height:1.05;
+    margin-top:10px;
+    letter-spacing:.012em;
+
+    /* degradado rosa viejo / mauve */
+    background: linear-gradient(160deg,
+      #d6a9b1 0%,
+      #b9858f 38%,
+      #9a6b78 70%,
+      #7a4f5c 100%);
+    -webkit-background-clip:text;
+            background-clip:text;
+    -webkit-text-fill-color:transparent;
+            color:transparent;
+
+    /* profundidad y brillo satinado muy sutil */
+    filter:
+      drop-shadow(0 1px 0 rgba(255,255,255,.55))
+      drop-shadow(0 6px 14px rgba(122,79,92,.18))
+      drop-shadow(0 2px 4px rgba(122,79,92,.10));
+    text-shadow: 0 1px 0 rgba(255,255,255,.35);
+    paint-order: stroke fill;
+  }
+  /* Mayúscula extendida en la "M" */
+  .quincea .swash-m{
+    font-family:'Allura','Great Vibes', cursive;
+    font-size:1.18em;
+    margin-right:-.04em;
+    display:inline-block;
+    transform: translateY(.04em);
+  }
+  /* "Q" con curva extendida */
+  .quincea .swash-q{
+    font-family:'Allura','Great Vibes', cursive;
+    font-size:1.12em;
+    margin-right:-.03em;
+    display:inline-block;
+    transform: translateY(.05em);
   }
   .sublinea{
     font-family:'Cormorant Garamond', serif;
@@ -155,21 +199,51 @@
 
   .nombre{
     text-align:center;
-    font-family:'Parisienne', cursive;
-    color:var(--rosa-oscuro);
-    font-size:54px;
-    line-height:1;
-    margin-top:4px;
+    font-family:'Allura', 'Great Vibes', cursive;
+    font-weight:400;
+    font-size:clamp(72px, 18vw, 92px);
+    line-height:.95;
+    margin-top:6px;
+    letter-spacing:.005em;
+
+    background: linear-gradient(155deg,
+      #d6a9b1 0%,
+      #b9858f 35%,
+      #9a6b78 65%,
+      #6f4654 100%);
+    -webkit-background-clip:text;
+            background-clip:text;
+    -webkit-text-fill-color:transparent;
+            color:transparent;
+
+    filter:
+      drop-shadow(0 1px 0 rgba(255,255,255,.65))
+      drop-shadow(0 10px 22px rgba(122,79,92,.22))
+      drop-shadow(0 3px 6px rgba(122,79,92,.14));
+    text-shadow: 0 1px 0 rgba(255,255,255,.45);
+    paint-order: stroke fill;
+  }
+  /* Swash extendido en la "L" inicial */
+  .nombre .swash-l{
+    font-family:'Great Vibes','Allura', cursive;
+    font-size:1.15em;
+    margin-right:-.05em;
+    display:inline-block;
+    transform: translateY(.04em);
   }
   .nombre small{
     display:block;
     font-family:'Italiana', serif;
-    font-size:12px;
-    letter-spacing:.5em;
-    color:var(--tinta);
-    opacity:.65;
-    margin-top:14px;
+    font-size:11px;
+    letter-spacing:.55em;
+    color:var(--mauve-1);
+    opacity:.75;
+    margin-top:18px;
     text-transform:uppercase;
+    -webkit-text-fill-color:initial;
+    background:none;
+    filter:none;
+    text-shadow:none;
   }
 
   .divisor{
@@ -253,8 +327,8 @@
   .esquina.br{bottom:-18px;right:-18px}
 
   @media (max-width:380px){
-    .quincea{font-size:36px}
-    .nombre{font-size:46px}
+    .quincea{font-size:42px}
+    .nombre{font-size:68px}
   }
 </style>
 </head>
@@ -280,7 +354,7 @@
     <header class="encabezado">
       <div class="monograma">· tenéis el honor ·</div>
       <div class="moñito">❀</div>
-      <h2 class="quincea">Mis Quince Años</h2>
+      <h2 class="quincea"><span class="swash-m">M</span>is <span class="swash-q">Q</span>uince Años</h2>
       <div class="sublinea">una celebración soñada</div>
     </header>
 
@@ -290,7 +364,7 @@
     </div>
 
     <h1 class="nombre">
-      Lizbeth
+      <span class="swash-l">L</span>izbeth
       <small>· la festejada ·</small>
     </h1>
 
