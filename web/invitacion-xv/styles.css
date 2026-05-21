@@ -68,6 +68,15 @@ body {
   overflow: hidden;
 }
 
+/* Mientras el usuario está scrolleando pausamos animaciones caras
+   (filter:blur + mix-blend-mode + transform), así el browser libera
+   el GPU para repintar el contenido fluido. Reactivan ~150ms después
+   de la última señal de scroll, así que nadie nota la pausa. */
+body.is-scrolling .brush,
+body.is-scrolling .particles__p {
+  animation-play-state: paused;
+}
+
 /* Necesario para que el main + secciones se pinten encima del
    canvas-fx fixed sin tener que pelear con z-index. */
 .invitacion {
@@ -98,15 +107,13 @@ body {
   height: 46px;
   padding: 0;
   border-radius: 50%;
-  background: rgba(11, 11, 11, 0.72);
+  background: rgba(11, 11, 11, 0.88);
   border: 1px solid rgba(217, 167, 173, 0.55);
   color: var(--c-rose-gold-soft);
   display: grid;
   place-items: center;
   cursor: pointer;
   z-index: 1000;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   box-shadow:
     0 8px 18px rgba(0, 0, 0, 0.5),
     0 0 22px rgba(217, 167, 173, 0.22);
@@ -2812,7 +2819,7 @@ body.edit-mode .galeria__pista {
     transparent 82%
   );
   border-radius: 50% 50% 40% 60% / 60% 40% 60% 40%;
-  filter: blur(18px);
+  filter: blur(14px);
   mix-blend-mode: screen;
   animation: brushBreathe var(--breathe, 18s) ease-in-out var(--breathe-delay, 0s) infinite;
 }
@@ -2824,7 +2831,7 @@ body.edit-mode .galeria__pista {
     rgba(217, 167, 173, 0.32) 40%,
     transparent 78%
   );
-  filter: blur(20px);
+  filter: blur(16px);
 }
 
 .brush--soft {
@@ -2834,7 +2841,7 @@ body.edit-mode .galeria__pista {
     rgba(183, 110, 121, 0.22) 45%,
     transparent 78%
   );
-  filter: blur(22px);
+  filter: blur(17px);
   mix-blend-mode: screen;
 }
 
@@ -2960,7 +2967,7 @@ body.edit-mode .galeria__pista {
   gap: 10px;
   padding: 12px 22px;
   border-radius: 999px;
-  background: rgba(11, 11, 11, 0.78);
+  background: rgba(11, 11, 11, 0.92);
   border: 1px solid var(--c-rose-gold);
   color: var(--c-rose-gold-soft);
   font-family: var(--f-sans);
@@ -2970,8 +2977,6 @@ body.edit-mode .galeria__pista {
   text-transform: uppercase;
   cursor: pointer;
   z-index: 800;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   box-shadow:
     0 10px 24px rgba(0, 0, 0, 0.5),
     0 0 22px rgba(217, 167, 173, 0.15);

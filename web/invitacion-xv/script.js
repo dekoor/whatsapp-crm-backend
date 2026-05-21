@@ -30,7 +30,37 @@ document.addEventListener("DOMContentLoaded", () => {
   initPolaroidTap();
   initBackgroundMusic();
   initCustomizer();
+  initScrollPause();
 });
+
+// =========================================================
+// Pausa las animaciones del canvas-fx mientras el usuario
+// scrollea: agrega body.is-scrolling y la quita ~150ms después
+// del último evento de scroll. Libera GPU y hace el scroll mucho
+// más fluido en mobile sin que el usuario perciba el corte.
+// =========================================================
+function initScrollPause() {
+  let timeout = null;
+  let scrolling = false;
+  const ANIM_RESUME_MS = 160;
+
+  function onScroll() {
+    if (!scrolling) {
+      scrolling = true;
+      document.body.classList.add("is-scrolling");
+    }
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      scrolling = false;
+      document.body.classList.remove("is-scrolling");
+    }, ANIM_RESUME_MS);
+  }
+
+  // passive: true es crítico — sin él el browser no puede optimizar
+  // el scroll porque sabría que podríamos llamar preventDefault
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("touchmove", onScroll, { passive: true });
+}
 
 // =========================================================
 // Personalizar plantilla
@@ -622,8 +652,8 @@ function compressImageToWebP(file, maxSide, quality) {
 // en un contenedor fixed, las pinceladas son las mismas para todas las
 // secciones y el lienzo se siente continuo sin franjas vacías al
 // pasar de una sección a otra.
-const GLOBAL_BRUSH_COUNT = 14;
-const GLOBAL_PARTICLE_COUNT = 38;
+const GLOBAL_BRUSH_COUNT = 10;
+const GLOBAL_PARTICLE_COUNT = 24;
 
 function initBrushes() {
   const canvas = document.querySelector(".canvas-fx");
