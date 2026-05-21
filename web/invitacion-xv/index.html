@@ -13,7 +13,7 @@
       rel="stylesheet"
     />
 
-    <link rel="stylesheet" href="./styles.css?b=20260521h" />
+    <link rel="stylesheet" href="./styles.css?b=20260521i" />
   </head>
   <body>
     <main class="invitacion">
@@ -462,6 +462,82 @@
               </li>
             </ul>
             <p class="paleta__nota"><em>Reservados para la quinceañera</em></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ MESA DE REGALOS ============ -->
+      <section class="regalos" aria-label="Mesa de regalos" data-particles="22" data-brushes="6">
+        <div class="regalos__contenido">
+          <p class="regalos__kicker" data-reveal>
+            <span>O</span><span>B</span><span>S</span><span>E</span><span>Q</span><span>U</span><span>I</span><span>O</span><span>S</span>
+          </p>
+
+          <div class="ornamento" aria-hidden="true" data-reveal data-reveal-delay="1">
+            <span class="ornamento__linea"></span>
+            <span class="ornamento__diamante"></span>
+            <span class="ornamento__linea"></span>
+          </div>
+
+          <!-- Retrato editorial: marco con borde fino, no polaroid -->
+          <figure class="regalos__retrato movible" data-editable="regalos-foto" data-photo-slot="regalos" data-reveal data-reveal-delay="2">
+            <div class="regalos__retrato-marco">
+              <img class="regalos__retrato-img polaroid__foto" src="./assets/regalos.webp" alt="Retrato de Valentina" loading="lazy" />
+            </div>
+            <button class="polaroid__cambiar" type="button" aria-label="Cambiar foto">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M9 3l-1.5 2H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3H9zm3 5a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          </figure>
+
+          <p class="regalos__frase" data-reveal data-reveal-delay="3">
+            <em>Tu presencia es mi mejor regalo.</em><br />
+            Si deseas obsequiarme algo más, dejo estas opciones con cariño.
+          </p>
+
+          <div class="regalos__opciones" data-reveal data-reveal-delay="4">
+            <article class="opcion-regalo">
+              <span class="opcion-regalo__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 8h12l-1 12H7L6 8z" />
+                  <path d="M9 8a3 3 0 016 0" />
+                  <line x1="9" y1="12" x2="9" y2="14" />
+                  <line x1="15" y1="12" x2="15" y2="14" />
+                </svg>
+              </span>
+              <h3 class="opcion-regalo__titulo">Mesa de Regalos</h3>
+              <p class="opcion-regalo__detalle">
+                <span class="opcion-regalo__tienda">Liverpool</span>
+                <span class="opcion-regalo__num">Núm. 51234567</span>
+              </p>
+              <a
+                class="opcion-regalo__cta"
+                href="https://mesaderegalos.liverpool.com.mx/milistaderegalos/51234567"
+                target="_blank"
+                rel="noopener"
+              >
+                Ver mesa
+              </a>
+            </article>
+
+            <article class="opcion-regalo">
+              <span class="opcion-regalo__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="6" width="18" height="13" rx="1.5" />
+                  <path d="M3 7l9 7 9-7" />
+                  <path d="M12 10l4-4M12 10l-4-4" opacity="0.5" />
+                </svg>
+              </span>
+              <h3 class="opcion-regalo__titulo">Lluvia de Sobres</h3>
+              <p class="opcion-regalo__detalle">
+                <span class="opcion-regalo__tienda">El día del evento</span>
+                <span class="opcion-regalo__num">Recibida con mucho cariño</span>
+              </p>
+            </article>
           </div>
         </div>
       </section>
