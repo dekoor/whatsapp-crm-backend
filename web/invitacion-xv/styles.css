@@ -46,13 +46,24 @@ body {
 .atmosfera {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: -2;
   background:
     radial-gradient(ellipse 90% 65% at 50% 32%, rgba(183, 110, 121, 0.08), transparent 62%),
     radial-gradient(ellipse 75% 55% at 50% 78%, rgba(155, 90, 100, 0.06), transparent 65%);
   pointer-events: none;
   transform: translateZ(0);
   will-change: transform;
+}
+
+/* Canvas global de pinceladas + partículas. Fixed para que sean
+   IDÉNTICAS en todas las secciones y no aparezcan cortes al pasar
+   de una a otra. */
+.canvas-fx {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
 }
 
 /* =========================================================

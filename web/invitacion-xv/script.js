@@ -289,90 +289,94 @@ function compressImageToWebP(file, maxSide, quality) {
 // =========================================================
 // Pinceladas oro rosa de fondo
 // =========================================================
+// Una sola capa global de pinceladas dentro de .canvas-fx. Como vive
+// en un contenedor fixed, las pinceladas son las mismas para todas las
+// secciones y el lienzo se siente continuo sin franjas vacías al
+// pasar de una sección a otra.
+const GLOBAL_BRUSH_COUNT = 14;
+const GLOBAL_PARTICLE_COUNT = 38;
+
 function initBrushes() {
-  document.querySelectorAll("[data-brushes]").forEach((section) => {
-    const count = parseInt(section.dataset.brushes, 10) || 5;
-    const wrap = document.createElement("div");
-    wrap.className = "brushes";
-    wrap.setAttribute("aria-hidden", "true");
+  const canvas = document.querySelector(".canvas-fx");
+  if (!canvas) return;
 
-    const variants = ["", "brush--bright", "brush--soft"];
+  const wrap = document.createElement("div");
+  wrap.className = "brushes brushes--global";
+  wrap.setAttribute("aria-hidden", "true");
 
-    for (let i = 0; i < count; i += 1) {
-      const b = document.createElement("span");
-      b.className = "brush";
-      const variant = variants[Math.floor(Math.random() * variants.length)];
-      if (variant) b.classList.add(variant);
+  const variants = ["", "brush--bright", "brush--soft"];
 
-      const top = Math.random() * 100;
-      const left = Math.random() * 100;
-      const width = 280 + Math.random() * 360;
-      const height = 70 + Math.random() * 110;
-      const rot = -55 + Math.random() * 110;
-      const opFrom = (0.18 + Math.random() * 0.16).toFixed(2);
-      const opTo = (parseFloat(opFrom) + 0.1 + Math.random() * 0.15).toFixed(2);
-      const breathe = (14 + Math.random() * 12).toFixed(1);
-      const breatheDelay = (-Math.random() * 14).toFixed(1);
+  for (let i = 0; i < GLOBAL_BRUSH_COUNT; i += 1) {
+    const b = document.createElement("span");
+    b.className = "brush";
+    const variant = variants[Math.floor(Math.random() * variants.length)];
+    if (variant) b.classList.add(variant);
 
-      b.style.top = top + "%";
-      b.style.left = left + "%";
-      b.style.width = width + "px";
-      b.style.height = height + "px";
-      // base transform: centra y rota; el keyframe lo reusa con var
-      const baseTransform = `translate(-50%, -50%) rotate(${rot.toFixed(0)}deg)`;
-      b.style.setProperty("--base-transform", baseTransform);
-      b.style.transform = baseTransform;
-      b.style.setProperty("--op-from", opFrom);
-      b.style.setProperty("--op-to", opTo);
-      b.style.setProperty("--breathe", breathe + "s");
-      b.style.setProperty("--breathe-delay", breatheDelay + "s");
-      b.style.opacity = opFrom;
+    const top = Math.random() * 100;
+    const left = Math.random() * 100;
+    const width = 280 + Math.random() * 360;
+    const height = 70 + Math.random() * 110;
+    const rot = -55 + Math.random() * 110;
+    const opFrom = (0.18 + Math.random() * 0.16).toFixed(2);
+    const opTo = (parseFloat(opFrom) + 0.1 + Math.random() * 0.15).toFixed(2);
+    const breathe = (14 + Math.random() * 12).toFixed(1);
+    const breatheDelay = (-Math.random() * 14).toFixed(1);
 
-      wrap.appendChild(b);
-    }
+    b.style.top = top + "%";
+    b.style.left = left + "%";
+    b.style.width = width + "px";
+    b.style.height = height + "px";
+    const baseTransform = `translate(-50%, -50%) rotate(${rot.toFixed(0)}deg)`;
+    b.style.setProperty("--base-transform", baseTransform);
+    b.style.transform = baseTransform;
+    b.style.setProperty("--op-from", opFrom);
+    b.style.setProperty("--op-to", opTo);
+    b.style.setProperty("--breathe", breathe + "s");
+    b.style.setProperty("--breathe-delay", breatheDelay + "s");
+    b.style.opacity = opFrom;
 
-    // Insertar al inicio del section para que esté detrás del contenido
-    section.insertBefore(wrap, section.firstChild);
-  });
+    wrap.appendChild(b);
+  }
+
+  canvas.appendChild(wrap);
 }
 
 // =========================================================
-// Partículas decorativas (destellos champagne)
+// Partículas decorativas (destellos champagne) — global
 // =========================================================
 function initParticles() {
   const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
   if (reduce) return;
 
-  document.querySelectorAll("[data-particles]").forEach((section) => {
-    const count = parseInt(section.dataset.particles, 10) || 20;
-    const wrap = document.createElement("div");
-    wrap.className = "particles";
-    wrap.setAttribute("aria-hidden", "true");
+  const canvas = document.querySelector(".canvas-fx");
+  if (!canvas) return;
 
-    for (let i = 0; i < count; i += 1) {
-      const p = document.createElement("span");
-      p.className = "particles__p";
-      // 1 de cada 5 partículas es "bright" (más brillante)
-      if (Math.random() < 0.2) p.classList.add("particles__p--bright");
+  const wrap = document.createElement("div");
+  wrap.className = "particles particles--global";
+  wrap.setAttribute("aria-hidden", "true");
 
-      const size = (1.2 + Math.random() * 4).toFixed(1);
-      const duration = (16 + Math.random() * 22).toFixed(1);
-      const delay = (-Math.random() * 30).toFixed(1); // negativo para que ya estén dispersas al cargar
-      const drift = ((Math.random() - 0.5) * 80).toFixed(0);
-      const opacity = (0.35 + Math.random() * 0.5).toFixed(2);
+  for (let i = 0; i < GLOBAL_PARTICLE_COUNT; i += 1) {
+    const p = document.createElement("span");
+    p.className = "particles__p";
+    if (Math.random() < 0.2) p.classList.add("particles__p--bright");
 
-      p.style.left = (Math.random() * 100).toFixed(2) + "%";
-      p.style.setProperty("--size", size + "px");
-      p.style.setProperty("--duration", duration + "s");
-      p.style.setProperty("--delay", delay + "s");
-      p.style.setProperty("--drift", drift + "px");
-      p.style.setProperty("--opacity", opacity);
+    const size = (1.2 + Math.random() * 4).toFixed(1);
+    const duration = (16 + Math.random() * 22).toFixed(1);
+    const delay = (-Math.random() * 30).toFixed(1);
+    const drift = ((Math.random() - 0.5) * 80).toFixed(0);
+    const opacity = (0.35 + Math.random() * 0.5).toFixed(2);
 
-      wrap.appendChild(p);
-    }
+    p.style.left = (Math.random() * 100).toFixed(2) + "%";
+    p.style.setProperty("--size", size + "px");
+    p.style.setProperty("--duration", duration + "s");
+    p.style.setProperty("--delay", delay + "s");
+    p.style.setProperty("--drift", drift + "px");
+    p.style.setProperty("--opacity", opacity);
 
-    section.appendChild(wrap);
-  });
+    wrap.appendChild(p);
+  }
+
+  canvas.appendChild(wrap);
 }
 
 // =========================================================
