@@ -604,13 +604,12 @@ img {
 
 .bienvenida {
   position: relative;
-  aspect-ratio: 1 / 1;
   width: 100%;
   background: transparent;
-  color: #f4eae6;
+  color: var(--c-ink);
   display: grid;
   place-items: center;
-  padding: clamp(28px, 6vw, 60px) 24px;
+  padding: clamp(64px, 14vw, 130px) 24px;
   overflow: hidden;
 }
 
@@ -658,34 +657,19 @@ img {
   display: block;
 }
 
+/* xv-3: línea acentuada en italic coral, sin gradient metalizado */
 .bienvenida__cita-linea--em {
   font-style: italic;
   font-family: var(--f-display);
-  background: linear-gradient(
-    180deg,
-    #fff7f3 0%,
-    #ffd8cf 30%,
-    #f1a89a 55%,
-    #c9796f 85%,
-    #9f4f49 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+  color: var(--c-rose-gold);
 }
 
 /* Ornamento: línea — diamante — línea */
-/* Ornamento minimal: una línea hairline coral, sin diamante.
-   Mantengo el HTML intacto y solo colapso el diamante a un punto
-   sutil para que la silueta sea más editorial y menos clásica. */
+/* xv-3: ornamentos clásicos (línea-diamante-línea) ocultos para
+   romper con la estética de invitación tradicional. El HTML queda
+   intacto. */
 .ornamento {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  width: clamp(80px, 22%, 140px);
-  opacity: 0.55;
+  display: none !important;
 }
 
 .ornamento__linea {
@@ -1299,25 +1283,23 @@ body.edit-mode .portada::after {
   padding-left: 0.55em;
 }
 
-/* Tarjeta de evento */
+/* xv-3: tarjeta de evento como glass card prominente, mismo lenguaje
+   visual que el countdown para consistencia. */
 .evento {
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(8px, 1.6vw, 14px);
-  padding: clamp(20px, 5vw, 36px) clamp(16px, 5vw, 28px);
-  border: 1px solid rgba(255, 207, 207, 0.25);
-  border-radius: 4px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 220, 200, 0.04),
-    rgba(0, 0, 0, 0.18)
-  );
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 220, 200, 0.08);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  gap: clamp(10px, 2vw, 16px);
+  padding: clamp(24px, 6vw, 40px) clamp(18px, 5vw, 32px);
+  border: 1px solid rgba(244, 168, 168, 0.18);
+  border-radius: 22px;
+  background: rgba(15, 15, 15, 0.55);
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .evento__tipo {
@@ -1332,22 +1314,12 @@ body.edit-mode .portada::after {
 
 .evento__hora {
   font-family: var(--f-display);
-  font-weight: 300;
-  font-size: clamp(2.6rem, 10vw, 4.2rem);
+  font-weight: 500;
+  font-size: clamp(2.4rem, 9vw, 3.6rem);
   line-height: 1;
-  letter-spacing: 0.01em;
-  background: linear-gradient(
-    180deg,
-    #fff7f3 0%,
-    #ffd8cf 30%,
-    #f1a89a 65%,
-    #c9796f 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45));
+  letter-spacing: -0.01em;
+  color: var(--c-rose-gold);
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   margin-top: 4px;
 }
 
@@ -1378,32 +1350,33 @@ body.edit-mode .portada::after {
   letter-spacing: 0.04em;
 }
 
+/* xv-3: CTA "Ver mapa" como pill coral filled prominente, no outline */
 .evento__mapa {
-  margin-top: clamp(8px, 1.6vw, 16px);
+  margin-top: clamp(10px, 2vw, 18px);
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  border: 1px solid var(--c-rose-gold);
+  gap: 10px;
+  padding: 12px 22px;
+  border: 0;
   border-radius: 999px;
-  background: rgba(11, 11, 11, 0.45);
-  color: var(--c-rose-gold-soft);
+  background: var(--c-rose-gold);
+  color: #0b0b0b;
   font-family: var(--f-sans);
-  font-weight: 400;
-  font-size: clamp(0.74rem, 1.7vw, 0.85rem);
+  font-weight: 600;
+  font-size: clamp(0.78rem, 1.8vw, 0.88rem);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   text-decoration: none;
-  transition: background 0.25s var(--ease), color 0.25s var(--ease),
-    transform 0.25s var(--ease), border-color 0.25s var(--ease);
+  box-shadow: 0 8px 24px rgba(244, 168, 168, 0.25);
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease),
+    background 0.25s var(--ease);
 }
 
 .evento__mapa:hover,
 .evento__mapa:focus-visible {
-  background: var(--c-rose-gold);
-  color: #0b0b0b;
-  border-color: var(--c-rose-gold);
-  transform: translateY(-1px);
+  background: var(--c-rose-gold-soft);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(244, 168, 168, 0.35);
   outline: none;
 }
 
@@ -1413,15 +1386,10 @@ body.edit-mode .portada::after {
   flex-shrink: 0;
 }
 
-/* Separador entre ceremonia y recepción */
+/* xv-3: separador entre ceremonia y recepción oculto — las dos cards
+   glass se diferencian por sí mismas. */
 .ubicacion__sep {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  width: 80%;
-  max-width: 280px;
-  margin: clamp(4px, 1vw, 12px) 0;
+  display: none;
 }
 
 .ubicacion__sep-linea {
@@ -1490,38 +1458,32 @@ body.edit-mode .portada::after {
 }
 
 /* Contenedor que apila las polaroids superpuestas */
+/* xv-3 polaroids: grid editorial moderno. Sin rotación, sin papel
+   blanco vintage, sin captions cursivas. Mantienen el data-photo-slot
+   y los --tx/--ty/--scale/--pop para que JS y modo editor sigan vivos. */
 .polaroids {
   position: relative;
-  width: min(94vw, 520px);
-  /* Alto suficiente para 2 filas + leve cushion arriba/abajo */
-  height: min(140vw, 700px);
+  width: min(94vw, 540px);
   margin: clamp(24px, 5vw, 44px) auto 0;
-  perspective: 1200px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(12px, 2.5vw, 18px);
+  height: auto;
+  perspective: none;
 }
 
-/* Polaroid individual */
 .polaroid {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 49%;
-  padding: 4.5% 4.5% 14% 4.5%;
-  background: linear-gradient(
-    180deg,
-    #fdfaf6 0%,
-    #f7f0e8 100%
-  );
-  border-radius: 3px;
-  box-shadow:
-    0 22px 38px rgba(0, 0, 0, 0.55),
-    0 6px 14px rgba(0, 0, 0, 0.35),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.6),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.05);
-  /* La rotación va en --rot y la posición en --tx/--ty/--scale (compartidas con .movible).
-     --pop es el boost de escala al tap (1 por defecto, ~1.12 cuando .polaroid--active). */
+  position: relative;
+  width: 100%;
+  padding: 0;
+  background: rgba(15, 15, 15, 0.55);
+  border: 1px solid rgba(244, 168, 168, 0.18);
+  border-radius: 8px;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
   --rot: 0deg;
-  --ox: -50%;
-  --oy: -50%;
+  --ox: 0px;
+  --oy: 0px;
   --pop: 1;
   transform:
     translate(calc(var(--ox) + var(--tx, 0px)), calc(var(--oy) + var(--ty, 0px)))
@@ -1566,57 +1528,38 @@ body.edit-mode .polaroid {
   -webkit-user-drag: none;
 }
 
+/* xv-3: captions cursivas Caveat eliminadas (estética vintage), el
+   marco editorial habla por sí solo. */
 .polaroid__caption {
-  font-family: "Caveat", "Segoe Script", cursive;
-  font-weight: 400;
-  font-size: clamp(1.1rem, 3.4vw, 1.5rem);
-  color: #2d2118;
-  text-align: center;
-  margin-top: clamp(6px, 1.5vw, 12px);
-  letter-spacing: 0.01em;
-  opacity: 0.78;
+  display: none;
 }
 
-/* Layout 2x2: cada polaroid en su cuadrante, sólo esquinas se rozan */
-.polaroid--1 {
-  --ox: -94%;
-  --oy: -94%;
-  --rot: -8deg;
-  z-index: 2;
-}
-.polaroid--2 {
-  --ox: -6%;
-  --oy: -80%;
-  --rot: 6deg;
-  z-index: 1;
-}
-.polaroid--3 {
-  --ox: -94%;
-  --oy: -20%;
-  --rot: -4deg;
-  z-index: 3;
-}
+/* xv-3: cuadrantes sin rotación ni overlap absoluto — el grid del
+   contenedor las pone en 2x2. Reset --ox/--oy/--rot a 0 para no
+   interferir con el transform compartido con .movible. */
+.polaroid--1,
+.polaroid--2,
+.polaroid--3,
 .polaroid--4 {
-  --ox: -6%;
-  --oy: -6%;
-  --rot: 10deg;
-  z-index: 4;
+  --ox: 0px;
+  --oy: 0px;
+  --rot: 0deg;
+  z-index: auto;
 }
 
 /* Polaroid activa: se centra en el stack, se endereza, crece y sube
    por encima de todas las demás. Va después de los .polaroid--N para
    ganar por orden de cascada (misma especificidad). */
 .polaroid--active {
-  --ox: -50%;
-  --oy: -50%;
+  --ox: 0px;
+  --oy: 0px;
   --rot: 0deg;
-  --pop: 1.18;
+  --pop: 1.06;
   z-index: 20;
+  border-color: rgba(244, 168, 168, 0.4);
   box-shadow:
-    0 38px 64px rgba(0, 0, 0, 0.75),
-    0 18px 34px rgba(0, 0, 0, 0.55),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.7),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.05);
+    0 24px 48px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(244, 168, 168, 0.25);
 }
 
 /* Botón cámara para cambiar foto (visible solo en modo editor) */
@@ -2204,24 +2147,21 @@ body.edit-mode .galeria__pista {
   gap: clamp(14px, 3vw, 22px);
 }
 
+/* xv-3: mismo lenguaje glass que las cards de evento y countdown */
 .opcion-regalo {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(8px, 1.6vw, 12px);
-  padding: clamp(20px, 4.5vw, 32px) clamp(16px, 4vw, 26px);
-  border: 1px solid rgba(255, 207, 207, 0.25);
-  border-radius: 4px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 220, 200, 0.04),
-    rgba(0, 0, 0, 0.2)
-  );
+  gap: clamp(10px, 2vw, 14px);
+  padding: clamp(24px, 5vw, 36px) clamp(18px, 4vw, 28px);
+  border: 1px solid rgba(244, 168, 168, 0.18);
+  border-radius: 22px;
+  background: rgba(15, 15, 15, 0.55);
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
   box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 220, 200, 0.08);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+    0 24px 60px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .opcion-regalo__icon {
@@ -2276,31 +2216,33 @@ body.edit-mode .galeria__pista {
   color: rgba(244, 234, 230, 0.7);
 }
 
+/* xv-3: CTA pill coral filled (consistente con evento__mapa) */
 .opcion-regalo__cta {
-  margin-top: clamp(8px, 1.8vw, 14px);
+  margin-top: clamp(10px, 2vw, 16px);
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 22px;
-  border: 1px solid var(--c-rose-gold);
+  gap: 10px;
+  padding: 12px 26px;
+  border: 0;
   border-radius: 999px;
-  background: rgba(11, 11, 11, 0.45);
-  color: var(--c-rose-gold-soft);
+  background: var(--c-rose-gold);
+  color: #0b0b0b;
   font-family: var(--f-sans);
-  font-weight: 400;
-  font-size: clamp(0.74rem, 1.7vw, 0.85rem);
+  font-weight: 600;
+  font-size: clamp(0.78rem, 1.8vw, 0.88rem);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   text-decoration: none;
-  transition: background 0.25s var(--ease), color 0.25s var(--ease),
-    transform 0.25s var(--ease);
+  box-shadow: 0 8px 24px rgba(244, 168, 168, 0.25);
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease),
+    background 0.25s var(--ease);
 }
 
 .opcion-regalo__cta:hover,
 .opcion-regalo__cta:focus-visible {
-  background: var(--c-rose-gold);
-  color: #0b0b0b;
-  transform: translateY(-1px);
+  background: var(--c-rose-gold-soft);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(244, 168, 168, 0.35);
   outline: none;
 }
 
@@ -2375,26 +2317,16 @@ body.edit-mode .galeria__pista {
   color: rgba(244, 234, 230, 0.92);
 }
 
-/* Hashtag enorme con el mismo metal oro rosa del nombre */
+/* xv-3: hashtag flat coral, sin gradient metalizado */
 .hashtag__tag {
   font-family: var(--f-display);
-  font-weight: 500;
-  font-size: clamp(2.4rem, 9vw, 4rem);
+  font-weight: 600;
+  font-size: clamp(2.2rem, 8vw, 3.4rem);
   line-height: 1;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.01em;
   margin: 0;
-  background: linear-gradient(
-    180deg,
-    #fff7f3 0%,
-    #ffd8cf 30%,
-    #f1a89a 60%,
-    #c9796f 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  filter: drop-shadow(0 5px 14px rgba(0, 0, 0, 0.5));
+  color: var(--c-rose-gold);
+  text-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
   display: inline-flex;
   align-items: baseline;
   gap: 0.04em;
@@ -2410,25 +2342,26 @@ body.edit-mode .galeria__pista {
   font-style: italic;
 }
 
-/* CTA pill a Instagram */
+/* xv-3: CTA Instagram pill coral filled */
 .hashtag__cta {
   margin-top: clamp(4px, 1vw, 10px);
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 11px 22px;
-  border: 1px solid var(--c-rose-gold);
+  padding: 12px 24px;
+  border: 0;
   border-radius: 999px;
-  background: rgba(11, 11, 11, 0.5);
-  color: var(--c-rose-gold-soft);
+  background: var(--c-rose-gold);
+  color: #0b0b0b;
   font-family: var(--f-sans);
-  font-weight: 400;
-  font-size: clamp(0.74rem, 1.7vw, 0.85rem);
+  font-weight: 600;
+  font-size: clamp(0.78rem, 1.8vw, 0.88rem);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   text-decoration: none;
-  transition: background 0.25s var(--ease), color 0.25s var(--ease),
-    transform 0.25s var(--ease);
+  box-shadow: 0 8px 24px rgba(244, 168, 168, 0.25);
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease),
+    background 0.25s var(--ease);
 }
 
 .hashtag__cta svg {
@@ -2438,9 +2371,9 @@ body.edit-mode .galeria__pista {
 
 .hashtag__cta:hover,
 .hashtag__cta:focus-visible {
-  background: var(--c-rose-gold);
-  color: #0b0b0b;
-  transform: translateY(-1px);
+  background: var(--c-rose-gold-soft);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(244, 168, 168, 0.35);
   outline: none;
 }
 
@@ -2583,7 +2516,10 @@ body.edit-mode .galeria__pista {
   }
 }
 
-/* Botón principal — dominante con halo respirante */
+/* xv-3: dos botones diferenciados como en la referencia.
+   - .rsvp__boton (mamá): outline coral (secundario)
+   - .rsvp__boton--papa: filled coral solid (primario)
+   Halo respirante removido para look más editorial. */
 .rsvp__boton {
   position: relative;
   display: inline-flex;
@@ -2591,24 +2527,17 @@ body.edit-mode .galeria__pista {
   gap: 12px;
   padding: clamp(14px, 2.6vw, 18px) clamp(26px, 5.5vw, 38px);
   margin-top: clamp(4px, 1vw, 10px);
-  border: 1px solid var(--c-rose-gold);
+  border: 1.5px solid var(--c-rose-gold);
   border-radius: 999px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 207, 207, 0.18) 0%,
-    rgba(224, 133, 133, 0.22) 100%
-  );
-  color: #fff5ef;
+  background: transparent;
+  color: var(--c-rose-gold);
   font-family: var(--f-sans);
-  font-weight: 500;
+  font-weight: 600;
   font-size: clamp(0.85rem, 2.1vw, 1rem);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   text-decoration: none;
-  box-shadow:
-    0 14px 30px rgba(0, 0, 0, 0.55),
-    inset 0 1px 0 rgba(255, 220, 200, 0.18),
-    0 0 0 0 rgba(255, 207, 207, 0.4);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
   transition:
     transform 0.25s var(--ease),
     background 0.25s var(--ease),
@@ -2617,40 +2546,23 @@ body.edit-mode .galeria__pista {
   isolation: isolate;
 }
 
-/* Halo respirante: pulse sutil con animación de box-shadow */
+.rsvp__boton--papa {
+  background: var(--c-rose-gold);
+  color: #0b0b0b;
+  border-color: var(--c-rose-gold);
+  box-shadow: 0 8px 24px rgba(244, 168, 168, 0.3);
+}
+
 .rsvp__boton-glow {
-  position: absolute;
-  inset: -4px;
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: -1;
-  animation: rsvpPulse 2.6s ease-in-out infinite;
-  box-shadow: 0 0 0 0 rgba(255, 207, 207, 0.45);
-}
-
-/* Desfasar el pulse del segundo botón para que no parpadeen al unísono */
-.rsvp__boton--papa .rsvp__boton-glow {
-  animation-delay: -1.3s;
-}
-
-@keyframes rsvpPulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(255, 207, 207, 0.45);
-  }
-  70% {
-    box-shadow: 0 0 0 18px rgba(255, 207, 207, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(255, 207, 207, 0);
-  }
+  display: none;
 }
 
 .rsvp__boton-icon {
   width: clamp(20px, 4.5vw, 24px);
   height: clamp(20px, 4.5vw, 24px);
   flex-shrink: 0;
-  color: var(--c-rose-gold-soft);
-  transition: color 0.25s var(--ease), transform 0.25s var(--ease);
+  color: currentColor;
+  transition: transform 0.25s var(--ease);
 }
 
 .rsvp__boton:hover,
@@ -2658,10 +2570,7 @@ body.edit-mode .galeria__pista {
   background: var(--c-rose-gold);
   color: #0b0b0b;
   transform: translateY(-2px);
-  box-shadow:
-    0 18px 38px rgba(0, 0, 0, 0.55),
-    0 0 30px rgba(255, 207, 207, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  box-shadow: 0 12px 32px rgba(244, 168, 168, 0.35);
   outline: none;
 }
 
@@ -2856,6 +2765,14 @@ body.edit-mode .galeria__pista {
 /* =========================================================
    PINCELADAS DE FONDO — manchas oro rosa con blur
    ========================================================= */
+
+/* xv-3: hide etheric brush strokes and floating particles to drop
+   the bohemian atmosphere of the original template. Keep the DOM
+   intact so the JS that injects them still works. */
+.brushes,
+.particles {
+  display: none !important;
+}
 
 .brushes {
   position: absolute;
