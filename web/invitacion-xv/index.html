@@ -15,7 +15,7 @@
 
     <link rel="preload" as="image" href="./assets/portada.webp" fetchpriority="high" />
 
-    <link rel="stylesheet" href="./styles.css?b=20260521I" />
+    <link rel="stylesheet" href="./styles.css?b=20260521J" />
   </head>
   <body>
     <div class="atmosfera" aria-hidden="true"></div>
@@ -818,7 +818,12 @@
       </header>
 
       <form class="cust-form" id="cust-form" novalidate>
-        <fieldset class="cust-form__group">
+        <div class="cust-stepper" aria-hidden="true">
+          <span class="cust-stepper__dot" data-step="1"></span>
+          <span class="cust-stepper__dot" data-step="2"></span>
+        </div>
+
+        <fieldset class="cust-step cust-form__group" data-step="1">
           <legend class="cust-form__legend">Portada</legend>
 
           <label class="cust-field">
@@ -870,17 +875,77 @@
           </label>
         </fieldset>
 
+        <fieldset class="cust-step cust-form__group" data-step="2" hidden>
+          <legend class="cust-form__legend">Frase de bienvenida</legend>
+
+          <label class="cust-field">
+            <span class="cust-field__label">Primera línea</span>
+            <input
+              class="cust-field__input"
+              name="frase1"
+              type="text"
+              value="Hay momentos"
+              maxlength="48"
+              autocomplete="off"
+            />
+          </label>
+
+          <label class="cust-field">
+            <span class="cust-field__label">Segunda línea (en cursiva)</span>
+            <input
+              class="cust-field__input"
+              name="frase2"
+              type="text"
+              value="que merecen ser"
+              maxlength="48"
+              autocomplete="off"
+            />
+          </label>
+
+          <label class="cust-field">
+            <span class="cust-field__label">Tercera línea</span>
+            <input
+              class="cust-field__input"
+              name="frase3"
+              type="text"
+              value="recordados para siempre."
+              maxlength="60"
+              autocomplete="off"
+            />
+          </label>
+        </fieldset>
+
         <div class="cust-form__actions">
           <button type="button" class="cust-btn cust-btn--ghost" data-action="reset">
             Restablecer
           </button>
-          <button type="button" class="cust-btn cust-btn--primary" data-action="close">
+          <button
+            type="button"
+            class="cust-btn cust-btn--ghost"
+            data-action="back"
+            hidden
+          >
+            Atrás
+          </button>
+          <button
+            type="button"
+            class="cust-btn cust-btn--primary"
+            data-action="next"
+          >
+            Siguiente
+          </button>
+          <button
+            type="button"
+            class="cust-btn cust-btn--primary"
+            data-action="close"
+            hidden
+          >
             Listo
           </button>
         </div>
       </form>
     </aside>
 
-    <script src="./script.js?b=20260521J" defer></script>
+    <script src="./script.js?b=20260521K" defer></script>
   </body>
 </html>

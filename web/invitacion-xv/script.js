@@ -101,7 +101,13 @@ const CUST_DEFAULTS = {
   nombre1: "Valentina",
   nombre2: "Sofía",
   fecha: "2026-11-15",
+  frase1: "Hay momentos",
+  frase2: "que merecen ser",
+  frase3: "recordados para siempre.",
 };
+
+const CUST_TOTAL_STEPS = 2;
+let custCurrentStep = 1;
 
 function initCustomizer() {
   const toggle = document.querySelector(".cust-toggle");
@@ -151,10 +157,45 @@ function initCustomizer() {
       }
       applyCustom(CUST_DEFAULTS);
       saveCustom(CUST_DEFAULTS);
+    } else if (action === "next") {
+      goToStep(drawer, form, Math.min(custCurrentStep + 1, CUST_TOTAL_STEPS));
+    } else if (action === "back") {
+      goToStep(drawer, form, Math.max(custCurrentStep - 1, 1));
     } else if (action === "close") {
       closeDrawer(drawer, overlay);
     }
   });
+
+  // Arrancar siempre en el paso 1 cuando se abre por primera vez
+  goToStep(drawer, form, 1);
+}
+
+// Muestra el fieldset n, oculta los demás y actualiza la barra
+// de botones (Atrás visible desde el paso 2, Siguiente hasta el
+// penúltimo, Listo sólo en el último). También repinta el stepper.
+function goToStep(drawer, form, n) {
+  custCurrentStep = n;
+
+  form.querySelectorAll(".cust-step").forEach((fs) => {
+    const step = parseInt(fs.dataset.step, 10);
+    fs.hidden = step !== n;
+  });
+
+  const backBtn = form.querySelector('[data-action="back"]');
+  const nextBtn = form.querySelector('[data-action="next"]');
+  const closeBtn = form.querySelector('[data-action="close"]');
+  if (backBtn) backBtn.hidden = n === 1;
+  if (nextBtn) nextBtn.hidden = n >= CUST_TOTAL_STEPS;
+  if (closeBtn) closeBtn.hidden = n < CUST_TOTAL_STEPS;
+
+  form.querySelectorAll(".cust-stepper__dot").forEach((dot) => {
+    const step = parseInt(dot.dataset.step, 10);
+    dot.classList.toggle("is-active", step === n);
+    dot.classList.toggle("is-done", step < n);
+  });
+
+  // Sube el scroll al inicio del drawer al cambiar de paso
+  if (drawer) drawer.scrollTop = 0;
 }
 
 function openDrawer(drawer, overlay) {
@@ -187,6 +228,9 @@ function readCurrentValues(form) {
     nombre1: form.elements.nombre1?.value ?? CUST_DEFAULTS.nombre1,
     nombre2: form.elements.nombre2?.value ?? CUST_DEFAULTS.nombre2,
     fecha: form.elements.fecha?.value ?? CUST_DEFAULTS.fecha,
+    frase1: form.elements.frase1?.value ?? CUST_DEFAULTS.frase1,
+    frase2: form.elements.frase2?.value ?? CUST_DEFAULTS.frase2,
+    frase3: form.elements.frase3?.value ?? CUST_DEFAULTS.frase3,
   };
 }
 
@@ -218,7 +262,15 @@ function applyCustom(data) {
   renderHashtag(data.nombre1, data.nombre2);
   renderAlts(data.nombre1, data.nombre2);
   renderWhatsApp(data.nombre1, data.nombre2);
+  renderFrase(data.frase1, data.frase2, data.frase3);
   updateTitle(data.nombre1, data.nombre2);
+}
+
+function renderFrase(f1, f2, f3) {
+  const lineas = document.querySelectorAll(".bienvenida__cita-linea");
+  if (lineas[0]) lineas[0].textContent = f1 ?? "";
+  if (lineas[1]) lineas[1].textContent = f2 ?? "";
+  if (lineas[2]) lineas[2].textContent = f3 ?? "";
 }
 
 function renderKicker(text) {
