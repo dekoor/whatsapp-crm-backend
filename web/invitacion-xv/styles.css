@@ -1330,16 +1330,39 @@ body.edit-mode .portada::after {
     0 6px 14px rgba(0, 0, 0, 0.35),
     inset 0 0 0 1px rgba(255, 255, 255, 0.6),
     inset 0 -2px 0 rgba(0, 0, 0, 0.05);
-  /* La rotación va en --rot y la posición en --tx/--ty/--scale (compartidas con .movible) */
+  /* La rotación va en --rot y la posición en --tx/--ty/--scale (compartidas con .movible).
+     --pop es el boost de escala al tap (1 por defecto, ~1.12 cuando .polaroid--active). */
   --rot: 0deg;
   --ox: -50%;
   --oy: -50%;
+  --pop: 1;
   transform:
     translate(calc(var(--ox) + var(--tx, 0px)), calc(var(--oy) + var(--ty, 0px)))
     rotate(var(--rot))
-    scale(var(--scale, 1));
+    scale(calc(var(--scale, 1) * var(--pop)));
   transform-origin: center center;
-  transition: box-shadow 0.3s var(--ease), filter 0.3s var(--ease);
+  transition:
+    transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.3s var(--ease),
+    filter 0.3s var(--ease);
+  cursor: pointer;
+}
+
+/* Cuando una polaroid está activa (tap en lectura, no en editor):
+   se agranda 12% y se trae completamente al frente */
+.polaroid--active {
+  --pop: 1.12;
+  z-index: 20;
+  box-shadow:
+    0 32px 56px rgba(0, 0, 0, 0.7),
+    0 14px 28px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* En modo editor el cursor pasa a grab (drag) — definido más abajo en .movible */
+body.edit-mode .polaroid {
+  cursor: grab;
 }
 
 body.edit-mode .polaroid {

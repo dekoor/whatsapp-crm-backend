@@ -27,7 +27,38 @@ document.addEventListener("DOMContentLoaded", () => {
   initBrushes();
   initParticles();
   initPhotoSlots();
+  initPolaroidTap();
 });
+
+// =========================================================
+// Tap en polaroid: la trae al frente y la agranda un poco.
+// Tap de nuevo (o en otra) la regresa a su sitio.
+// Ignorado en modo editor — ahí gana el drag.
+// =========================================================
+function initPolaroidTap() {
+  const polaroids = document.querySelectorAll(".polaroid");
+  if (!polaroids.length) return;
+
+  polaroids.forEach((p) => {
+    p.addEventListener("click", (e) => {
+      if (document.body.classList.contains("edit-mode")) return;
+      if (e.target.closest(".polaroid__cambiar")) return;
+
+      const wasActive = p.classList.contains("polaroid--active");
+      polaroids.forEach((other) => other.classList.remove("polaroid--active"));
+      if (!wasActive) {
+        p.classList.add("polaroid--active");
+      }
+    });
+  });
+
+  // Tap fuera para cerrar
+  document.addEventListener("click", (e) => {
+    if (document.body.classList.contains("edit-mode")) return;
+    if (e.target.closest(".polaroid")) return;
+    polaroids.forEach((p) => p.classList.remove("polaroid--active"));
+  });
+}
 
 // =========================================================
 // Slots de foto editables (galería polaroid)
