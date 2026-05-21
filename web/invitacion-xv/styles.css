@@ -65,7 +65,8 @@ body {
 .familia,
 .vestimenta,
 .regalos,
-.hashtag {
+.hashtag,
+.rsvp {
   content-visibility: auto;
   contain-intrinsic-size: 100vw 90vh;
 }
@@ -2238,6 +2239,192 @@ body.edit-mode .galeria__pista {
   color: rgba(244, 234, 230, 0.6);
   margin: 0;
   max-width: 28ch;
+}
+
+/* =========================================================
+   RSVP — confirmar asistencia vía WhatsApp
+   ========================================================= */
+
+.rsvp {
+  position: relative;
+  width: 100%;
+  background: transparent;
+  color: #f4eae6;
+  display: grid;
+  place-items: center;
+  padding: clamp(72px, 14vw, 130px) 24px;
+  overflow: hidden;
+}
+
+.rsvp__contenido {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 520px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(22px, 4.5vw, 38px);
+}
+
+.rsvp__kicker {
+  display: inline-flex;
+  gap: 0.55em;
+  font-family: var(--f-sans);
+  font-weight: 300;
+  font-size: clamp(0.72rem, 1.7vw, 0.9rem);
+  letter-spacing: 0.55em;
+  text-transform: uppercase;
+  color: rgba(217, 167, 173, 0.95);
+  padding-left: 0.55em;
+}
+
+.rsvp__frase {
+  font-family: var(--f-display);
+  font-weight: 300;
+  font-size: clamp(1.05rem, 2.8vw, 1.3rem);
+  line-height: 1.55;
+  color: rgba(244, 234, 230, 0.9);
+  letter-spacing: 0.02em;
+  margin: 0;
+  max-width: 30ch;
+}
+
+.rsvp__frase em {
+  font-style: italic;
+  color: var(--c-rose-gold-soft);
+  font-size: 1.06em;
+}
+
+.rsvp__fecha-limite {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.rsvp__fecha-kicker {
+  font-family: var(--f-sans);
+  font-weight: 300;
+  font-size: clamp(0.7rem, 1.55vw, 0.8rem);
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(217, 167, 173, 0.9);
+  padding-left: 0.4em;
+}
+
+.rsvp__fecha-fuerte {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.4rem, 4.2vw, 1.85rem);
+  line-height: 1.15;
+  color: #f4eae6;
+}
+
+/* Botón principal — dominante con halo respirante */
+.rsvp__boton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: clamp(14px, 2.6vw, 18px) clamp(26px, 5.5vw, 38px);
+  margin-top: clamp(4px, 1vw, 10px);
+  border: 1px solid var(--c-rose-gold);
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    rgba(217, 167, 173, 0.18) 0%,
+    rgba(155, 90, 100, 0.22) 100%
+  );
+  color: #fff5ef;
+  font-family: var(--f-sans);
+  font-weight: 500;
+  font-size: clamp(0.85rem, 2.1vw, 1rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 220, 200, 0.18),
+    0 0 0 0 rgba(217, 167, 173, 0.4);
+  transition:
+    transform 0.25s var(--ease),
+    background 0.25s var(--ease),
+    color 0.25s var(--ease),
+    box-shadow 0.25s var(--ease);
+  isolation: isolate;
+}
+
+/* Halo respirante: pulse sutil con animación de box-shadow */
+.rsvp__boton-glow {
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+  animation: rsvpPulse 2.6s ease-in-out infinite;
+  box-shadow: 0 0 0 0 rgba(217, 167, 173, 0.45);
+}
+
+@keyframes rsvpPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(217, 167, 173, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 18px rgba(217, 167, 173, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(217, 167, 173, 0);
+  }
+}
+
+.rsvp__boton-icon {
+  width: clamp(20px, 4.5vw, 24px);
+  height: clamp(20px, 4.5vw, 24px);
+  flex-shrink: 0;
+  color: var(--c-rose-gold-soft);
+  transition: color 0.25s var(--ease), transform 0.25s var(--ease);
+}
+
+.rsvp__boton:hover,
+.rsvp__boton:focus-visible {
+  background: var(--c-rose-gold);
+  color: #0b0b0b;
+  transform: translateY(-2px);
+  box-shadow:
+    0 18px 38px rgba(0, 0, 0, 0.55),
+    0 0 30px rgba(217, 167, 173, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  outline: none;
+}
+
+.rsvp__boton:hover .rsvp__boton-icon,
+.rsvp__boton:focus-visible .rsvp__boton-icon {
+  color: #0b0b0b;
+  transform: scale(1.08);
+}
+
+.rsvp__boton:active {
+  transform: translateY(0);
+}
+
+.rsvp__nota {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(0.88rem, 2.1vw, 1rem);
+  color: rgba(244, 234, 230, 0.55);
+  margin: 0;
+  letter-spacing: 0.04em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rsvp__boton-glow {
+    animation: none;
+  }
 }
 
 /* =========================================================
