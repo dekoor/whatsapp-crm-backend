@@ -42,11 +42,13 @@ body {
 
 /* Capa de atmósfera continua. Vive en su propia capa de compositing
    (transform: translateZ(0)) y no se repinta al hacer scroll, a
-   diferencia de background-attachment: fixed que mata FPS en móvil. */
+   diferencia de background-attachment: fixed que mata FPS en móvil.
+   Va primera en el DOM para que se pinte al fondo; sin z-index
+   negativo para evitar que algunos browsers la metan detrás del
+   background opaco del body. */
 .atmosfera {
   position: fixed;
   inset: 0;
-  z-index: -2;
   background:
     radial-gradient(ellipse 90% 65% at 50% 32%, rgba(183, 110, 121, 0.08), transparent 62%),
     radial-gradient(ellipse 75% 55% at 50% 78%, rgba(155, 90, 100, 0.06), transparent 65%);
@@ -57,13 +59,20 @@ body {
 
 /* Canvas global de pinceladas + partículas. Fixed para que sean
    IDÉNTICAS en todas las secciones y no aparezcan cortes al pasar
-   de una a otra. */
+   de una a otra. Se ve a través porque las secciones tienen
+   background: transparent. */
 .canvas-fx {
   position: fixed;
   inset: 0;
-  z-index: -1;
   pointer-events: none;
   overflow: hidden;
+}
+
+/* Necesario para que el main + secciones se pinten encima del
+   canvas-fx fixed sin tener que pelear con z-index. */
+.invitacion {
+  position: relative;
+  z-index: 1;
 }
 
 /* =========================================================
