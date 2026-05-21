@@ -398,6 +398,13 @@ img {
   display: grid;
   place-items: center;
   padding: clamp(80px, 14vh, 140px) 24px;
+  overflow: hidden;
+}
+
+.bienvenida__contenido,
+.countdown__contenido {
+  position: relative;
+  z-index: 2;
 }
 
 .bienvenida__contenido {
@@ -1032,6 +1039,73 @@ body.edit-mode .portada::after {
   }
 }
 
+/* =========================================================
+   PARTÍCULAS — destellos champaña flotando
+   ========================================================= */
+
+.particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.portada .particles {
+  /* En la portada van sobre el velo (z:1) pero debajo del marco/contenido */
+  z-index: 2;
+}
+
+.particles__p {
+  position: absolute;
+  bottom: -20px;
+  width: var(--size, 3px);
+  height: var(--size, 3px);
+  background: radial-gradient(
+    circle,
+    #fff5e8 0%,
+    rgba(255, 220, 200, 0.85) 30%,
+    rgba(217, 167, 173, 0.55) 60%,
+    transparent 75%
+  );
+  border-radius: 50%;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: particleFloat var(--duration, 22s) linear var(--delay, 0s) infinite;
+  filter: blur(0.3px);
+}
+
+.particles__p--bright {
+  background: radial-gradient(
+    circle,
+    #ffffff 0%,
+    #fff5e8 25%,
+    rgba(255, 220, 200, 0.7) 55%,
+    transparent 75%
+  );
+  box-shadow: 0 0 6px rgba(255, 220, 200, 0.55);
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.8);
+    opacity: 0;
+  }
+  8% {
+    opacity: var(--opacity, 0.5);
+  }
+  50% {
+    transform: translate3d(calc(var(--drift, 0px) / 2), -55vh, 0) scale(1);
+  }
+  92% {
+    opacity: var(--opacity, 0.5);
+  }
+  100% {
+    transform: translate3d(var(--drift, 0px), -110vh, 0) scale(0.9);
+    opacity: 0;
+  }
+}
+
 /* Respeta usuarios con reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .portada__foto,
@@ -1051,5 +1125,9 @@ body.edit-mode .portada::after {
   .portada__marco::before,
   .portada__marco::after {
     width: 60% !important;
+  }
+
+  .particles {
+    display: none !important;
   }
 }

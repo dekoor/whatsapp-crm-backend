@@ -24,7 +24,47 @@ document.addEventListener("DOMContentLoaded", () => {
   initEditorMode();
   initRevealOnScroll();
   initCountdown();
+  initParticles();
 });
+
+// =========================================================
+// Partículas decorativas (destellos champagne)
+// =========================================================
+function initParticles() {
+  const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  if (reduce) return;
+
+  document.querySelectorAll("[data-particles]").forEach((section) => {
+    const count = parseInt(section.dataset.particles, 10) || 20;
+    const wrap = document.createElement("div");
+    wrap.className = "particles";
+    wrap.setAttribute("aria-hidden", "true");
+
+    for (let i = 0; i < count; i += 1) {
+      const p = document.createElement("span");
+      p.className = "particles__p";
+      // 1 de cada 5 partículas es "bright" (más brillante)
+      if (Math.random() < 0.2) p.classList.add("particles__p--bright");
+
+      const size = (1.2 + Math.random() * 4).toFixed(1);
+      const duration = (16 + Math.random() * 22).toFixed(1);
+      const delay = (-Math.random() * 30).toFixed(1); // negativo para que ya estén dispersas al cargar
+      const drift = ((Math.random() - 0.5) * 80).toFixed(0);
+      const opacity = (0.35 + Math.random() * 0.5).toFixed(2);
+
+      p.style.left = (Math.random() * 100).toFixed(2) + "%";
+      p.style.setProperty("--size", size + "px");
+      p.style.setProperty("--duration", duration + "s");
+      p.style.setProperty("--delay", delay + "s");
+      p.style.setProperty("--drift", drift + "px");
+      p.style.setProperty("--opacity", opacity);
+
+      wrap.appendChild(p);
+    }
+
+    section.appendChild(wrap);
+  });
+}
 
 // =========================================================
 // Cuenta regresiva al evento
