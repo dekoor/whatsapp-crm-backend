@@ -22,7 +22,35 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   initEditorMode();
+  initRevealOnScroll();
 });
+
+// =========================================================
+// Reveal de elementos al entrar al viewport
+// =========================================================
+function initRevealOnScroll() {
+  const targets = document.querySelectorAll("[data-reveal]");
+  if (!targets.length) return;
+
+  if (!("IntersectionObserver" in window)) {
+    targets.forEach((el) => el.classList.add("is-revealed"));
+    return;
+  }
+
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-revealed");
+          io.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.25, rootMargin: "0px 0px -8% 0px" }
+  );
+
+  targets.forEach((el) => io.observe(el));
+}
 
 // =========================================================
 // Modo editor: 5 taps consecutivos → arrastrar elementos
