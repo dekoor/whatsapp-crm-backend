@@ -1,0 +1,1031 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0B0B0B" />
+    <title>Mis XV Años · Plantilla</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Allura&family=Caveat:wght@400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Great+Vibes&family=Inter:wght@300;400;500;600&family=Permanent+Marker&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="preload" as="image" href="./assets/portada.webp?v=2" fetchpriority="high" />
+
+    <link rel="stylesheet" href="./styles.css?b=20260521A3h" />
+  </head>
+  <body>
+    <div class="atmosfera" aria-hidden="true"></div>
+    <div class="canvas-fx" aria-hidden="true"></div>
+
+    <!-- Líneas guía globales (visibles sólo en modo editor) -->
+    <div class="guias guias--global" aria-hidden="true">
+      <span class="guia guia--tercio guia--vt1"></span>
+      <span class="guia guia--tercio guia--vt2"></span>
+      <span class="guia guia--tercio guia--ht1"></span>
+      <span class="guia guia--tercio guia--ht2"></span>
+      <span class="guia guia--centro guia--vcenter"></span>
+      <span class="guia guia--centro guia--hcenter"></span>
+    </div>
+
+    <!-- Reproductor de YouTube oculto (audio de fondo) -->
+    <div class="yt-host" aria-hidden="true">
+      <div id="yt-player"></div>
+    </div>
+
+    <!-- Botón flotante de música (play/pause) -->
+    <button class="music-toggle" type="button" aria-label="Pausar música" data-state="off">
+      <svg class="music-toggle__icon music-toggle__icon--off" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 00-2.5-4.03v8.06A4.5 4.5 0 0016.5 12z"/>
+        <line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <svg class="music-toggle__icon music-toggle__icon--on" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 00-2.5-4.03v8.06A4.5 4.5 0 0016.5 12zM14 3.23v2.06a7 7 0 010 13.42v2.06a9 9 0 000-17.54z"/>
+      </svg>
+      <span class="music-toggle__pulse" aria-hidden="true"></span>
+    </button>
+
+    <main class="invitacion">
+      <!-- ============ PORTADA ============ -->
+      <section class="portada" aria-label="Portada" data-particles="10">
+        <!-- Slot de foto: reemplaza ./assets/portada.webp?v=2 cuando tengas la imagen -->
+        <img
+          class="portada__foto"
+          src="./assets/portada.webp?v=2"
+          alt="Foto de la quinceañera"
+          decoding="async"
+          fetchpriority="high"
+        />
+
+        <!-- Veladura para legibilidad -->
+        <div class="portada__velo" aria-hidden="true"></div>
+
+        <!-- Marco fino premium -->
+        <div class="portada__marco" aria-hidden="true"></div>
+
+        <header class="portada__contenido">
+          <div class="portada__top">
+            <div class="movible portada__mis-wrap" data-editable="kicker">
+              <!-- "MIS" como SVG inline con filtro de pincelada irregular -->
+              <svg class="portada__mis" viewBox="0 0 300 120" fill="none" aria-label="Mis">
+                <defs>
+                  <filter id="brush-mis" x="-10%" y="-10%" width="120%" height="120%">
+                    <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="2" seed="7" result="t"/>
+                    <feDisplacementMap in="SourceGraphic" in2="t" scale="10" xChannelSelector="R" yChannelSelector="G"/>
+                  </filter>
+                </defs>
+                <g stroke="#fff" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#brush-mis)">
+                  <!-- M -->
+                  <path d="M14 106 L22 14 L62 70 L102 14 L110 106"/>
+                  <!-- I -->
+                  <path d="M148 14 L148 106"/>
+                  <!-- S -->
+                  <path d="M280 28 Q224 14 220 40 Q218 58 252 60 Q286 62 286 84 Q286 108 228 102"/>
+                </g>
+                <!-- Drip pequeño de la S -->
+                <g stroke="#fff" stroke-width="4" stroke-linecap="round" fill="#fff" filter="url(#brush-mis)">
+                  <path d="M232 100 L232 116"/>
+                </g>
+              </svg>
+              <!-- Corona verde lima encima de la S del MIS -->
+              <svg class="portada__corona" viewBox="0 0 80 56" fill="none" aria-hidden="true">
+                <path d="M6 50 L12 18 L26 38 L40 8 L54 38 L68 18 L74 50 Z"
+                      fill="#c7ff45" stroke="#c7ff45" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+                <circle cx="12" cy="18" r="4" fill="#c7ff45"/>
+                <circle cx="40" cy="8" r="4" fill="#c7ff45"/>
+                <circle cx="68" cy="18" r="4" fill="#c7ff45"/>
+              </svg>
+            </div>
+
+            <div class="movible" data-editable="nombre-valentina">
+              <h1 class="portada__nombre">
+                <!-- "XV" como SVG inline con filtro de pincelada irregular -->
+                <svg class="portada__xv" viewBox="0 0 260 340" fill="none" aria-label="XV">
+                  <defs>
+                    <filter id="brush-xv" x="-8%" y="-8%" width="116%" height="116%">
+                      <feTurbulence type="fractalNoise" baseFrequency="0.022" numOctaves="2" seed="3" result="t"/>
+                      <feDisplacementMap in="SourceGraphic" in2="t" scale="12" xChannelSelector="R" yChannelSelector="G"/>
+                    </filter>
+                  </defs>
+                  <g stroke="#a48bff" stroke-width="36" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#brush-xv)">
+                    <!-- X -->
+                    <path d="M14 20 L106 150"/>
+                    <path d="M106 20 L14 150"/>
+                    <!-- V -->
+                    <path d="M136 20 L184 150 L232 20"/>
+                  </g>
+                  <!-- Drips (también con filter para que se vean orgánicos) -->
+                  <g stroke="#a48bff" stroke-width="8" stroke-linecap="round" fill="#a48bff" filter="url(#brush-xv)">
+                    <path d="M22 150 L22 232"/>
+                    <circle cx="22" cy="238" r="10"/>
+                    <path d="M98 150 L98 208"/>
+                    <circle cx="98" cy="214" r="8"/>
+                    <path d="M184 150 L184 240"/>
+                    <circle cx="184" cy="246" r="11"/>
+                  </g>
+                  <!-- Drips secundarios (más finos) -->
+                  <g stroke="#a48bff" stroke-width="5" stroke-linecap="round" opacity="0.75" filter="url(#brush-xv)">
+                    <path d="M60 110 L60 152"/>
+                    <path d="M146 70 L146 116"/>
+                    <path d="M220 84 L220 128"/>
+                  </g>
+                </svg>
+                <!-- Corazón outline lavender al lado-derecho del XV -->
+                <svg class="portada__corazon" viewBox="0 0 50 50" fill="none" aria-hidden="true">
+                  <path d="M25 44 Q8 30 8 18 Q8 8 17 8 Q22 8 25 14 Q28 8 33 8 Q42 8 42 18 Q42 30 25 44 Z"
+                        stroke="#a48bff" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+                </svg>
+              </h1>
+            </div>
+
+            <div class="movible movible--invita" data-editable="invita">
+              <p class="portada__invita">
+                <span class="portada__invita-l1">No es solo<br/>una fiesta,</span>
+                <span class="portada__invita-l2-wrap">
+                  <span class="portada__invita-l2">Es mi momento.</span>
+                  <!-- Brush stroke decorativo lavender debajo de "Es mi momento" -->
+                  <svg class="portada__invita-brush" viewBox="0 0 220 18" fill="none" aria-hidden="true" preserveAspectRatio="none">
+                    <path d="M4 10 Q40 4 80 9 Q120 14 160 8 Q190 4 216 9"
+                          stroke="#a48bff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Bloques fecha/hora ocultos visualmente por ahora (se mantienen
+               en el DOM para que el customizer pueda seguir editándolos) -->
+          <div class="portada__detalles" hidden>
+            <div class="movible movible--fecha-bloque" data-editable="fecha">
+              <p class="portada__bloque portada__bloque--fecha">
+                <span class="portada__bloque-top">SÁBADO</span>
+                <span class="portada__bloque-num">28</span>
+                <span class="portada__bloque-bot">JUNIO</span>
+                <span class="portada__bloque-bot portada__bloque-bot--anio">2025</span>
+              </p>
+            </div>
+
+            <div class="movible movible--hora-bloque" data-editable="hora">
+              <p class="portada__bloque portada__bloque--hora">
+                <span class="portada__bloque-top">INICIA A LAS</span>
+                <span class="portada__bloque-num">06:00</span>
+                <span class="portada__bloque-bot">PM</span>
+              </p>
+            </div>
+          </div>
+        </header>
+
+        <div class="movible movible--scroll" data-editable="scroll">
+          <button class="portada__scroll" type="button" aria-label="Desliza para continuar">
+            <span class="portada__scroll-label">Desliza</span>
+            <span class="portada__scroll-line" aria-hidden="true"></span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ============ BIENVENIDA ============ -->
+      <section class="bienvenida" aria-label="Bienvenida" data-particles="14" data-brushes="4">
+        <div class="bienvenida__contenido">
+          <div class="ornamento" aria-hidden="true" data-reveal data-reveal-delay="1">
+            <span class="ornamento__linea"></span>
+            <span class="ornamento__diamante"></span>
+            <span class="ornamento__linea"></span>
+          </div>
+
+          <p class="bienvenida__cita">
+            <span class="bienvenida__cita-linea" data-reveal data-reveal-delay="2">Hay momentos</span>
+            <span class="bienvenida__cita-linea bienvenida__cita-linea--em" data-reveal data-reveal-delay="3">que merecen ser</span>
+            <span class="bienvenida__cita-linea" data-reveal data-reveal-delay="4">recordados para siempre.</span>
+          </p>
+
+          <div class="ornamento" aria-hidden="true" data-reveal data-reveal-delay="5">
+            <span class="ornamento__linea"></span>
+            <span class="ornamento__diamante"></span>
+            <span class="ornamento__linea"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ CUENTA REGRESIVA ============ -->
+      <section
+        class="countdown"
+        aria-label="Cuenta regresiva"
+        data-evento="2026-11-15T20:00:00-06:00"
+        data-particles="14"
+        data-brushes="4"
+      >
+        <div class="countdown__contenido">
+          <p class="countdown__kicker" data-reveal>
+            <span>F</span><span>A</span><span>L</span><span>T</span><span>A</span><span>N</span>
+          </p>
+
+          <div class="countdown__grid" data-reveal data-reveal-delay="1">
+            <div class="countdown__unidad">
+              <span class="countdown__num" data-cd="dias">000</span>
+              <span class="countdown__label">Días</span>
+            </div>
+            <span class="countdown__sep" aria-hidden="true">:</span>
+            <div class="countdown__unidad">
+              <span class="countdown__num" data-cd="horas">00</span>
+              <span class="countdown__label">Horas</span>
+            </div>
+            <span class="countdown__sep" aria-hidden="true">:</span>
+            <div class="countdown__unidad">
+              <span class="countdown__num" data-cd="minutos">00</span>
+              <span class="countdown__label">Min</span>
+            </div>
+            <span class="countdown__sep" aria-hidden="true">:</span>
+            <div class="countdown__unidad">
+              <span class="countdown__num" data-cd="segundos">00</span>
+              <span class="countdown__label">Seg</span>
+            </div>
+          </div>
+
+          <p class="countdown__pie" data-reveal data-reveal-delay="2">
+            <span class="countdown__pie-em">para celebrar</span> este momento único
+          </p>
+        </div>
+      </section>
+
+      <!-- ============ UBICACIÓN ============ -->
+      <section class="ubicacion" aria-label="Lugar del evento" data-particles="12" data-brushes="4">
+        <div class="ubicacion__contenido">
+          <p class="ubicacion__kicker" data-reveal>
+            <span>L</span><span>U</span><span>G</span><span>A</span><span>R</span>
+          </p>
+
+          <div class="ornamento" aria-hidden="true" data-reveal data-reveal-delay="1">
+            <span class="ornamento__linea"></span>
+            <span class="ornamento__diamante"></span>
+            <span class="ornamento__linea"></span>
+          </div>
+
+          <article class="evento" data-reveal data-reveal-delay="2">
+            <p class="evento__tipo">Ceremonia</p>
+            <p class="evento__hora">5:00 <span>PM</span></p>
+            <h3 class="evento__lugar">Parroquia de San Francisco</h3>
+            <p class="evento__direccion">
+              Av. Hidalgo 123, Centro<br />Zapopan, Jalisco
+            </p>
+            <a
+              class="evento__mapa"
+              href="https://www.google.com/maps/search/?api=1&amp;query=Parroquia+San+Francisco+Zapopan+Jalisco"
+              target="_blank"
+              rel="noopener"
+            >
+              <svg class="evento__pin" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"
+                  fill="currentColor"
+                />
+              </svg>
+              <span>Ver en mapa</span>
+            </a>
+          </article>
+
+          <div class="ubicacion__sep" aria-hidden="true" data-reveal data-reveal-delay="3">
+            <span class="ubicacion__sep-linea"></span>
+            <span class="ornamento__diamante"></span>
+            <span class="ubicacion__sep-linea"></span>
+          </div>
+
+          <article class="evento" data-reveal data-reveal-delay="4">
+            <p class="evento__tipo">Recepción</p>
+            <p class="evento__hora">7:30 <span>PM</span></p>
+            <h3 class="evento__lugar">Jardín La Victoria</h3>
+            <p class="evento__direccion">
+              Av. del Sol 1234, Col. Jardines<br />Zapopan, Jalisco
+            </p>
+            <a
+              class="evento__mapa"
+              href="https://www.google.com/maps/search/?api=1&amp;query=Jardin+La+Victoria+Zapopan+Jalisco"
+              target="_blank"
+              rel="noopener"
+            >
+              <svg class="evento__pin" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"
+                  fill="currentColor"
+                />
+              </svg>
+              <span>Ver en mapa</span>
+            </a>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ GALERÍA POLAROID ============ -->
+      <section class="galeria" aria-label="Galería de recuerdos" data-particles="12" data-brushes="4">
+        <div class="galeria__contenido">
+          <p class="galeria__kicker" data-reveal>
+            <span>R</span><span>E</span><span>C</span><span>U</span><span>E</span><span>R</span><span>D</span><span>O</span><span>S</span>
+          </p>
+
+          <div class="ornamento" aria-hidden="true" data-reveal data-reveal-delay="1">
+            <span class="ornamento__linea"></span>
+            <span class="ornamento__diamante"></span>
+            <span class="ornamento__linea"></span>
+          </div>
+
+          <p class="galeria__intro" data-reveal data-reveal-delay="2">
+            <em>Cada instante guardado</em><br />
+            es un pedacito de mi historia
+          </p>
+
+          <div class="polaroids" data-reveal data-reveal-delay="3">
+            <figure
+              class="polaroid polaroid--1 movible"
+              data-editable="polaroid-1"
+              data-photo-slot="1"
+            >
+              <div class="polaroid__marco">
+                <img class="polaroid__foto" src="./assets/galeria-1.webp?v=2" alt="Recuerdo 1" loading="lazy" />
+              </div>
+              <figcaption class="polaroid__caption">sonreír</figcaption>
+              <button class="polaroid__cambiar" type="button" aria-label="Cambiar foto">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M9 3l-1.5 2H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3H9zm3 5a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </figure>
+
+            <figure
+              class="polaroid polaroid--2 movible"
+              data-editable="polaroid-2"
+              data-photo-slot="2"
+            >
+              <div class="polaroid__marco">
+                <img class="polaroid__foto" src="./assets/galeria-2.webp?v=2" alt="Recuerdo 2" loading="lazy" />
+              </div>
+              <figcaption class="polaroid__caption">brillar</figcaption>
+              <button class="polaroid__cambiar" type="button" aria-label="Cambiar foto">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M9 3l-1.5 2H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3H9zm3 5a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </figure>
+
+            <figure
+              class="polaroid polaroid--3 movible"
+              data-editable="polaroid-3"
+              data-photo-slot="3"
+            >
+              <div class="polaroid__marco">
+                <img class="polaroid__foto" src="./assets/galeria-3.webp?v=2" alt="Recuerdo 3" loading="lazy" />
+              </div>
+              <figcaption class="polaroid__caption">soñar</figcaption>
+              <button class="polaroid__cambiar" type="button" aria-label="Cambiar foto">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M9 3l-1.5 2H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3H9zm3 5a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </figure>
+
+            <figure
+              class="polaroid polaroid--4 movible"
+              data-editable="polaroid-4"
+              data-photo-slot="4"
+            >
+              <div class="polaroid__marco">
+                <img class="polaroid__foto" src="./assets/galeria-4.webp?v=2" alt="Recuerdo 4" loading="lazy" />
+              </div>
+              <figcaption class="polaroid__caption">celebrar</figcaption>
+              <button class="polaroid__cambiar" type="button" aria-label="Cambiar foto">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M9 3l-1.5 2H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3H9zm3 5a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </figure>
+          </div>
+
+          <p class="galeria__pista" data-reveal data-reveal-delay="4" aria-hidden="true">
+            En modo editor: arrastra para reposicionar · toca <span class="galeria__pista-ic">📷</span> para cambiar la foto
+          </p>
+        </div>
+      </section>
+
+      <!-- ============ PADRES Y PADRINOS ============ -->
+      <section class="familia" aria-label="Padres y padrinos" data-particles="12" data-brushes="4">
+        <div class="familia__contenido">
+          <p class="familia__kicker" data-reveal>
+            <span>F</span><span>A</span><span>M</span><span>I</span><span>L</span><span>I</span><span>A</span>
+          </p>
+
+          <div class="ornamento" aria-hidden="true" data-reveal data-reveal-delay="1">
+            <span class="ornamento__linea"></span>
+            <span class="ornamento__diamante"></span>
+            <span class="ornamento__linea"></span>
+          </div>
+
+          <!-- Padres -->
+          <article class="padres" data-reveal data-reveal-delay="2">
+            <p class="padres__intro">Con la bendición de mis padres</p>
+            <h3 class="padres__nombres">
+              <span>Carlos Hernández</span>
+              <span class="padres__amp" aria-hidden="true">&amp;</span>
+              <span>María González</span>
+            </h3>
+          </article>
+
+          <div class="familia__sep" aria-hidden="true" data-reveal data-reveal-delay="3">
+            <span class="familia__sep-linea"></span>
+            <span class="ornamento__diamante"></span>
+            <span class="familia__sep-linea"></span>
+          </div>
+
+          <!-- Padrinos -->
+          <article class="padrinos" data-reveal data-reveal-delay="4">
+            <p class="padrinos__intro">Acompañados de mis padrinos</p>
+            <ul class="padrinos__lista" role="list">
+              <li class="padrino">
+                <span class="padrino__rol">Vals</span>
+                <span class="padrino__nombres">Roberto y Laura Martínez</span>
+              </li>
+              <li class="padrino">
+                <span class="padrino__rol">Brindis</span>
+                <span class="padrino__nombres">Miguel y Patricia Sánchez</span>
+              </li>
+              <li class="padrino">
+                <span class="padrino__rol">Ramo</span>
+                <span class="padrino__nombres">Andrea Hernández</span>
+              </li>
+              <li class="padrino">
+                <span class="padrino__rol">Pastel</span>
+                <span class="padrino__nombres">Juan y Sofía López</span>
+              </li>
+              <li class="padrino">
+                <span class="padrino__rol">Recuerdos</span>
+                <span class="padrino__nombres">Eduardo y Ana Ramírez</span>
+              </li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ CÓDIGO DE VESTIMENTA ============ -->
+      <section class="vestimenta" aria-label="Código de vestimenta" data-particles="12" data-brushes="4">
+        <div class="vestimenta__contenido">
+          <p class="vestimenta__kicker" data-reveal>
+            <span>V</span><span>E</span><span>S</span><span>T</span><span>I</span><span>M</span><span>E</span><span>N</span><span>T</span><span>A</span>
+          </p>
+
+          <div class="ornamento" aria-hidden="true" data-reveal data-reveal-delay="1">
+            <span class="ornamento__linea"></span>
+            <span class="ornamento__diamante"></span>
+            <span class="ornamento__linea"></span>
+          </div>
+
+          <!-- Etiqueta del dress code -->
+          <div class="vestimenta__hero" data-reveal data-reveal-delay="2">
+            <p class="vestimenta__etiqueta">Etiqueta</p>
+            <h3 class="vestimenta__formal">F&middot;O&middot;R&middot;M&middot;A&middot;L</h3>
+            <p class="vestimenta__nota">Vestido largo &nbsp;·&nbsp; Traje oscuro</p>
+          </div>
+
+          <!-- Siluetas SVG -->
+          <div class="vestimenta__siluetas" aria-hidden="true" data-reveal data-reveal-delay="3">
+            <svg class="silueta silueta--vestido" viewBox="0 0 120 220" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+              <!-- Tirantes hacia los hombros (no convergen) -->
+              <path d="M45 26 L40 6" />
+              <path d="M75 26 L80 6" />
+              <!-- Escote V con curvas, abierto -->
+              <path d="M45 26 Q60 50 60 58" />
+              <path d="M75 26 Q60 50 60 58" />
+              <!-- Costados del corpiño -->
+              <path d="M45 26 L40 82" />
+              <path d="M75 26 L80 82" />
+              <!-- Cintura -->
+              <line x1="40" y1="82" x2="80" y2="82" />
+              <!-- Falda en campana abierta -->
+              <path d="M40 82 L18 200 Q18 208 26 208 L94 208 Q102 208 102 200 L80 82" />
+              <!-- Pliegues sutiles -->
+              <path d="M36 140 Q60 154 84 140" opacity="0.4" />
+              <path d="M30 180 Q60 196 90 180" opacity="0.4" />
+            </svg>
+            <svg class="silueta silueta--traje" viewBox="0 0 120 220" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+              <!-- Cuerpo del traje -->
+              <path d="M40 38 L32 60 L32 200 Q32 208 40 208 L80 208 Q88 208 88 200 L88 60 L80 38" />
+              <!-- Solapas formando V abierta -->
+              <path d="M40 38 L52 62 L60 70 L68 62 L80 38" />
+              <!-- Costura central -->
+              <line x1="60" y1="70" x2="60" y2="208" />
+              <!-- Cuello en V superior -->
+              <path d="M52 62 L60 46 L68 62" />
+              <!-- Pajarita -->
+              <path d="M54 50 L50 46 L50 56 Z" fill="currentColor" stroke="none" />
+              <path d="M66 50 L70 46 L70 56 Z" fill="currentColor" stroke="none" />
+              <rect x="58" y="48" width="4" height="4" fill="currentColor" stroke="none" />
+              <!-- Botones -->
+              <circle cx="60" cy="112" r="1.5" fill="currentColor" stroke="none" />
+              <circle cx="60" cy="142" r="1.5" fill="currentColor" stroke="none" />
+              <!-- Bolsillo -->
+              <line x1="40" y1="108" x2="50" y2="108" opacity="0.55" />
+            </svg>
+          </div>
+
+          <!-- Paleta sugerida -->
+          <div class="paleta paleta--sugerida" data-reveal data-reveal-delay="4">
+            <p class="paleta__titulo">Tonos sugeridos</p>
+            <ul class="paleta__lista" role="list">
+              <li class="swatch" style="--c: #131211">
+                <span class="swatch__color"></span>
+                <span class="swatch__label">Negro</span>
+              </li>
+              <li class="swatch" style="--c: #1d2538">
+                <span class="swatch__color"></span>
+                <span class="swatch__label">Marino</span>
+              </li>
+              <li class="swatch" style="--c: #4a1c26">
+                <span class="swatch__color"></span>
+                <span class="swatch__label">Borgoña</span>
+              </li>
+              <li class="swatch" style="--c: #1f3a2c">
+                <span class="swatch__color"></span>
+                <span class="swatch__label">Verde botella</span>
+              </li>
+              <li class="swatch" style="--c: #c9a36b">
+                <span class="swatch__color"></span>
+                <span class="swatch__label">Champagne</span>
+              </li>
+              <li class="swatch" style="--c: #aeb2b5">
+                <span class="swatch__color"></span>
+                <span class="swatch__label">Plata</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Paleta a evitar -->
+          <div class="paleta paleta--evitar" data-reveal data-reveal-delay="5">
+            <p class="paleta__titulo paleta__titulo--evitar">Por favor evita</p>
+            <ul class="paleta__lista" role="list">
+              <li class="swatch swatch--no" style="--c: #b91d2a">
+                <span class="swatch__color"></span>
+                <span class="swatch__label">Rojo</span>
+              </li>
+              <li class="swatch swatch--no" style="--c: #f5f0e8">
+                <span class="swatch__color"></span>
+                <span class="swatch__label">Blanco</span>
+              </li>
+            </ul>
+            <p class="paleta__nota"><em>Reservados para la quinceañera</em></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ MESA DE REGALOS ============ -->
+      <section class="regalos" aria-label="Mesa de regalos" data-particles="12" data-brushes="4">
+        <div class="regalos__contenido">
+          <p class="regalos__kicker" data-reveal>
+            <span>O</span><span>B</span><span>S</span><span>E</span><span>Q</span><span>U</span><span>I</span><span>O</span><span>S</span>
+          </p>
+
+          <div class="ornamento" aria-hidden="true" data-reveal data-reveal-delay="1">
+            <span class="ornamento__linea"></span>
+            <span class="ornamento__diamante"></span>
+            <span class="ornamento__linea"></span>
+          </div>
+
+          <!-- Retrato editorial: marco con borde fino, no polaroid -->
+          <figure class="regalos__retrato movible" data-editable="regalos-foto" data-photo-slot="regalos" data-reveal data-reveal-delay="2">
+            <div class="regalos__retrato-marco">
+              <img class="regalos__retrato-img polaroid__foto" src="./assets/regalos.webp" alt="Retrato de Valentina" loading="lazy" />
+            </div>
+            <button class="polaroid__cambiar" type="button" aria-label="Cambiar foto">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M9 3l-1.5 2H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3H9zm3 5a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+          </figure>
+
+          <p class="regalos__frase" data-reveal data-reveal-delay="3">
+            <em>Tu presencia es mi mejor regalo.</em><br />
+            Si deseas obsequiarme algo más, dejo estas opciones con cariño.
+          </p>
+
+          <div class="regalos__opciones" data-reveal data-reveal-delay="4">
+            <article class="opcion-regalo">
+              <span class="opcion-regalo__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 8h12l-1 12H7L6 8z" />
+                  <path d="M9 8a3 3 0 016 0" />
+                  <line x1="9" y1="12" x2="9" y2="14" />
+                  <line x1="15" y1="12" x2="15" y2="14" />
+                </svg>
+              </span>
+              <h3 class="opcion-regalo__titulo">Mesa de Regalos</h3>
+              <p class="opcion-regalo__detalle">
+                <span class="opcion-regalo__tienda">Liverpool</span>
+                <span class="opcion-regalo__num">Núm. 51234567</span>
+              </p>
+              <a
+                class="opcion-regalo__cta"
+                href="https://mesaderegalos.liverpool.com.mx/milistaderegalos/51234567"
+                target="_blank"
+                rel="noopener"
+              >
+                Ver mesa
+              </a>
+            </article>
+
+            <article class="opcion-regalo">
+              <span class="opcion-regalo__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="6" width="18" height="13" rx="1.5" />
+                  <path d="M3 7l9 7 9-7" />
+                  <path d="M12 10l4-4M12 10l-4-4" opacity="0.5" />
+                </svg>
+              </span>
+              <h3 class="opcion-regalo__titulo">Lluvia de Sobres</h3>
+              <p class="opcion-regalo__detalle">
+                <span class="opcion-regalo__tienda">El día del evento</span>
+                <span class="opcion-regalo__num">Recibida con mucho cariño</span>
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ HASHTAG / INSTAGRAM ============ -->
+      <section class="hashtag" aria-label="Comparte tus fotos" data-particles="12" data-brushes="4">
+        <div class="hashtag__contenido">
+          <p class="hashtag__kicker" data-reveal>
+            <span>C</span><span>O</span><span>M</span><span>P</span><span>A</span><span>R</span><span>T</span><span>E</span>
+          </p>
+
+          <div class="ornamento" aria-hidden="true" data-reveal data-reveal-delay="1">
+            <span class="ornamento__linea"></span>
+            <span class="ornamento__diamante"></span>
+            <span class="ornamento__linea"></span>
+          </div>
+
+          <!-- Logo Instagram (placeholder SVG hasta que llegue el PNG) -->
+          <div class="hashtag__logo logo-badge" data-reveal data-reveal-delay="2">
+            <img class="logo-badge__img" src="./assets/instagram.webp" alt="Instagram" loading="lazy" decoding="async" />
+          </div>
+
+          <p class="hashtag__instruccion" data-reveal data-reveal-delay="3">
+            <em>Etiqueta tus fotos con</em>
+          </p>
+
+          <h2 class="hashtag__tag" data-reveal data-reveal-delay="4">
+            <span class="hashtag__pound">#</span><span class="hashtag__texto">ValentinaSofiaXV</span>
+          </h2>
+
+          <a
+            class="hashtag__cta"
+            href="https://www.instagram.com/explore/tags/valentinasofiaxv/"
+            target="_blank"
+            rel="noopener"
+            data-reveal
+            data-reveal-delay="5"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.6" />
+              <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.6" />
+              <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" />
+            </svg>
+            <span>Ver en Instagram</span>
+          </a>
+
+          <p class="hashtag__nota" data-reveal data-reveal-delay="6">
+            Para revivir juntos cada momento de la noche
+          </p>
+        </div>
+      </section>
+
+      <!-- ============ RSVP ============ -->
+      <section class="rsvp" aria-label="Confirmar asistencia" data-particles="14" data-brushes="4">
+        <div class="rsvp__contenido">
+          <p class="rsvp__kicker" data-reveal>
+            <span>C</span><span>O</span><span>N</span><span>F</span><span>I</span><span>R</span><span>M</span><span>A</span>
+          </p>
+
+          <div class="ornamento" aria-hidden="true" data-reveal data-reveal-delay="1">
+            <span class="ornamento__linea"></span>
+            <span class="ornamento__diamante"></span>
+            <span class="ornamento__linea"></span>
+          </div>
+
+          <div class="rsvp__logo logo-badge" data-reveal data-reveal-delay="2">
+            <img class="logo-badge__img" src="./assets/whatsapp.webp" alt="WhatsApp" loading="lazy" decoding="async" />
+          </div>
+
+          <p class="rsvp__frase" data-reveal data-reveal-delay="3">
+            <em>Tu presencia es lo más importante.</em><br />
+            Confírmame que estarás conmigo en este día.
+          </p>
+
+          <p class="rsvp__fecha-limite" data-reveal data-reveal-delay="4">
+            <span class="rsvp__fecha-kicker">Antes del</span>
+            <span class="rsvp__fecha-fuerte">1 de Noviembre</span>
+          </p>
+
+          <div class="rsvp__botones" data-reveal data-reveal-delay="5">
+            <a
+              class="rsvp__boton rsvp__boton--mama"
+              href="https://wa.me/526182297167?text=Hola%2C%20confirmo%20mi%20asistencia%20a%20los%20XV%20de%20Valentina%20Sof%C3%ADa."
+              target="_blank"
+              rel="noopener"
+            >
+              <span class="rsvp__boton-glow" aria-hidden="true"></span>
+              <svg class="rsvp__boton-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.71.306 1.263.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413"
+                />
+              </svg>
+              <span class="rsvp__boton-texto">Confirmar a mamá</span>
+            </a>
+
+            <a
+              class="rsvp__boton rsvp__boton--papa"
+              href="https://wa.me/526182297167?text=Hola%2C%20confirmo%20mi%20asistencia%20a%20los%20XV%20de%20Valentina%20Sof%C3%ADa."
+              target="_blank"
+              rel="noopener"
+            >
+              <span class="rsvp__boton-glow" aria-hidden="true"></span>
+              <svg class="rsvp__boton-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.71.306 1.263.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413"
+                />
+              </svg>
+              <span class="rsvp__boton-texto">Confirmar a papá</span>
+            </a>
+          </div>
+
+          <p class="rsvp__nota" data-reveal data-reveal-delay="6">
+            Te responderé personalmente
+          </p>
+        </div>
+      </section>
+
+      <!-- ============ DESPEDIDA / CIERRE ============ -->
+      <section class="despedida" aria-label="Te espero" data-photo-slot="despedida">
+        <img
+          class="despedida__foto polaroid__foto"
+          src="./assets/despedida.webp?v=2"
+          alt="Valentina al atardecer"
+          loading="lazy"
+          decoding="async"
+        />
+
+        <div class="despedida__velo" aria-hidden="true"></div>
+
+        <div class="despedida__contenido">
+          <div class="movible" data-editable="despedida-ornamento-top" data-reveal>
+            <div class="ornamento ornamento--claro" aria-hidden="true">
+              <span class="ornamento__linea"></span>
+              <span class="ornamento__diamante"></span>
+              <span class="ornamento__linea"></span>
+            </div>
+          </div>
+
+          <div class="movible" data-editable="despedida-intro" data-reveal data-reveal-delay="1">
+            <p class="despedida__intro">
+              <em>Te espero</em>
+            </p>
+          </div>
+
+          <div class="movible" data-editable="despedida-fecha" data-reveal data-reveal-delay="2">
+            <h2 class="despedida__fecha">15 · Noviembre</h2>
+          </div>
+
+          <div class="movible" data-editable="despedida-cierre" data-reveal data-reveal-delay="3">
+            <p class="despedida__cierre">
+              Para celebrar juntos<br />una noche inolvidable
+            </p>
+          </div>
+
+          <div class="movible" data-editable="despedida-firma" data-reveal data-reveal-delay="4">
+            <p class="despedida__firma">Valentina Sofía</p>
+          </div>
+
+          <div class="movible" data-editable="despedida-ornamento-bot" data-reveal data-reveal-delay="5">
+            <div class="ornamento ornamento--claro" aria-hidden="true">
+              <span class="ornamento__linea"></span>
+              <span class="ornamento__diamante"></span>
+              <span class="ornamento__linea"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botón cámara para reemplazar la foto en modo editor -->
+        <button class="despedida__cambiar polaroid__cambiar" type="button" aria-label="Cambiar foto de despedida">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M9 3l-1.5 2H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3H9zm3 5a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+      </section>
+    </main>
+
+    <!-- Toast centrado al entrar/salir del modo editor -->
+    <div class="edit-toast" hidden role="status" aria-live="polite">
+      <span class="edit-toast__icon" aria-hidden="true"></span>
+      <span class="edit-toast__text">Modo editor activado</span>
+    </div>
+
+    <!-- Barra del modo editor (oculta hasta activarse con 5 taps) -->
+    <div class="edit-bar" hidden role="toolbar" aria-label="Modo editor">
+      <span class="edit-bar__label">Modo editor · arrastra los elementos</span>
+      <button type="button" class="edit-bar__btn" data-action="reset">Resetear</button>
+      <button type="button" class="edit-bar__btn edit-bar__btn--primary" data-action="exit">Salir</button>
+    </div>
+
+    <!-- ====== Personalizar plantilla ====== -->
+    <button class="cust-toggle" type="button" aria-haspopup="dialog" aria-controls="cust-drawer">
+      <svg class="cust-toggle__icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M14.06 4.94l3 3M3 21l3.5-1 11-11-3-3-11 11L3 21z"
+        />
+      </svg>
+      <span class="cust-toggle__label">Personalizar plantilla</span>
+    </button>
+
+    <div class="cust-overlay" data-state="closed" hidden></div>
+
+    <aside
+      id="cust-drawer"
+      class="cust-drawer"
+      data-state="closed"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="cust-title"
+      hidden
+    >
+      <header class="cust-drawer__head">
+        <div>
+          <p class="cust-drawer__kicker">Tus datos</p>
+          <h2 id="cust-title" class="cust-drawer__title">Personalizar invitación</h2>
+        </div>
+        <button class="cust-drawer__close" type="button" aria-label="Cerrar">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              d="M6 6l12 12M18 6L6 18"
+            />
+          </svg>
+        </button>
+      </header>
+
+      <form class="cust-form" id="cust-form" novalidate>
+        <div class="cust-stepper" aria-hidden="true">
+          <span class="cust-stepper__dot" data-step="1"></span>
+          <span class="cust-stepper__dot" data-step="2"></span>
+        </div>
+
+        <fieldset class="cust-step cust-form__group" data-step="1">
+          <legend class="cust-form__legend">Portada</legend>
+
+          <label class="cust-field">
+            <span class="cust-field__label">Línea superior</span>
+            <input
+              class="cust-field__input"
+              name="kicker"
+              type="text"
+              value="XV AÑOS"
+              maxlength="22"
+              autocomplete="off"
+            />
+            <span class="cust-field__hint">Los espacios se mostrarán como “·”</span>
+          </label>
+
+          <label class="cust-field">
+            <span class="cust-field__label">Nombre — primera línea</span>
+            <input
+              class="cust-field__input"
+              name="nombre1"
+              type="text"
+              value="Valentina"
+              maxlength="22"
+              autocomplete="off"
+            />
+          </label>
+
+          <label class="cust-field">
+            <span class="cust-field__label">Nombre — segunda línea</span>
+            <input
+              class="cust-field__input"
+              name="nombre2"
+              type="text"
+              value="Sofía"
+              maxlength="22"
+              autocomplete="off"
+            />
+            <span class="cust-field__hint">Déjala vacía si sólo usas un nombre</span>
+          </label>
+
+          <label class="cust-field">
+            <span class="cust-field__label">Fecha del evento</span>
+            <input
+              class="cust-field__input"
+              name="fecha"
+              type="date"
+              value="2026-11-15"
+            />
+          </label>
+        </fieldset>
+
+        <fieldset class="cust-step cust-form__group" data-step="2" hidden>
+          <legend class="cust-form__legend">Frase de bienvenida</legend>
+
+          <label class="cust-field">
+            <span class="cust-field__label">Primera línea</span>
+            <input
+              class="cust-field__input"
+              name="frase1"
+              type="text"
+              value="Hay momentos"
+              maxlength="48"
+              autocomplete="off"
+            />
+          </label>
+
+          <label class="cust-field">
+            <span class="cust-field__label">Segunda línea (en cursiva)</span>
+            <input
+              class="cust-field__input"
+              name="frase2"
+              type="text"
+              value="que merecen ser"
+              maxlength="48"
+              autocomplete="off"
+            />
+          </label>
+
+          <label class="cust-field">
+            <span class="cust-field__label">Tercera línea</span>
+            <input
+              class="cust-field__input"
+              name="frase3"
+              type="text"
+              value="recordados para siempre."
+              maxlength="60"
+              autocomplete="off"
+            />
+          </label>
+        </fieldset>
+
+        <div class="cust-form__actions">
+          <button type="button" class="cust-btn cust-btn--ghost" data-action="reset">
+            Restablecer
+          </button>
+          <button
+            type="button"
+            class="cust-btn cust-btn--ghost"
+            data-action="back"
+            hidden
+          >
+            Atrás
+          </button>
+          <button
+            type="button"
+            class="cust-btn cust-btn--primary"
+            data-action="next"
+          >
+            Siguiente
+          </button>
+          <button
+            type="button"
+            class="cust-btn cust-btn--primary"
+            data-action="close"
+            hidden
+          >
+            Listo
+          </button>
+        </div>
+      </form>
+    </aside>
+
+    <script src="./script.js?b=20260521B3b" defer></script>
+  </body>
+</html>
