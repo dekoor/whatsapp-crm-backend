@@ -156,7 +156,10 @@ body {
 
 /* Performance: secciones fuera del viewport no se rasterizan hasta
    que se acerquen. contain-intrinsic-size le da al browser un alto
-   estimado para que el scrollbar no salte. */
+   estimado para que el scrollbar no salte.
+   La despedida queda fuera de esta lista porque sus .movible necesitan
+   hit-testing fiable y content-visibility auto a veces interfiere con
+   pointer events en secciones con min-height: 100svh. */
 .bienvenida,
 .countdown,
 .ubicacion,
@@ -165,8 +168,7 @@ body {
 .vestimenta,
 .regalos,
 .hashtag,
-.rsvp,
-.despedida {
+.rsvp {
   content-visibility: auto;
   contain-intrinsic-size: 100vw 90vh;
 }

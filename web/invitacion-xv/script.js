@@ -104,11 +104,9 @@ function bindFirstTap() {
       /* ignore */
     }
   };
-  // pointerdown captura tanto touch como click; pasiva para no afectar scroll
-  document.addEventListener("pointerdown", onFirstTap, {
-    once: true,
-    passive: true,
-  });
+  // click se dispara sólo en taps completos (no en drags), así que
+  // arrancar la música aquí no interfiere con el modo editor.
+  document.addEventListener("click", onFirstTap, { once: true });
 }
 
 function toggleMusic() {
