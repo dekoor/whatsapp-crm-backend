@@ -31,7 +31,29 @@ document.addEventListener("DOMContentLoaded", () => {
   initBackgroundMusic();
   initCustomizer();
   initScrollPause();
+  initNameRefit();
 });
+
+// Re-mide el ancho de las líneas del nombre cuando el viewport cambia
+// (rotación, redimensionar ventana) o cuando termina de cargar la
+// fuente Great Vibes, que es bastante más ancha que la genérica de
+// fallback
+function initNameRefit() {
+  let timeout = null;
+  function schedule() {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      if (typeof fitNameLines === "function") fitNameLines();
+    }, 120);
+  }
+  window.addEventListener("resize", schedule, { passive: true });
+  window.addEventListener("orientationchange", schedule, { passive: true });
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => {
+      if (typeof fitNameLines === "function") fitNameLines();
+    });
+  }
+}
 
 // =========================================================
 // Pausa las animaciones del canvas-fx mientras el usuario
@@ -234,6 +256,53 @@ function renderNombres(linea1, linea2) {
   if (wrapS) {
     wrapS.style.display = linea2 && linea2.trim() ? "" : "none";
   }
+
+  fitNameLines();
+}
+
+// Mide el ancho real de las líneas del nombre y baja el font-size
+// proporcionalmente si una de ellas excede el contenedor. Aplica el
+// mismo factor a las dos para que mantengan la jerarquía visual.
+function fitNameLines() {
+  const elV = document.querySelector(
+    '[data-editable="nombre-valentina"] .linea'
+  );
+  const elS = document.querySelector(
+    '[data-editable="nombre-sofia"] .linea'
+  );
+  const wrapS = document.querySelector('[data-editable="nombre-sofia"]');
+  if (!elV) return;
+
+  const hasSecond =
+    wrapS && wrapS.style.display !== "none" && elS && elS.textContent.trim();
+
+  // Quitamos cualquier override anterior para volver a medir desde
+  // el tamaño base del clamp() del CSS
+  elV.style.fontSize = "";
+  if (elS) elS.style.fontSize = "";
+
+  // Una vez que el browser aplicó el reset, medimos
+  requestAnimationFrame(() => {
+    // El contenedor que queremos que NO sobrepase es el contenido
+    // central de la portada (que respeta el padding del section)
+    const container =
+      document.querySelector(".portada__contenido") || elV.parentElement;
+    if (!container) return;
+
+    const maxWidth = container.clientWidth * 0.94; // 6% de aire a los lados
+    const wV = elV.scrollWidth;
+    const wS = hasSecond ? elS.scrollWidth : 0;
+    const widest = Math.max(wV, wS);
+
+    if (widest <= maxWidth) return;
+
+    const computed = parseFloat(getComputedStyle(elV).fontSize);
+    const factor = maxWidth / widest;
+    const newSize = (computed * factor).toFixed(1) + "px";
+
+    elV.style.fontSize = newSize;
+    if (hasSecond) elS.style.fontSize = newSize;
+  });
 }
 
 function renderFecha(iso) {
