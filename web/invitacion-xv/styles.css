@@ -18,6 +18,7 @@
   --c-overlay: rgba(11, 11, 11, 0.42);
 
   --f-display: "Cormorant Garamond", "Times New Roman", serif;
+  --f-script: "Allura", "Great Vibes", "Pinyon Script", cursive;
   --f-sans: "Inter", system-ui, sans-serif;
 
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -199,19 +200,21 @@ img {
 .portada__kicker span:nth-child(6) { animation-delay: 0.6s; }
 .portada__kicker span:nth-child(7) { animation-delay: 0.68s; }
 
-/* Nombre */
+/* Nombre — script con efecto metálico oro rosado */
 .portada__nombre {
-  font-family: var(--f-display);
-  font-weight: 300;
-  font-size: clamp(3.4rem, 12vw, 7.5rem);
-  line-height: 0.95;
+  font-family: var(--f-script);
+  font-weight: 400;
+  font-size: clamp(3.6rem, 14vw, 8rem);
+  line-height: 1;
   letter-spacing: 0.005em;
-  color: #fff;
-  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.35);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(4px, 1vh, 12px);
+  gap: clamp(2px, 0.8vh, 10px);
+  padding: 0.08em 0; /* espacio para los descenders del script */
+  /* sombra del bloque entero para despegar del fondo */
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.55))
+    drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
 }
 
 .portada__nombre .linea {
@@ -219,20 +222,76 @@ img {
   opacity: 0;
   transform: translateY(24px);
   animation: nombreIn 1.2s var(--ease) forwards;
+
+  /* === Gradiente metálico oro rosado ===
+     Bandas oscuras → claras → highlight central → claras → oscuras
+     simulan un cilindro de metal pulido reflejando luz */
+  background: linear-gradient(
+    180deg,
+    #5e2f39 0%,
+    #8a4a55 8%,
+    #b06974 17%,
+    #d49aa2 27%,
+    #f3d6c5 36%,
+    #fff5e8 45%,
+    #fff5e8 50%,
+    #f3d6c5 56%,
+    #e3b3b9 64%,
+    #b87681 75%,
+    #8a4a55 87%,
+    #5e2f39 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Variante alterna para "Sofía" — desplaza el highlight para que las
+   dos líneas no parezcan calcadas */
+.portada__nombre .linea--alt {
+  background: linear-gradient(
+    180deg,
+    #5e2f39 0%,
+    #8a4a55 10%,
+    #b87681 22%,
+    #e3b3b9 32%,
+    #f3d6c5 42%,
+    #fff5e8 50%,
+    #f3d6c5 58%,
+    #d49aa2 68%,
+    #b06974 80%,
+    #8a4a55 90%,
+    #5e2f39 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 .portada__nombre .linea:nth-child(1) { animation-delay: 0.9s; }
 .portada__nombre .linea--alt { animation-delay: 1.5s; }
 
 .portada__nombre .divisor {
-  width: 64px;
-  height: 1px;
-  background: var(--c-rose-gold);
-  margin: clamp(6px, 1.4vh, 14px) 0;
+  width: 96px;
+  height: 2px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    #8a4a55 18%,
+    #d49aa2 38%,
+    #fff5e8 50%,
+    #d49aa2 62%,
+    #8a4a55 82%,
+    transparent 100%
+  );
+  margin: clamp(8px, 1.6vh, 16px) 0;
   opacity: 0;
   transform: scaleX(0);
   transform-origin: center;
   animation: divisorIn 1s var(--ease) 1.25s forwards;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
 }
 
 @keyframes divisorIn {
