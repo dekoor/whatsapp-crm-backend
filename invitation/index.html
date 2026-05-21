@@ -130,37 +130,23 @@
 
     /* profundidad y brillo satinado muy sutil */
     filter:
-      drop-shadow(0 1px 0 rgba(255,255,255,.55))
       drop-shadow(0 6px 14px rgba(122,79,92,.18))
       drop-shadow(0 2px 4px rgba(122,79,92,.10));
-    text-shadow: 0 1px 0 rgba(255,255,255,.35);
     paint-order: stroke fill;
   }
-  /* Mayúscula extendida en la "M" */
+  /* Mayúsculas con curva extendida — quedan inline para heredar
+     el background-clip:text del padre y evitar cortes en los swashes */
   .quincea .swash-m,
   .quincea .swash-q{
     font-family:'Allura','Great Vibes', cursive;
-    display:inline-block;
-    background: linear-gradient(160deg,
-      #d6a9b1 0%,
-      #b9858f 38%,
-      #9a6b78 70%,
-      #7a4f5c 100%);
-    -webkit-background-clip:text;
-            background-clip:text;
-    -webkit-text-fill-color:transparent;
-            color:transparent;
   }
   .quincea .swash-m{
     font-size:1.18em;
     margin-right:-.04em;
-    transform: translateY(.04em);
   }
-  /* "Q" con curva extendida */
   .quincea .swash-q{
     font-size:1.12em;
     margin-right:-.03em;
-    transform: translateY(.05em);
   }
   .sublinea{
     font-family:'Cormorant Garamond', serif;
@@ -227,28 +213,16 @@
             color:transparent;
 
     filter:
-      drop-shadow(0 1px 0 rgba(255,255,255,.65))
       drop-shadow(0 10px 22px rgba(122,79,92,.22))
       drop-shadow(0 3px 6px rgba(122,79,92,.14));
-    text-shadow: 0 1px 0 rgba(255,255,255,.45);
     paint-order: stroke fill;
   }
-  /* Swash extendido en la "L" inicial */
+  /* Swash extendido en la "L" — inline para heredar el clip del padre
+     y que las curvas/colas no queden sin pintar */
   .nombre .swash-l{
     font-family:'Great Vibes','Allura', cursive;
     font-size:1.15em;
     margin-right:-.05em;
-    display:inline-block;
-    transform: translateY(.04em);
-    background: linear-gradient(155deg,
-      #d6a9b1 0%,
-      #b9858f 35%,
-      #9a6b78 65%,
-      #6f4654 100%);
-    -webkit-background-clip:text;
-            background-clip:text;
-    -webkit-text-fill-color:transparent;
-            color:transparent;
   }
   .nombre small{
     display:block;
