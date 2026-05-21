@@ -32,7 +32,11 @@
 
 html,
 body {
-  background: #0b0b0b;
+  background:
+    radial-gradient(ellipse 90% 65% at 50% 32%, rgba(183, 110, 121, 0.08), transparent 62%),
+    radial-gradient(ellipse 75% 55% at 50% 78%, rgba(155, 90, 100, 0.06), transparent 65%),
+    #0a0908;
+  background-attachment: fixed;
   color: var(--c-ink);
   font-family: var(--f-sans);
   -webkit-font-smoothing: antialiased;
@@ -391,8 +395,7 @@ img {
   position: relative;
   aspect-ratio: 1 / 1;
   width: 100%;
-  background:
-    radial-gradient(75% 55% at 50% 50%, rgba(183, 110, 121, 0.1), transparent 70%);
+  background: transparent;
   color: #f4eae6;
   display: grid;
   place-items: center;
@@ -506,8 +509,7 @@ img {
   position: relative;
   aspect-ratio: 1 / 1;
   width: 100%;
-  background:
-    radial-gradient(70% 55% at 50% 50%, rgba(183, 110, 121, 0.12), transparent 70%);
+  background: transparent;
   color: #f4eae6;
   display: grid;
   place-items: center;
@@ -1044,8 +1046,7 @@ body.edit-mode .portada::after {
 .ubicacion {
   position: relative;
   width: 100%;
-  background:
-    radial-gradient(70% 50% at 50% 50%, rgba(183, 110, 121, 0.1), transparent 70%);
+  background: transparent;
   color: #f4eae6;
   display: grid;
   place-items: center;
@@ -1220,8 +1221,7 @@ body.edit-mode .portada::after {
 .galeria {
   position: relative;
   width: 100%;
-  background:
-    radial-gradient(65% 50% at 50% 50%, rgba(183, 110, 121, 0.1), transparent 70%);
+  background: transparent;
   color: #f4eae6;
   display: grid;
   place-items: center;
@@ -1437,8 +1437,7 @@ body.edit-mode .galeria__pista {
 .familia {
   position: relative;
   width: 100%;
-  background:
-    radial-gradient(70% 50% at 50% 50%, rgba(183, 110, 121, 0.1), transparent 70%);
+  background: transparent;
   color: #f4eae6;
   display: grid;
   place-items: center;
@@ -1606,8 +1605,7 @@ body.edit-mode .galeria__pista {
 .vestimenta {
   position: relative;
   width: 100%;
-  background:
-    radial-gradient(65% 50% at 50% 50%, rgba(183, 110, 121, 0.1), transparent 70%);
+  background: transparent;
   color: #f4eae6;
   display: grid;
   place-items: center;
