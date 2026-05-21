@@ -159,6 +159,9 @@ function applyCustom(data) {
   renderKicker(data.kicker);
   renderNombres(data.nombre1, data.nombre2);
   renderFecha(data.fecha);
+  renderDespedidaFecha(data.fecha);
+  renderRsvpDeadline(data.fecha);
+  renderCountdownDate(data.fecha);
   renderFirma(data.nombre1, data.nombre2);
   renderHashtag(data.nombre1, data.nombre2);
   renderAlts(data.nombre1, data.nombre2);
@@ -206,18 +209,73 @@ function renderNombres(linea1, linea2) {
 function renderFecha(iso) {
   const el = document.querySelector(".portada__fecha");
   if (!el || !iso) return;
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
-  if (!m) return;
-  const [, year, month, day] = m;
-  const mesIdx = parseInt(month, 10) - 1;
-  const mesNombre = MESES_ES[mesIdx] || "";
-  const dia = String(parseInt(day, 10)).padStart(2, "0");
+  const parts = parseFechaISO(iso);
+  if (!parts) return;
+  const { year, mesNombre, dia } = parts;
   el.innerHTML =
     `<span>${dia}</span>` +
     `<span class="punto">·</span>` +
     `<span>${escapeHtml(mesNombre)}</span>` +
     `<span class="punto">·</span>` +
     `<span>${year}</span>`;
+}
+
+function renderDespedidaFecha(iso) {
+  const el = document.querySelector(".despedida__fecha");
+  if (!el) return;
+  const parts = parseFechaISO(iso);
+  if (!parts) return;
+  el.textContent = `${parts.dia} · ${parts.mesNombre}`;
+}
+
+function renderRsvpDeadline(iso) {
+  // Fecha límite para confirmar = fecha del evento - 14 días
+  const el = document.querySelector(".rsvp__fecha-fuerte");
+  if (!el) return;
+  const parts = parseFechaISO(iso);
+  if (!parts) return;
+  const eventDate = new Date(
+    Date.UTC(parseInt(parts.year, 10), parts.mesIdx, parseInt(parts.dia, 10))
+  );
+  eventDate.setUTCDate(eventDate.getUTCDate() - 14);
+  const dia = eventDate.getUTCDate();
+  const mesNombre = MESES_ES[eventDate.getUTCMonth()] || "";
+  el.textContent = `${dia} de ${mesNombre}`;
+}
+
+function renderCountdownDate(iso) {
+  // El countdown mira section.dataset.evento. Conservamos la
+  // hora/zona originales y solo reemplazamos la parte de fecha.
+  const section = document.querySelector(".countdown");
+  if (!section || !iso) return;
+  const parts = parseFechaISO(iso);
+  if (!parts) return;
+
+  const current = section.dataset.evento || "";
+  // current esperado: "YYYY-MM-DDTHH:MM:SS±HH:MM"
+  const timePart = current.includes("T") ? current.slice(current.indexOf("T")) : "T20:00:00-06:00";
+  section.dataset.evento = `${parts.year}-${parts.month}-${parts.dia}${timePart}`;
+
+  // Forzar el siguiente tick a usar el nuevo target sin esperar 1 s
+  if (typeof window.__refreshCountdown === "function") {
+    window.__refreshCountdown();
+  }
+}
+
+// Helper compartido: parsea "YYYY-MM-DD" en sus partes con
+// formato consistente para todos los renderers
+function parseFechaISO(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || "");
+  if (!m) return null;
+  const [, year, month, day] = m;
+  const mesIdx = parseInt(month, 10) - 1;
+  return {
+    year,
+    month,
+    mesIdx,
+    mesNombre: MESES_ES[mesIdx] || "",
+    dia: String(parseInt(day, 10)).padStart(2, "0"),
+  };
 }
 
 function updateTitle(n1, n2) {
@@ -657,8 +715,15 @@ function initCountdown() {
   const section = document.querySelector(".countdown");
   if (!section) return;
 
-  const target = new Date(section.dataset.evento);
-  if (isNaN(target)) return;
+  // Lee el target en cada tick: si el customizer cambia data-evento,
+  // el siguiente segundo el countdown ya apunta a la fecha nueva
+  function readTarget() {
+    const t = new Date(section.dataset.evento);
+    return isNaN(t) ? null : t;
+  }
+
+  let target = readTarget();
+  if (!target) return;
 
   const els = {
     dias: section.querySelector('[data-cd="dias"]'),
@@ -678,6 +743,7 @@ function initCountdown() {
   }
 
   function tick() {
+    target = readTarget() || target;
     let diff = target.getTime() - Date.now();
 
     if (diff <= 0) {
@@ -704,6 +770,10 @@ function initCountdown() {
 
   tick();
   setInterval(tick, 1000);
+
+  // Expone tick() para que el customizer fuerce un refresh
+  // inmediato cuando cambie la fecha del evento
+  window.__refreshCountdown = tick;
 }
 
 // =========================================================
