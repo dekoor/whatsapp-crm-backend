@@ -52,11 +52,49 @@
   buildTapsIndicator();
 
   // ----- DETECCION DE 5 TAPS -----
+  // Para evitar que swipes/flicks de scroll cuenten como taps, exigimos
+  // que pointerdown y pointerup ocurran en (casi) la misma posicion y
+  // dentro de una ventana corta. Asi solo los taps reales suman.
+  var TAP_MAX_MOVE_PX = 8;    // movimiento permitido entre down y up
+  var TAP_MAX_HOLD_MS = 350;  // tiempo maximo del gesto
+
+  var pendingTap = null; // { x, y, t } o null si el down ya se invalido
+
+  function isIgnoredTarget(target) {
+    if (target.closest('a, button, input, textarea, select, label')) return true;
+    if (target.closest('.editor-ui, .editor-taps, [data-editable]')) return true;
+    return false;
+  }
+
   document.addEventListener('pointerdown', function (e) {
     if (editorOn) return;
-    // Ignorar taps sobre elementos interactivos y dentro del editor mismo
-    if (e.target.closest('a, button, input, textarea, select')) return;
-    if (e.target.closest('.editor-ui, .editor-taps')) return;
+    if (isIgnoredTarget(e.target)) { pendingTap = null; return; }
+    if (e.pointerType === 'touch' && e.isPrimary === false) return;
+
+    pendingTap = { x: e.clientX, y: e.clientY, t: Date.now() };
+  }, true);
+
+  // Si el dedo se mueve mas alla del umbral, invalidamos el tap
+  document.addEventListener('pointermove', function (e) {
+    if (!pendingTap || editorOn) return;
+    var dx = Math.abs(e.clientX - pendingTap.x);
+    var dy = Math.abs(e.clientY - pendingTap.y);
+    if (dx > TAP_MAX_MOVE_PX || dy > TAP_MAX_MOVE_PX) {
+      pendingTap = null;
+    }
+  }, true);
+
+  document.addEventListener('pointerup', function (e) {
+    if (editorOn || !pendingTap) return;
+
+    var dt = Date.now() - pendingTap.t;
+    var dx = Math.abs(e.clientX - pendingTap.x);
+    var dy = Math.abs(e.clientY - pendingTap.y);
+    pendingTap = null;
+
+    // Filtrar: si fue largo (hold) o se movio (swipe/scroll), no cuenta
+    if (dt > TAP_MAX_HOLD_MS) return;
+    if (dx > TAP_MAX_MOVE_PX || dy > TAP_MAX_MOVE_PX) return;
 
     var now = Date.now();
     if (now - lastTapAt > TAP_WINDOW_MS) {
@@ -81,6 +119,11 @@
       tapCount = 0;
       hideTapsIndicator();
     }, TAP_WINDOW_MS);
+  }, true);
+
+  // Cancelacion (toque interrumpido por el sistema, etc.)
+  document.addEventListener('pointercancel', function () {
+    pendingTap = null;
   }, true);
 
   // ESC para salir (desktop)
