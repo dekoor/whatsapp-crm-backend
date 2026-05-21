@@ -1,24 +1,24 @@
 /* =========================================================
-   Invitación XV — Valentina Sofía
-   Estilo: Minimal moderno · Negro + Oro rosado
+   Invitación XV — Plantilla 3
+   Estilo: Urbano contemporáneo · Dark + Coral
    ========================================================= */
 
 :root {
-  --c-bg: #faf7f5;
-  --c-ink: #0b0b0b;
-  --c-ink-soft: #2a2624;
+  --c-bg: #0b0b0b;
+  --c-ink: #f5f1ee;
+  --c-ink-soft: #c9c2bd;
   --c-mute: #8a807b;
-  --c-line: rgba(11, 11, 11, 0.12);
+  --c-line: rgba(255, 255, 255, 0.12);
 
-  /* Oro rosado */
-  --c-rose-gold: #b76e79;
-  --c-rose-gold-soft: #d9a7ad;
-  --c-rose-gold-deep: #8a4a55;
+  /* Coral / rosa cálido (reemplaza el oro rosado de plantillas previas) */
+  --c-rose-gold: #f4a8a8;
+  --c-rose-gold-soft: #ffcfcf;
+  --c-rose-gold-deep: #e08585;
 
-  --c-overlay: rgba(11, 11, 11, 0.42);
+  --c-overlay: rgba(11, 11, 11, 0.55);
 
   --f-display: "Cormorant Garamond", "Times New Roman", serif;
-  --f-script: "Great Vibes", "Allura", "Pinyon Script", cursive;
+  --f-script: "Allura", "Pinyon Script", "Great Vibes", cursive;
   --f-sans: "Inter", system-ui, sans-serif;
 
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -50,8 +50,8 @@ body {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 90% 65% at 50% 32%, rgba(183, 110, 121, 0.08), transparent 62%),
-    radial-gradient(ellipse 75% 55% at 50% 78%, rgba(155, 90, 100, 0.06), transparent 65%);
+    radial-gradient(ellipse 90% 65% at 50% 32%, rgba(244, 168, 168, 0.08), transparent 62%),
+    radial-gradient(ellipse 75% 55% at 50% 78%, rgba(224, 133, 133, 0.06), transparent 65%);
   pointer-events: none;
   transform: translateZ(0);
   will-change: transform;
@@ -252,7 +252,7 @@ img {
       rgba(11, 11, 11, 0.05) 55%,
       rgba(11, 11, 11, 0.85) 100%
     ),
-    radial-gradient(90% 60% at 50% 95%, rgba(183, 110, 121, 0.22), transparent 70%);
+    radial-gradient(90% 60% at 50% 95%, rgba(244, 168, 168, 0.22), transparent 70%);
   z-index: 1;
 }
 
@@ -658,7 +658,7 @@ img {
   height: 8px;
   background: var(--c-rose-gold);
   transform: rotate(45deg);
-  box-shadow: 0 0 10px rgba(183, 110, 121, 0.65),
+  box-shadow: 0 0 10px rgba(244, 168, 168, 0.65),
     0 0 0 1px rgba(255, 244, 234, 0.25);
   flex-shrink: 0;
 }
@@ -940,15 +940,15 @@ body.snap-vcenter .guia--vcenter,
 body.snap-hcenter .guia--hcenter {
   opacity: 1;
   background: var(--c-rose-gold);
-  box-shadow: 0 0 14px rgba(183, 110, 121, 0.9),
-    0 0 32px rgba(183, 110, 121, 0.45),
+  box-shadow: 0 0 14px rgba(244, 168, 168, 0.9),
+    0 0 32px rgba(244, 168, 168, 0.45),
     0 0 1px rgba(0, 0, 0, 0.4);
 }
 
 body.snap-vcenter .guia--vcenter::after {
   background: var(--c-rose-gold);
   border-color: #fff;
-  box-shadow: 0 0 12px rgba(183, 110, 121, 0.9);
+  box-shadow: 0 0 12px rgba(244, 168, 168, 0.9);
 }
 
 
@@ -1089,7 +1089,7 @@ body.edit-mode .portada::after {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55),
-    0 0 0 4px rgba(183, 110, 121, 0.15);
+    0 0 0 4px rgba(244, 168, 168, 0.15);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   transform: translate(-50%, -50%) scale(0.92);
@@ -1112,16 +1112,16 @@ body.edit-mode .portada::after {
   height: 10px;
   border-radius: 999px;
   background: var(--c-rose-gold);
-  box-shadow: 0 0 0 4px rgba(183, 110, 121, 0.25);
+  box-shadow: 0 0 0 4px rgba(244, 168, 168, 0.25);
   animation: toastPulse 1.4s ease-in-out infinite;
 }
 
 @keyframes toastPulse {
   0%, 100% {
-    box-shadow: 0 0 0 4px rgba(183, 110, 121, 0.25);
+    box-shadow: 0 0 0 4px rgba(244, 168, 168, 0.25);
   }
   50% {
-    box-shadow: 0 0 0 8px rgba(183, 110, 121, 0.1);
+    box-shadow: 0 0 0 8px rgba(244, 168, 168, 0.1);
   }
 }
 
@@ -2550,7 +2550,7 @@ body.edit-mode .galeria__pista {
   background: linear-gradient(
     180deg,
     rgba(217, 167, 173, 0.18) 0%,
-    rgba(155, 90, 100, 0.22) 100%
+    rgba(224, 133, 133, 0.22) 100%
   );
   color: #fff5ef;
   font-family: var(--f-sans);
@@ -2823,7 +2823,7 @@ body.edit-mode .galeria__pista {
   position: absolute;
   background: radial-gradient(
     ellipse 100% 55% at center,
-    rgba(183, 110, 121, 0.65) 0%,
+    rgba(244, 168, 168, 0.65) 0%,
     rgba(217, 167, 173, 0.32) 38%,
     rgba(217, 167, 173, 0.12) 65%,
     transparent 82%
@@ -2847,8 +2847,8 @@ body.edit-mode .galeria__pista {
 .brush--soft {
   background: radial-gradient(
     ellipse 100% 55% at center,
-    rgba(155, 80, 95, 0.55) 0%,
-    rgba(183, 110, 121, 0.22) 45%,
+    rgba(224, 133, 133, 0.55) 0%,
+    rgba(244, 168, 168, 0.22) 45%,
     transparent 78%
   );
   filter: blur(17px);
