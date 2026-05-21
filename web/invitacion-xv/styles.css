@@ -1600,6 +1600,225 @@ body.edit-mode .galeria__pista {
 }
 
 /* =========================================================
+   VESTIMENTA — dress code visual
+   ========================================================= */
+
+.vestimenta {
+  position: relative;
+  width: 100%;
+  background:
+    radial-gradient(65% 50% at 50% 50%, rgba(183, 110, 121, 0.1), transparent 70%);
+  color: #f4eae6;
+  display: grid;
+  place-items: center;
+  padding: clamp(64px, 12vw, 110px) 24px;
+  overflow: hidden;
+}
+
+.vestimenta__contenido {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 560px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(28px, 5.5vw, 50px);
+}
+
+.vestimenta__kicker {
+  display: inline-flex;
+  gap: 0.55em;
+  font-family: var(--f-sans);
+  font-weight: 300;
+  font-size: clamp(0.72rem, 1.7vw, 0.9rem);
+  letter-spacing: 0.55em;
+  text-transform: uppercase;
+  color: rgba(217, 167, 173, 0.95);
+  padding-left: 0.55em;
+}
+
+/* Hero "FORMAL" */
+.vestimenta__hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(10px, 2.4vw, 18px);
+}
+
+.vestimenta__etiqueta {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(0.95rem, 2.4vw, 1.15rem);
+  color: rgba(244, 234, 230, 0.75);
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.vestimenta__formal {
+  font-family: var(--f-display);
+  font-weight: 500;
+  font-size: clamp(2rem, 7.5vw, 3.4rem);
+  line-height: 1;
+  letter-spacing: 0.18em;
+  margin: 0;
+  background: linear-gradient(
+    180deg,
+    #fff7f3 0%,
+    #ffd8cf 30%,
+    #f1a89a 65%,
+    #c9796f 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+}
+
+.vestimenta__nota {
+  font-family: var(--f-sans);
+  font-weight: 300;
+  font-size: clamp(0.78rem, 1.85vw, 0.9rem);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(244, 234, 230, 0.7);
+  margin: 0;
+}
+
+/* Siluetas de vestido y traje */
+.vestimenta__siluetas {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: clamp(34px, 8vw, 70px);
+  color: var(--c-rose-gold-soft);
+  opacity: 0.85;
+}
+
+.silueta {
+  width: clamp(74px, 17vw, 110px);
+  height: auto;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.5));
+  transition: transform 0.4s var(--ease);
+}
+
+.silueta:hover {
+  transform: translateY(-4px);
+}
+
+/* Paletas de colores */
+.paleta {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(14px, 3vw, 22px);
+}
+
+.paleta__titulo {
+  font-family: var(--f-sans);
+  font-weight: 300;
+  font-size: clamp(0.7rem, 1.55vw, 0.8rem);
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(217, 167, 173, 0.95);
+  padding-left: 0.4em;
+  margin: 0;
+}
+
+.paleta__titulo--evitar {
+  color: rgba(244, 234, 230, 0.55);
+}
+
+.paleta__lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(14px, 3.5vw, 26px) clamp(14px, 3.5vw, 26px);
+}
+
+.swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+}
+
+.swatch__color {
+  position: relative;
+  width: clamp(44px, 11vw, 60px);
+  height: clamp(44px, 11vw, 60px);
+  background: var(--c);
+  border-radius: 50%;
+  border: 1px solid rgba(217, 167, 173, 0.35);
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.25);
+}
+
+.swatch__label {
+  font-family: var(--f-sans);
+  font-weight: 300;
+  font-size: clamp(0.62rem, 1.4vw, 0.72rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(244, 234, 230, 0.7);
+}
+
+/* Tachadura para colores a evitar */
+.swatch--no .swatch__color {
+  opacity: 0.55;
+}
+
+.swatch--no .swatch__color::before,
+.swatch--no .swatch__color::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.swatch--no .swatch__color::after {
+  background:
+    linear-gradient(
+      135deg,
+      transparent calc(50% - 1.2px),
+      rgba(255, 90, 90, 0.92) calc(50% - 1.2px),
+      rgba(255, 90, 90, 0.92) calc(50% + 1.2px),
+      transparent calc(50% + 1.2px)
+    );
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  mask: radial-gradient(circle at center, #000 50%, transparent 51%);
+  -webkit-mask: radial-gradient(circle at center, #000 50%, transparent 51%);
+}
+
+.swatch--no .swatch__label {
+  color: rgba(244, 234, 230, 0.5);
+}
+
+.paleta__nota {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(0.82rem, 2vw, 0.95rem);
+  color: rgba(244, 234, 230, 0.6);
+  margin: 4px 0 0;
+}
+
+.paleta__nota em {
+  font-style: italic;
+  color: var(--c-rose-gold-soft);
+}
+
+/* =========================================================
    PINCELADAS DE FONDO — manchas oro rosa con blur
    ========================================================= */
 
