@@ -159,6 +159,10 @@ function applyCustom(data) {
   renderKicker(data.kicker);
   renderNombres(data.nombre1, data.nombre2);
   renderFecha(data.fecha);
+  renderFirma(data.nombre1, data.nombre2);
+  renderHashtag(data.nombre1, data.nombre2);
+  renderAlts(data.nombre1, data.nombre2);
+  renderWhatsApp(data.nombre1, data.nombre2);
   updateTitle(data.nombre1, data.nombre2);
 }
 
@@ -221,6 +225,74 @@ function updateTitle(n1, n2) {
   if (partes.length) {
     document.title = `${partes.join(" ")} · Mis XV Años`;
   }
+}
+
+function renderFirma(n1, n2) {
+  const el = document.querySelector(".despedida__firma");
+  if (!el) return;
+  el.textContent = fullName(n1, n2);
+}
+
+function renderHashtag(n1, n2) {
+  // El hashtag usa los nombres sin espacios ni acentos + sufijo "XV"
+  const base = [n1, n2]
+    .filter((s) => s && s.trim())
+    .map(toAscii)
+    .join("");
+  const tag = base ? `${base}XV` : "XV";
+
+  const textoEl = document.querySelector(".hashtag__texto");
+  if (textoEl) textoEl.textContent = tag;
+
+  const cta = document.querySelector(".hashtag__cta");
+  if (cta) {
+    cta.href = `https://www.instagram.com/explore/tags/${tag.toLowerCase()}/`;
+  }
+}
+
+function renderAlts(n1, n2) {
+  const full = fullName(n1, n2);
+  const first = (n1 || "").trim() || full;
+  const setAlt = (sel, value) => {
+    const el = document.querySelector(sel);
+    if (el && value) el.setAttribute("alt", value);
+  };
+  setAlt(".portada__foto", `Foto de ${full}`);
+  setAlt(".regalos__retrato-img", `Retrato de ${first}`);
+  setAlt(".despedida__foto", `${first} al atardecer`);
+}
+
+function renderWhatsApp(n1, n2) {
+  // Reescribe el href de cada botón de RSVP conservando su número de
+  // teléfono pero reemplazando el nombre que va dentro del mensaje.
+  const full = fullName(n1, n2);
+  const msg = `Hola, confirmo mi asistencia a los XV de ${full}.`;
+  const encoded = encodeURIComponent(msg);
+
+  document.querySelectorAll(".rsvp__boton").forEach((a) => {
+    try {
+      const url = new URL(a.href);
+      url.searchParams.set("text", msg);
+      // wa.me espera el query encoded con %20 en espacios (lo que URL hace)
+      a.href = `${url.origin}${url.pathname}?text=${encoded}`;
+    } catch {
+      /* href inválido, lo dejamos */
+    }
+  });
+}
+
+function fullName(n1, n2) {
+  return [n1, n2]
+    .map((s) => (s || "").trim())
+    .filter(Boolean)
+    .join(" ");
+}
+
+function toAscii(s) {
+  return (s || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9]/g, "");
 }
 
 function escapeHtml(s) {
