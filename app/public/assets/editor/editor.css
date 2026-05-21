@@ -62,16 +62,19 @@ body.is-editor [data-editable]:active {
 }
 
 /* Overlay del editor (barra + linea guia) — vive dentro del .phone */
+/* Overlay del editor: vive a nivel viewport (no dentro del phone).
+   Asi la barra y la linea guia quedan ancladas a la pantalla mientras
+   el usuario scrollea contenido largo dentro del phone. */
 .editor-ui {
-  position: absolute;
+  position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 9999;
 }
 
-/* Barra superior con label + boton salir */
+/* Barra superior — fixed al viewport */
 .editor-bar {
-  position: absolute;
+  position: fixed;
   top: 14px;
   left: 50%;
   transform: translateX(-50%);
@@ -88,6 +91,7 @@ body.is-editor [data-editable]:active {
     0 0 16px rgba(255, 43, 214, 0.35),
     0 4px 14px rgba(0, 0, 0, 0.5);
   pointer-events: auto;
+  z-index: 10000;
 }
 
 .editor-bar__label {
@@ -125,15 +129,22 @@ body.is-editor [data-editable]:active {
   outline: none;
 }
 
-/* Linea guia vertical — centro del phone */
+/* Linea guia vertical — fixed al centro del viewport.
+   En desktop el phone esta centrado en pantalla, asi que el centro
+   del viewport coincide con el centro del phone. En mobile el phone
+   ocupa el ancho completo, asi que tambien coincide. */
 .editor-guide {
-  position: absolute;
+  position: fixed;
   top: 0;
   bottom: 0;
   width: 1px;
   pointer-events: none;
   transition: opacity .2s ease, background .2s ease, box-shadow .2s ease;
+  /* Solo visible dentro de modo editor (defensivo) */
+  display: none;
 }
+body.is-editor .editor-guide { display: block; }
+
 .editor-guide--v {
   left: 50%;
   transform: translateX(-50%);

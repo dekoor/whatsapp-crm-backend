@@ -126,7 +126,10 @@
     if (editorOn) return;
     editorOn = true;
     document.body.classList.add('is-editor');
-    phoneEl.appendChild(buildEditorUI());
+    // La UI del editor (barra + linea guia) vive a nivel <body>, NO dentro
+    // del phone: asi position:fixed no queda atrapado por transforms del
+    // mockup y se mantiene anclada al viewport durante el scroll.
+    document.body.appendChild(buildEditorUI());
     activeEditables = collectEditables();
     activeEditables.forEach(setupElement);
 
@@ -138,7 +141,7 @@
     if (!editorOn) return;
     editorOn = false;
     document.body.classList.remove('is-editor');
-    var ui = phoneEl.querySelector('.editor-ui');
+    var ui = document.body.querySelector(':scope > .editor-ui');
     if (ui) ui.remove();
     activeEditables.forEach(teardownElement);
     activeEditables = [];
