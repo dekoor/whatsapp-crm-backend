@@ -115,6 +115,7 @@ const CUST_DEFAULTS = {
   ceremonia_lugar: "Parroquia de San Francisco",
   ceremonia_dir1: "Av. Hidalgo 123, Centro",
   ceremonia_dir2: "Zapopan, Jalisco",
+  ceremonia_maps: "",
 };
 
 const CUST_TOTAL_STEPS = 3;
@@ -275,6 +276,7 @@ function applyCustom(data) {
     lugar: data.ceremonia_lugar,
     dir1: data.ceremonia_dir1,
     dir2: data.ceremonia_dir2,
+    maps: data.ceremonia_maps,
   });
   updateTitle(data.nombre1, data.nombre2);
 }
@@ -282,7 +284,7 @@ function applyCustom(data) {
 // Render compartido para ceremonia y recepción. La tarjeta de cada
 // evento tiene la misma estructura interna (.evento__hora, __lugar,
 // __direccion, __mapa), así que cambia sólo el selector base.
-function renderEvento(tipo, { hora, lugar, dir1, dir2 }) {
+function renderEvento(tipo, { hora, lugar, dir1, dir2, maps }) {
   const evento = document.querySelector(`.evento--${tipo}`);
   if (!evento) return;
 
@@ -304,13 +306,21 @@ function renderEvento(tipo, { hora, lugar, dir1, dir2 }) {
     dirEl.innerHTML = html;
   }
 
+  // Si el cliente proporciono un link de Maps lo usamos tal cual;
+  // si no, armamos uno con el nombre del lugar + direccion como
+  // search query (fallback razonable, no siempre apunta al pin exacto)
   const mapaLink = evento.querySelector(".evento__mapa");
   if (mapaLink) {
-    const query = [lugar, dir1, dir2]
-      .filter((s) => s && s.trim())
-      .join(", ");
-    if (query) {
-      mapaLink.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    const custom = (maps || "").trim();
+    if (custom) {
+      mapaLink.href = custom;
+    } else {
+      const query = [lugar, dir1, dir2]
+        .filter((s) => s && s.trim())
+        .join(", ");
+      if (query) {
+        mapaLink.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+      }
     }
   }
 }

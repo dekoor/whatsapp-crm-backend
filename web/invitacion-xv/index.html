@@ -16,9 +16,9 @@
     <link rel="preload" as="image" href="./assets/portada.webp" fetchpriority="high" />
 
     <!-- Engine compartido (editor, customizer, animaciones, layout estructural) -->
-    <link rel="stylesheet" href="../_shared/core.css?b=20260521L" />
+    <link rel="stylesheet" href="../_shared/core.css?b=20260521M" />
     <!-- Skin especifico de esta plantilla (paleta, tipografias, secciones) -->
-    <link rel="stylesheet" href="./skin.css?b=20260521L" />
+    <link rel="stylesheet" href="./skin.css?b=20260521M" />
   </head>
   <body data-template-id="xv">
     <div class="atmosfera" aria-hidden="true"></div>
@@ -967,7 +967,20 @@
               maxlength="60"
               autocomplete="off"
             />
-            <span class="cust-field__hint">El botón “Ver en mapa” usa el nombre + dirección como búsqueda en Google Maps</span>
+          </label>
+
+          <label class="cust-field">
+            <span class="cust-field__label">Link de Google Maps</span>
+            <input
+              class="cust-field__input"
+              name="ceremonia_maps"
+              type="url"
+              value=""
+              placeholder="https://maps.app.goo.gl/..."
+              autocomplete="off"
+              inputmode="url"
+            />
+            <span class="cust-field__hint">Opcional. Si lo dejas vacío, el botón “Ver en mapa” usa el nombre + dirección como búsqueda.</span>
           </label>
         </fieldset>
 
@@ -1002,6 +1015,6 @@
       </form>
     </aside>
 
-    <script src="../_shared/core.js?b=20260521L" defer></script>
+    <script src="../_shared/core.js?b=20260521M" defer></script>
   </body>
 </html>
