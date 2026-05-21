@@ -32,16 +32,41 @@
 
 html,
 body {
-  background:
-    radial-gradient(ellipse 90% 65% at 50% 32%, rgba(183, 110, 121, 0.08), transparent 62%),
-    radial-gradient(ellipse 75% 55% at 50% 78%, rgba(155, 90, 100, 0.06), transparent 65%),
-    #0a0908;
-  background-attachment: fixed;
+  background: #0a0908;
   color: var(--c-ink);
   font-family: var(--f-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+/* Capa de atmósfera continua. Vive en su propia capa de compositing
+   (transform: translateZ(0)) y no se repinta al hacer scroll, a
+   diferencia de background-attachment: fixed que mata FPS en móvil. */
+.atmosfera {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 90% 65% at 50% 32%, rgba(183, 110, 121, 0.08), transparent 62%),
+    radial-gradient(ellipse 75% 55% at 50% 78%, rgba(155, 90, 100, 0.06), transparent 65%);
+  pointer-events: none;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Performance: secciones fuera del viewport no se rasterizan hasta
+   que se acerquen. contain-intrinsic-size le da al browser un alto
+   estimado para que el scrollbar no salte. */
+.bienvenida,
+.countdown,
+.ubicacion,
+.galeria,
+.familia,
+.vestimenta,
+.regalos {
+  content-visibility: auto;
+  contain-intrinsic-size: 100vw 90vh;
 }
 
 img {
@@ -1312,6 +1337,9 @@ body.edit-mode .portada::after {
     scale(var(--scale, 1));
   transform-origin: center center;
   transition: box-shadow 0.3s var(--ease), filter 0.3s var(--ease);
+}
+
+body.edit-mode .polaroid {
   will-change: transform;
 }
 
@@ -2078,9 +2106,8 @@ body.edit-mode .galeria__pista {
     transparent 82%
   );
   border-radius: 50% 50% 40% 60% / 60% 40% 60% 40%;
-  filter: blur(28px);
+  filter: blur(18px);
   mix-blend-mode: screen;
-  will-change: transform;
   animation: brushBreathe var(--breathe, 18s) ease-in-out var(--breathe-delay, 0s) infinite;
 }
 
@@ -2091,7 +2118,7 @@ body.edit-mode .galeria__pista {
     rgba(217, 167, 173, 0.32) 40%,
     transparent 78%
   );
-  filter: blur(32px);
+  filter: blur(20px);
 }
 
 .brush--soft {
@@ -2101,7 +2128,7 @@ body.edit-mode .galeria__pista {
     rgba(183, 110, 121, 0.22) 45%,
     transparent 78%
   );
-  filter: blur(36px);
+  filter: blur(22px);
   mix-blend-mode: screen;
 }
 
