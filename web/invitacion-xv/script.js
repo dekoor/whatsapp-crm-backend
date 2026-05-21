@@ -26,7 +26,104 @@ document.addEventListener("DOMContentLoaded", () => {
   initCountdown();
   initBrushes();
   initParticles();
+  initPhotoSlots();
 });
+
+// =========================================================
+// Slots de foto editables (galería polaroid)
+// Botón cámara → file picker → resize + compress a WebP → localStorage
+// =========================================================
+const PHOTO_PREFIX = "inv-xv:photo:";
+const PHOTO_MAX_SIDE = 900;
+const PHOTO_QUALITY = 0.82;
+
+function initPhotoSlots() {
+  document.querySelectorAll("[data-photo-slot]").forEach((slot) => {
+    const slotId = slot.dataset.photoSlot;
+    const img = slot.querySelector(".polaroid__foto");
+    const btn = slot.querySelector(".polaroid__cambiar");
+    if (!img || !btn) return;
+
+    // Restaurar imagen guardada en sesiones previas
+    try {
+      const saved = localStorage.getItem(PHOTO_PREFIX + slotId);
+      if (saved) img.src = saved;
+    } catch {
+      // localStorage bloqueado, ignorar
+    }
+
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
+      input.style.display = "none";
+      input.addEventListener("change", async () => {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        try {
+          const dataUrl = await compressImageToWebP(
+            file,
+            PHOTO_MAX_SIDE,
+            PHOTO_QUALITY
+          );
+          img.src = dataUrl;
+          try {
+            localStorage.setItem(PHOTO_PREFIX + slotId, dataUrl);
+          } catch (err) {
+            showToast("Imagen demasiado grande para guardar");
+          }
+        } catch (err) {
+          console.error("No se pudo procesar la imagen", err);
+          showToast("No se pudo cargar la imagen");
+        }
+      });
+      document.body.appendChild(input);
+      input.click();
+      setTimeout(() => input.remove(), 0);
+    });
+  });
+}
+
+function compressImageToWebP(file, maxSide, quality) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(reader.error);
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("decode failed"));
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > height && width > maxSide) {
+          height = Math.round((height * maxSide) / width);
+          width = maxSide;
+        } else if (height >= width && height > maxSide) {
+          width = Math.round((width * maxSide) / height);
+          height = maxSide;
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) return reject(new Error("encode failed"));
+            const fr = new FileReader();
+            fr.onload = () => resolve(fr.result);
+            fr.onerror = () => reject(fr.error);
+            fr.readAsDataURL(blob);
+          },
+          "image/webp",
+          quality
+        );
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 // =========================================================
 // Pinceladas oro rosa de fondo
@@ -341,6 +438,8 @@ function setupEditable(el) {
   el.addEventListener("pointerdown", (e) => {
     if (!document.body.classList.contains("edit-mode")) return;
     if (e.target === handle) return; // handle tiene su propio flujo
+    // Permitir interacción con controles internos (ej. botón cámara de polaroid)
+    if (e.target.closest("button, [data-no-drag]")) return;
     e.preventDefault();
     el.setPointerCapture(e.pointerId);
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });

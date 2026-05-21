@@ -1217,6 +1217,224 @@ body.edit-mode .portada::after {
 }
 
 /* =========================================================
+   GALERÍA POLAROID — fotos empalmadas, rotadas
+   ========================================================= */
+
+.galeria {
+  position: relative;
+  width: 100%;
+  background:
+    radial-gradient(60% 50% at 50% 50%, rgba(183, 110, 121, 0.1), transparent 70%),
+    linear-gradient(180deg, #0b0b0b 0%, #16110f 50%, #0b0b0b 100%);
+  color: #f4eae6;
+  display: grid;
+  place-items: center;
+  padding: clamp(64px, 12vw, 110px) 24px;
+  overflow: hidden;
+}
+
+.galeria__contenido {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 620px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(20px, 4.5vw, 40px);
+}
+
+.galeria__kicker {
+  display: inline-flex;
+  gap: 0.55em;
+  font-family: var(--f-sans);
+  font-weight: 300;
+  font-size: clamp(0.72rem, 1.7vw, 0.9rem);
+  letter-spacing: 0.55em;
+  text-transform: uppercase;
+  color: rgba(217, 167, 173, 0.95);
+  padding-left: 0.55em;
+}
+
+.galeria__intro {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: clamp(1.05rem, 2.9vw, 1.35rem);
+  line-height: 1.45;
+  color: rgba(244, 234, 230, 0.92);
+  max-width: 28ch;
+  margin: 0;
+}
+
+.galeria__intro em {
+  font-style: italic;
+  color: var(--c-rose-gold-soft);
+}
+
+/* Contenedor que apila las polaroids superpuestas */
+.polaroids {
+  position: relative;
+  width: min(92vw, 480px);
+  /* Más alto que ancho para acomodar las 4 polaroids inclinadas */
+  height: min(110vw, 560px);
+  margin: clamp(8px, 2vw, 16px) auto;
+  perspective: 1200px;
+}
+
+/* Polaroid individual */
+.polaroid {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 56%;
+  padding: 4.5% 4.5% 14% 4.5%;
+  background: linear-gradient(
+    180deg,
+    #fdfaf6 0%,
+    #f7f0e8 100%
+  );
+  border-radius: 3px;
+  box-shadow:
+    0 22px 38px rgba(0, 0, 0, 0.55),
+    0 6px 14px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.05);
+  /* La rotación va en --rot y la posición en --tx/--ty/--scale (compartidas con .movible) */
+  --rot: 0deg;
+  --ox: -50%;
+  --oy: -50%;
+  transform:
+    translate(calc(var(--ox) + var(--tx, 0px)), calc(var(--oy) + var(--ty, 0px)))
+    rotate(var(--rot))
+    scale(var(--scale, 1));
+  transform-origin: center center;
+  transition: box-shadow 0.3s var(--ease), filter 0.3s var(--ease);
+  will-change: transform;
+}
+
+.polaroid__marco {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #1a1612;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+
+.polaroid__foto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.polaroid__caption {
+  font-family: "Caveat", "Segoe Script", cursive;
+  font-weight: 400;
+  font-size: clamp(1.1rem, 3.4vw, 1.5rem);
+  color: #2d2118;
+  text-align: center;
+  margin-top: clamp(6px, 1.5vw, 12px);
+  letter-spacing: 0.01em;
+  opacity: 0.78;
+}
+
+/* Posiciones, rotaciones y z-index para el efecto empalmado */
+.polaroid--1 {
+  --ox: -78%;
+  --oy: -82%;
+  --rot: -11deg;
+  z-index: 1;
+}
+.polaroid--2 {
+  --ox: -22%;
+  --oy: -70%;
+  --rot: 7deg;
+  z-index: 2;
+}
+.polaroid--3 {
+  --ox: -68%;
+  --oy: -22%;
+  --rot: -5deg;
+  z-index: 3;
+}
+.polaroid--4 {
+  --ox: -28%;
+  --oy: -10%;
+  --rot: 13deg;
+  z-index: 4;
+}
+
+/* Botón cámara para cambiar foto (visible solo en modo editor) */
+.polaroid__cambiar {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--c-rose-gold);
+  border-radius: 50%;
+  background: rgba(11, 11, 11, 0.85);
+  color: var(--c-rose-gold-soft);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  z-index: 5;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
+  transition: transform 0.18s var(--ease), background 0.18s var(--ease);
+}
+
+.polaroid__cambiar svg {
+  width: 18px;
+  height: 18px;
+}
+
+.polaroid__cambiar:hover,
+.polaroid__cambiar:focus-visible {
+  background: var(--c-rose-gold);
+  color: #0b0b0b;
+  transform: scale(1.08);
+  outline: none;
+}
+
+body.edit-mode .polaroid__cambiar {
+  display: inline-flex;
+}
+
+/* Pista al usuario */
+.galeria__pista {
+  font-family: var(--f-sans);
+  font-weight: 300;
+  font-size: clamp(0.7rem, 1.6vw, 0.78rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(244, 234, 230, 0.45);
+  display: none;
+}
+
+body.edit-mode .galeria__pista {
+  display: block;
+}
+
+.galeria__pista-ic {
+  display: inline-block;
+  filter: grayscale(0.2);
+  vertical-align: -2px;
+}
+
+/* En desktop ancho, dejamos un poco más de aire */
+@media (min-width: 720px) {
+  .polaroid {
+    width: 46%;
+  }
+}
+
+/* =========================================================
    PINCELADAS DE FONDO — manchas oro rosa con blur
    ========================================================= */
 

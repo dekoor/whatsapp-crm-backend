@@ -9,20 +9,20 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Great+Vibes&family=Inter:wght@300;400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Allura&family=Caveat:wght@400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Great+Vibes&family=Inter:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
 
-    <link rel="stylesheet" href="./styles.css?b=20260521a" />
+    <link rel="stylesheet" href="./styles.css?b=20260521b" />
   </head>
   <body>
     <main class="invitacion">
       <!-- ============ PORTADA ============ -->
       <section class="portada" aria-label="Portada" data-particles="14">
-        <!-- Slot de foto: reemplaza ./assets/portada.jpg cuando tengas la imagen -->
+        <!-- Slot de foto: reemplaza ./assets/portada.webp cuando tengas la imagen -->
         <img
           class="portada__foto"
-          src="./assets/portada.jpg?v=3"
+          src="./assets/portada.webp"
           alt="Foto de Valentina Sofía"
           decoding="async"
           fetchpriority="high"
@@ -209,6 +209,108 @@
           </article>
         </div>
       </section>
+
+      <!-- ============ GALERÍA POLAROID ============ -->
+      <section class="galeria" aria-label="Galería de recuerdos" data-particles="22" data-brushes="6">
+        <div class="galeria__contenido">
+          <p class="galeria__kicker" data-reveal>
+            <span>R</span><span>E</span><span>C</span><span>U</span><span>E</span><span>R</span><span>D</span><span>O</span><span>S</span>
+          </p>
+
+          <div class="ornamento" aria-hidden="true" data-reveal data-reveal-delay="1">
+            <span class="ornamento__linea"></span>
+            <span class="ornamento__diamante"></span>
+            <span class="ornamento__linea"></span>
+          </div>
+
+          <p class="galeria__intro" data-reveal data-reveal-delay="2">
+            <em>Cada instante guardado</em><br />
+            es un pedacito de mi historia
+          </p>
+
+          <div class="polaroids" data-reveal data-reveal-delay="3">
+            <figure
+              class="polaroid polaroid--1 movible"
+              data-editable="polaroid-1"
+              data-photo-slot="1"
+            >
+              <div class="polaroid__marco">
+                <img class="polaroid__foto" src="./assets/galeria-1.webp" alt="Recuerdo 1" loading="lazy" />
+              </div>
+              <figcaption class="polaroid__caption">primeros pasos</figcaption>
+              <button class="polaroid__cambiar" type="button" aria-label="Cambiar foto">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M9 3l-1.5 2H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3H9zm3 5a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </figure>
+
+            <figure
+              class="polaroid polaroid--2 movible"
+              data-editable="polaroid-2"
+              data-photo-slot="2"
+            >
+              <div class="polaroid__marco">
+                <img class="polaroid__foto" src="./assets/galeria-2.webp" alt="Recuerdo 2" loading="lazy" />
+              </div>
+              <figcaption class="polaroid__caption">cumpleaños</figcaption>
+              <button class="polaroid__cambiar" type="button" aria-label="Cambiar foto">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M9 3l-1.5 2H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3H9zm3 5a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </figure>
+
+            <figure
+              class="polaroid polaroid--3 movible"
+              data-editable="polaroid-3"
+              data-photo-slot="3"
+            >
+              <div class="polaroid__marco">
+                <img class="polaroid__foto" src="./assets/galeria-3.webp" alt="Recuerdo 3" loading="lazy" />
+              </div>
+              <figcaption class="polaroid__caption">en familia</figcaption>
+              <button class="polaroid__cambiar" type="button" aria-label="Cambiar foto">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M9 3l-1.5 2H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3H9zm3 5a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </figure>
+
+            <figure
+              class="polaroid polaroid--4 movible"
+              data-editable="polaroid-4"
+              data-photo-slot="4"
+            >
+              <div class="polaroid__marco">
+                <img class="polaroid__foto" src="./assets/galeria-4.webp" alt="Recuerdo 4" loading="lazy" />
+              </div>
+              <figcaption class="polaroid__caption">hoy</figcaption>
+              <button class="polaroid__cambiar" type="button" aria-label="Cambiar foto">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M9 3l-1.5 2H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-3.5L15 3H9zm3 5a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </figure>
+          </div>
+
+          <p class="galeria__pista" data-reveal data-reveal-delay="4" aria-hidden="true">
+            En modo editor: arrastra para reposicionar · toca <span class="galeria__pista-ic">📷</span> para cambiar la foto
+          </p>
+        </div>
+      </section>
     </main>
 
     <!-- Toast centrado al entrar/salir del modo editor -->
@@ -224,6 +326,6 @@
       <button type="button" class="edit-bar__btn edit-bar__btn--primary" data-action="exit">Salir</button>
     </div>
 
-    <script src="./script.js?b=20260521a" defer></script>
+    <script src="./script.js?b=20260521b" defer></script>
   </body>
 </html>
