@@ -18,7 +18,7 @@
   --c-overlay: rgba(11, 11, 11, 0.42);
 
   --f-display: "Cormorant Garamond", "Times New Roman", serif;
-  --f-script: "Allura", "Great Vibes", "Pinyon Script", cursive;
+  --f-script: "Great Vibes", "Allura", "Pinyon Script", cursive;
   --f-sans: "Inter", system-ui, sans-serif;
 
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -200,70 +200,93 @@ img {
 .portada__kicker span:nth-child(6) { animation-delay: 0.6s; }
 .portada__kicker span:nth-child(7) { animation-delay: 0.68s; }
 
-/* Nombre — script con efecto metálico oro rosado */
+/* Nombre — script con efecto oro rosa metálico premium + brillo */
 .portada__nombre {
   font-family: var(--f-script);
   font-weight: 400;
-  font-size: clamp(3.6rem, 14vw, 8rem);
-  line-height: 1;
+  font-size: clamp(72px, 18vw, 110px);
+  line-height: 0.95;
   letter-spacing: 0.005em;
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: clamp(2px, 0.8vh, 10px);
-  padding: 0.08em 0; /* espacio para los descenders del script */
-  /* Sombras en capas para profundidad + perímetro sutil rose-gold */
-  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.5))
-    drop-shadow(0 1px 0 rgba(125, 73, 81, 0.55))
-    drop-shadow(0 0 1px rgba(255, 244, 234, 0.4));
+  margin: 0;
+  padding: 0.08em 0;
 }
 
 .portada__nombre .linea {
   display: block;
+  margin: 0;
+
+  /* === Capa 1: shimmer blanco diagonal animado ===
+     === Capa 2: gradiente vertical oro rosa metálico === */
+  background:
+    linear-gradient(
+      110deg,
+      transparent 0%,
+      transparent 35%,
+      rgba(255, 255, 255, 0.78) 48%,
+      rgba(255, 255, 255, 1) 50%,
+      rgba(255, 255, 255, 0.7) 52%,
+      transparent 65%,
+      transparent 100%
+    ),
+    linear-gradient(
+      180deg,
+      #fff7f3 0%,
+      #ffd8cf 14%,
+      #f1a89a 28%,
+      #c9796f 45%,
+      #9f4f49 58%,
+      #e7a298 72%,
+      #fff0ea 86%,
+      #b86d64 100%
+    );
+
+  background-size: 260% 100%, 100% 100%;
+  background-position: -180% center, center;
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+
+  /* Glow + sombra para profundidad y legibilidad sobre foto */
+  text-shadow:
+    0 0 8px rgba(255, 190, 180, 0.45),
+    0 0 22px rgba(255, 150, 135, 0.25),
+    0 6px 18px rgba(0, 0, 0, 0.45);
+
+  /* Entrada + brillo deslizante en bucle */
   opacity: 0;
   transform: translateY(24px);
-  animation: nombreIn 1.2s var(--ease) forwards;
-
-  /* === Gradiente metálico oro rosado ===
-     Top casi blanco → peach → rose-gold → rose-gold profundo.
-     Imita un oro rosado pulido con la luz cayendo desde arriba. */
-  background: linear-gradient(
-    180deg,
-    #fff4ea 0%,
-    /* highlight superior casi blanco */ #fadfca 16%,
-    /* peach claro */ #f0c2c6 34%,
-    /* rose-gold luminoso */ #dba2ab 52%,
-    /* rose-gold medio */ #c08490 70%,
-    /* rose-gold deeper */ #a26571 86%,
-    /* sombra rosada */ #7d4951 100% /* base profunda */
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+  animation:
+    nombreIn 1.2s var(--ease) 0.9s forwards,
+    brilloOroRosa 5s ease-in-out 1.5s infinite;
 }
 
-/* Variante "Sofía" — desplaza el highlight para diferenciar las dos
-   líneas y simular reflejo distinto en cada palabra */
+/* Variante "Sofía" — mismo metal, brillo desfasado para que las dos
+   líneas no destellen al unísono */
 .portada__nombre .linea--alt {
-  background: linear-gradient(
-    180deg,
-    #fff8f0 0%,
-    #f8d5bf 20%,
-    #ebb5b9 40%,
-    #d099a1 58%,
-    #b67682 76%,
-    #8a505a 92%,
-    #6b3b44 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+  animation:
+    nombreIn 1.2s var(--ease) 1.5s forwards,
+    brilloOroRosa 5s ease-in-out -1s infinite;
 }
 
-.portada__nombre .linea:nth-child(1) { animation-delay: 0.9s; }
-.portada__nombre .linea--alt { animation-delay: 1.5s; }
+@keyframes brilloOroRosa {
+  0% {
+    background-position: -180% center, center;
+  }
+  55% {
+    background-position: 180% center, center;
+  }
+  100% {
+    background-position: 180% center, center;
+  }
+}
+
 
 .portada__nombre .divisor {
   width: 96px;
