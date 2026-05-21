@@ -331,13 +331,16 @@ img {
   max-width: 560px;
 }
 
-/* "Mis" — script chico, degradado rosa, montado sobre XV */
+/* "Mis" — script chico, degradado rosa, montado sobre XV.
+   padding-top + margin-top negativo para que background-clip:text
+   alcance los ascendentes altos de Great Vibes sin alterar el layout. */
 .portada__mis {
   font-family: var(--f-script);
   font-weight: 400;
   font-size: clamp(52px, 13vw, 84px);
   line-height: 1;
-  margin: 0 0 -0.32em 0;
+  padding-top: 0.22em;
+  margin: -0.22em 0 -0.32em 0;
   transform: translateX(-12%);
   background: linear-gradient(100deg, #fbe1e6 0%, #e8a4b1 50%, #b8707d 100%);
   -webkit-background-clip: text;
@@ -408,7 +411,11 @@ img {
 
 .portada__nombre .linea {
   display: block;
-  margin: 0;
+  /* padding-top expande el área pintada por background-clip:text para
+     incluir los swashes altos del script; el margin-top negativo
+     mantiene la posición visual sin desplazar el layout. */
+  padding-top: 0.26em;
+  margin: -0.26em 0 0 0;
   background: linear-gradient(95deg, #fbe1e6 0%, #e8a4b1 50%, #b8707d 100%);
   -webkit-background-clip: text;
   background-clip: text;
