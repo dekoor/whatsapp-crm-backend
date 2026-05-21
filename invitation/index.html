@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mis XV Años · Portada</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Parisienne&family=Italiana&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --rosa-suave:#fbe5e8;
+    --rosa-polvo:#f3c8cf;
+    --rosa-medio:#e9a6b1;
+    --rosa-oscuro:#b97481;
+    --crema:#fff7f4;
+    --tinta:#5a3a40;
+    --dorado:#c9a96b;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Cormorant Garamond', serif;
+    color:var(--tinta);
+    background:
+      radial-gradient(1200px 700px at 80% -10%, #ffd9df 0%, transparent 60%),
+      radial-gradient(900px 600px at -10% 110%, #ffe8ec 0%, transparent 55%),
+      linear-gradient(180deg, #fff3f5 0%, #fde6ea 60%, #f8d2da 100%);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    overflow-x:hidden;
+  }
+
+  /* Pétalos flotantes */
+  .petalo{
+    position:fixed;
+    top:-40px;
+    width:14px;height:14px;
+    background:radial-gradient(circle at 30% 30%, #ffd1d8, #e89aa6);
+    border-radius:80% 0 80% 0;
+    opacity:.75;
+    animation:caer linear infinite;
+    z-index:0;
+    filter: drop-shadow(0 2px 2px rgba(185,116,129,.25));
+  }
+  @keyframes caer{
+    0%{transform:translateY(-10vh) rotate(0deg);opacity:0}
+    10%{opacity:.85}
+    100%{transform:translateY(115vh) rotate(540deg);opacity:0}
+  }
+
+  .tarjeta{
+    position:relative;
+    width:min(420px, 100%);
+    background:var(--crema);
+    border-radius:28px;
+    padding:34px 28px 40px;
+    box-shadow:
+      0 30px 60px -20px rgba(185,116,129,.35),
+      0 10px 25px -10px rgba(185,116,129,.25),
+      inset 0 0 0 1px rgba(201,169,107,.18);
+    overflow:hidden;
+    z-index:2;
+  }
+
+  /* Marco interno */
+  .tarjeta::before{
+    content:"";
+    position:absolute;inset:14px;
+    border:1px solid rgba(201,169,107,.45);
+    border-radius:20px;
+    pointer-events:none;
+  }
+  .tarjeta::after{
+    content:"";
+    position:absolute;inset:18px;
+    border:1px dashed rgba(185,116,129,.35);
+    border-radius:18px;
+    pointer-events:none;
+  }
+
+  .encabezado{
+    text-align:center;
+    margin-bottom:18px;
+  }
+  .monograma{
+    font-family:'Italiana', serif;
+    letter-spacing:.6em;
+    font-size:12px;
+    color:var(--rosa-oscuro);
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  .moñito{
+    display:inline-block;
+    color:var(--rosa-medio);
+    font-size:22px;
+    transform:translateY(2px);
+  }
+  .quincea{
+    font-family:'Parisienne', cursive;
+    color:var(--rosa-oscuro);
+    font-size:42px;
+    line-height:1;
+    margin-top:6px;
+  }
+  .sublinea{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-weight:300;
+    color:var(--tinta);
+    opacity:.7;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    font-size:11px;
+    margin-top:10px;
+  }
+
+  /* Foto con marco coquette */
+  .foto-wrap{
+    position:relative;
+    margin:18px auto 22px;
+    width:100%;
+    aspect-ratio: 3/4;
+    border-radius:200px 200px 24px 24px;
+    overflow:hidden;
+    box-shadow:
+      0 20px 40px -18px rgba(185,116,129,.55),
+      inset 0 0 0 6px #fff,
+      inset 0 0 0 7px rgba(201,169,107,.4);
+  }
+  .foto-wrap img{
+    width:100%;height:100%;
+    object-fit:cover;
+    display:block;
+    transform:scale(1.02);
+    transition: transform 6s ease;
+  }
+  .tarjeta:hover .foto-wrap img{transform:scale(1.08)}
+
+  /* Moños decorativos sobre la foto */
+  .lazo{
+    position:absolute;
+    top:-6px;left:50%;
+    transform:translateX(-50%);
+    font-size:36px;
+    color:#e98ea0;
+    filter: drop-shadow(0 3px 4px rgba(185,116,129,.45));
+    z-index:3;
+  }
+
+  .nombre{
+    text-align:center;
+    font-family:'Parisienne', cursive;
+    color:var(--rosa-oscuro);
+    font-size:54px;
+    line-height:1;
+    margin-top:4px;
+  }
+  .nombre small{
+    display:block;
+    font-family:'Italiana', serif;
+    font-size:12px;
+    letter-spacing:.5em;
+    color:var(--tinta);
+    opacity:.65;
+    margin-top:14px;
+    text-transform:uppercase;
+  }
+
+  .divisor{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:18px auto 14px;
+    color:var(--dorado);
+  }
+  .divisor::before,.divisor::after{
+    content:"";flex:1;height:1px;
+    background:linear-gradient(90deg, transparent, var(--dorado), transparent);
+  }
+  .divisor span{font-size:16px}
+
+  .fecha{
+    text-align:center;
+    font-family:'Italiana', serif;
+    letter-spacing:.35em;
+    color:var(--tinta);
+    font-size:13px;
+    text-transform:uppercase;
+  }
+  .fecha .dia{
+    display:inline-block;
+    font-family:'Cormorant Garamond', serif;
+    font-weight:500;
+    font-size:30px;
+    letter-spacing:.05em;
+    color:var(--rosa-oscuro);
+    margin:6px 14px 4px;
+    border-top:1px solid rgba(185,116,129,.4);
+    border-bottom:1px solid rgba(185,116,129,.4);
+    padding:4px 10px;
+  }
+
+  .pie{
+    margin-top:22px;
+    text-align:center;
+    font-style:italic;
+    font-weight:300;
+    color:var(--rosa-oscuro);
+    font-size:14px;
+    opacity:.85;
+  }
+  .pie em{font-family:'Parisienne', cursive; font-style:normal; font-size:20px}
+
+  .cta{
+    display:inline-block;
+    margin-top:18px;
+    padding:10px 22px;
+    background:linear-gradient(180deg, #fff, #fde7ec);
+    border:1px solid rgba(185,116,129,.45);
+    border-radius:999px;
+    color:var(--rosa-oscuro);
+    font-family:'Italiana', serif;
+    letter-spacing:.3em;
+    font-size:11px;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition: all .35s ease;
+    box-shadow:0 8px 18px -10px rgba(185,116,129,.55);
+  }
+  .cta:hover{
+    transform:translateY(-2px);
+    background:linear-gradient(180deg, #fff, #fbd4dc);
+  }
+
+  .cta-wrap{text-align:center}
+
+  /* Esquinas decorativas */
+  .esquina{
+    position:absolute;
+    width:54px;height:54px;
+    border:1px solid rgba(201,169,107,.55);
+    border-radius:50%;
+    opacity:.5;
+    z-index:1;
+  }
+  .esquina.tl{top:-18px;left:-18px}
+  .esquina.br{bottom:-18px;right:-18px}
+
+  @media (max-width:380px){
+    .quincea{font-size:36px}
+    .nombre{font-size:46px}
+  }
+</style>
+</head>
+<body>
+
+  <!-- pétalos -->
+  <script>
+    for(let i=0;i<14;i++){
+      const p=document.createElement('div');
+      p.className='petalo';
+      p.style.left=Math.random()*100+'vw';
+      p.style.animationDuration=(8+Math.random()*10)+'s';
+      p.style.animationDelay=(Math.random()*8)+'s';
+      p.style.transform='scale('+(.6+Math.random()*1.1)+')';
+      document.addEventListener('DOMContentLoaded',()=>document.body.appendChild(p));
+    }
+  </script>
+
+  <article class="tarjeta">
+    <span class="esquina tl"></span>
+    <span class="esquina br"></span>
+
+    <header class="encabezado">
+      <div class="monograma">· tenéis el honor ·</div>
+      <div class="moñito">❀</div>
+      <h2 class="quincea">Mis Quince Años</h2>
+      <div class="sublinea">una celebración soñada</div>
+    </header>
+
+    <div class="foto-wrap">
+      <span class="lazo">⌘</span>
+      <img src="assets/portada.png" alt="Foto de la quinceañera" />
+    </div>
+
+    <h1 class="nombre">
+      Ana Sofía
+      <small>· la festejada ·</small>
+    </h1>
+
+    <div class="divisor"><span>❦</span></div>
+
+    <p class="fecha">
+      sábado
+      <br>
+      <span class="dia">15 · 11 · 2026</span>
+      <br>
+      siete de la tarde
+    </p>
+
+    <p class="pie">
+      <em>Con cariño,</em><br>
+      mi familia y yo te esperamos
+    </p>
+
+    <div class="cta-wrap">
+      <button class="cta" onclick="this.innerText='con amor ♡'">Ver invitación</button>
+    </div>
+  </article>
+
+</body>
+</html>
