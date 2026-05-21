@@ -782,12 +782,21 @@ img {
    ========================================================= */
 [data-reveal] {
   opacity: 0;
-  transform: translateY(28px);
   transition: opacity 1s var(--ease), transform 1.1s var(--ease);
+}
+
+/* Slide-up sólo para elementos que NO son .movible. Los movibles ya
+   usan su transform (--tx/--ty/--scale) y un transform de reveal
+   encima los aplastaría, anulando el drag y el pinch. */
+[data-reveal]:not(.movible) {
+  transform: translateY(28px);
 }
 
 [data-reveal].is-revealed {
   opacity: 1;
+}
+
+[data-reveal]:not(.movible).is-revealed {
   transform: translateY(0);
 }
 
