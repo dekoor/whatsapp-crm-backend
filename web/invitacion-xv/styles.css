@@ -64,7 +64,8 @@ body {
 .galeria,
 .familia,
 .vestimenta,
-.regalos {
+.regalos,
+.hashtag {
   content-visibility: auto;
   contain-intrinsic-size: 100vw 90vh;
 }
@@ -2082,6 +2083,161 @@ body.edit-mode .galeria__pista {
   .opcion-regalo {
     flex: 1;
   }
+}
+
+/* =========================================================
+   HASHTAG — invitación a compartir en Instagram
+   ========================================================= */
+
+.hashtag {
+  position: relative;
+  width: 100%;
+  background: transparent;
+  color: #f4eae6;
+  display: grid;
+  place-items: center;
+  padding: clamp(64px, 12vw, 110px) 24px;
+  overflow: hidden;
+}
+
+.hashtag__contenido {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 560px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(20px, 4vw, 36px);
+}
+
+.hashtag__kicker {
+  display: inline-flex;
+  gap: 0.55em;
+  font-family: var(--f-sans);
+  font-weight: 300;
+  font-size: clamp(0.72rem, 1.7vw, 0.9rem);
+  letter-spacing: 0.55em;
+  text-transform: uppercase;
+  color: rgba(217, 167, 173, 0.95);
+  padding-left: 0.55em;
+}
+
+/* Logo IG dentro de un círculo con anillo oro rosa y glow sutil */
+.hashtag__logo {
+  position: relative;
+  width: clamp(82px, 18vw, 110px);
+  height: clamp(82px, 18vw, 110px);
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(11, 11, 11, 0.55);
+  border: 1px solid rgba(217, 167, 173, 0.4);
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 220, 200, 0.12),
+    0 0 40px rgba(217, 167, 173, 0.18);
+}
+
+.hashtag__logo-img {
+  width: 56%;
+  height: 56%;
+  display: block;
+}
+
+.hashtag__instruccion {
+  font-family: var(--f-display);
+  font-weight: 300;
+  font-size: clamp(0.98rem, 2.6vw, 1.2rem);
+  line-height: 1.5;
+  color: rgba(244, 234, 230, 0.78);
+  letter-spacing: 0.03em;
+  margin: 0;
+}
+
+.hashtag__instruccion em {
+  font-style: italic;
+  color: rgba(244, 234, 230, 0.92);
+}
+
+/* Hashtag enorme con el mismo metal oro rosa del nombre */
+.hashtag__tag {
+  font-family: var(--f-display);
+  font-weight: 500;
+  font-size: clamp(2.4rem, 9vw, 4rem);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  margin: 0;
+  background: linear-gradient(
+    180deg,
+    #fff7f3 0%,
+    #ffd8cf 30%,
+    #f1a89a 60%,
+    #c9796f 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 5px 14px rgba(0, 0, 0, 0.5));
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.04em;
+}
+
+.hashtag__pound {
+  font-weight: 400;
+  opacity: 0.78;
+  font-size: 0.85em;
+}
+
+.hashtag__texto {
+  font-style: italic;
+}
+
+/* CTA pill a Instagram */
+.hashtag__cta {
+  margin-top: clamp(4px, 1vw, 10px);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 22px;
+  border: 1px solid var(--c-rose-gold);
+  border-radius: 999px;
+  background: rgba(11, 11, 11, 0.5);
+  color: var(--c-rose-gold-soft);
+  font-family: var(--f-sans);
+  font-weight: 400;
+  font-size: clamp(0.74rem, 1.7vw, 0.85rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.25s var(--ease), color 0.25s var(--ease),
+    transform 0.25s var(--ease);
+}
+
+.hashtag__cta svg {
+  width: 18px;
+  height: 18px;
+}
+
+.hashtag__cta:hover,
+.hashtag__cta:focus-visible {
+  background: var(--c-rose-gold);
+  color: #0b0b0b;
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.hashtag__nota {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(0.88rem, 2.2vw, 1.05rem);
+  color: rgba(244, 234, 230, 0.6);
+  margin: 0;
+  max-width: 28ch;
 }
 
 /* =========================================================
