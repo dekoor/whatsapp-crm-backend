@@ -493,6 +493,149 @@ img {
 }
 
 /* =========================================================
+   CUENTA REGRESIVA
+   ========================================================= */
+
+.countdown {
+  position: relative;
+  min-height: 100svh;
+  width: 100%;
+  background:
+    radial-gradient(70% 50% at 50% 100%, rgba(183, 110, 121, 0.1), transparent 70%),
+    linear-gradient(180deg, #0b0b0b 0%, #181311 60%, #0b0b0b 100%);
+  color: #f4eae6;
+  display: grid;
+  place-items: center;
+  padding: clamp(80px, 14vh, 140px) 20px;
+  overflow: hidden;
+}
+
+.countdown__contenido {
+  width: 100%;
+  max-width: 720px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(28px, 6vh, 56px);
+}
+
+.countdown__kicker {
+  display: inline-flex;
+  gap: 0.55em;
+  font-family: var(--f-sans);
+  font-weight: 300;
+  font-size: clamp(0.72rem, 1.7vw, 0.9rem);
+  letter-spacing: 0.55em;
+  text-transform: uppercase;
+  color: rgba(217, 167, 173, 0.95);
+  padding-left: 0.55em;
+}
+
+.countdown__grid {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: clamp(8px, 2.5vw, 22px);
+  width: 100%;
+}
+
+.countdown__unidad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(8px, 1.6vh, 14px);
+  min-width: 0;
+}
+
+.countdown__num {
+  font-family: var(--f-display);
+  font-weight: 300;
+  font-size: clamp(2.6rem, 11vw, 5.5rem);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(
+    180deg,
+    #fff7f3 0%,
+    #ffe5db 35%,
+    #f1a89a 70%,
+    #c9796f 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.5));
+  transition: opacity 0.18s var(--ease);
+}
+
+.countdown__num--changing {
+  opacity: 0.35;
+}
+
+.countdown__label {
+  font-family: var(--f-sans);
+  font-weight: 300;
+  font-size: clamp(0.62rem, 1.5vw, 0.78rem);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(244, 234, 230, 0.7);
+  padding-left: 0.35em;
+}
+
+.countdown__sep {
+  font-family: var(--f-display);
+  font-weight: 300;
+  font-size: clamp(2.6rem, 11vw, 5.5rem);
+  line-height: 1;
+  color: var(--c-rose-gold);
+  opacity: 0.85;
+  align-self: flex-start;
+  /* alineación vertical con los números */
+  margin-top: -0.05em;
+  animation: sepBlink 2s ease-in-out infinite;
+}
+
+@keyframes sepBlink {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 0.4; }
+}
+
+.countdown__pie {
+  font-family: var(--f-display);
+  font-weight: 300;
+  font-size: clamp(1rem, 2.6vw, 1.25rem);
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  color: rgba(244, 234, 230, 0.85);
+  max-width: 28ch;
+}
+
+.countdown__pie-em {
+  font-style: italic;
+  background: linear-gradient(
+    180deg,
+    #fff7f3 0%,
+    #ffd8cf 30%,
+    #f1a89a 60%,
+    #c9796f 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* En pantallas estrechas, reducimos el gap del grid */
+@media (max-width: 380px) {
+  .countdown__grid {
+    gap: 4px;
+  }
+}
+
+/* =========================================================
    Reveal on scroll
    ========================================================= */
 [data-reveal] {

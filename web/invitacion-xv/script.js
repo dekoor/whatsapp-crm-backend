@@ -23,7 +23,64 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initEditorMode();
   initRevealOnScroll();
+  initCountdown();
 });
+
+// =========================================================
+// Cuenta regresiva al evento
+// =========================================================
+function initCountdown() {
+  const section = document.querySelector(".countdown");
+  if (!section) return;
+
+  const target = new Date(section.dataset.evento);
+  if (isNaN(target)) return;
+
+  const els = {
+    dias: section.querySelector('[data-cd="dias"]'),
+    horas: section.querySelector('[data-cd="horas"]'),
+    minutos: section.querySelector('[data-cd="minutos"]'),
+    segundos: section.querySelector('[data-cd="segundos"]'),
+  };
+  if (!els.dias) return;
+
+  function setNum(el, value) {
+    if (el.textContent === value) return;
+    el.classList.add("countdown__num--changing");
+    setTimeout(() => {
+      el.textContent = value;
+      el.classList.remove("countdown__num--changing");
+    }, 120);
+  }
+
+  function tick() {
+    let diff = target.getTime() - Date.now();
+
+    if (diff <= 0) {
+      setNum(els.dias, "000");
+      setNum(els.horas, "00");
+      setNum(els.minutos, "00");
+      setNum(els.segundos, "00");
+      return;
+    }
+
+    const dias = Math.floor(diff / 86400000);
+    diff -= dias * 86400000;
+    const horas = Math.floor(diff / 3600000);
+    diff -= horas * 3600000;
+    const minutos = Math.floor(diff / 60000);
+    diff -= minutos * 60000;
+    const segundos = Math.floor(diff / 1000);
+
+    setNum(els.dias, String(dias).padStart(3, "0"));
+    setNum(els.horas, String(horas).padStart(2, "0"));
+    setNum(els.minutos, String(minutos).padStart(2, "0"));
+    setNum(els.segundos, String(segundos).padStart(2, "0"));
+  }
+
+  tick();
+  setInterval(tick, 1000);
+}
 
 // =========================================================
 // Reveal de elementos al entrar al viewport

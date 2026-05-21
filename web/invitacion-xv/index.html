@@ -13,7 +13,7 @@
       rel="stylesheet"
     />
 
-    <link rel="stylesheet" href="./styles.css?v=12" />
+    <link rel="stylesheet" href="./styles.css?v=13" />
   </head>
   <body>
     <main class="invitacion">
@@ -101,6 +101,45 @@
           </div>
         </div>
       </section>
+
+      <!-- ============ CUENTA REGRESIVA ============ -->
+      <section
+        class="countdown"
+        aria-label="Cuenta regresiva"
+        data-evento="2026-11-15T20:00:00-06:00"
+      >
+        <div class="countdown__contenido">
+          <p class="countdown__kicker" data-reveal>
+            <span>F</span><span>A</span><span>L</span><span>T</span><span>A</span><span>N</span>
+          </p>
+
+          <div class="countdown__grid" data-reveal data-reveal-delay="1">
+            <div class="countdown__unidad">
+              <span class="countdown__num" data-cd="dias">000</span>
+              <span class="countdown__label">Días</span>
+            </div>
+            <span class="countdown__sep" aria-hidden="true">:</span>
+            <div class="countdown__unidad">
+              <span class="countdown__num" data-cd="horas">00</span>
+              <span class="countdown__label">Horas</span>
+            </div>
+            <span class="countdown__sep" aria-hidden="true">:</span>
+            <div class="countdown__unidad">
+              <span class="countdown__num" data-cd="minutos">00</span>
+              <span class="countdown__label">Min</span>
+            </div>
+            <span class="countdown__sep" aria-hidden="true">:</span>
+            <div class="countdown__unidad">
+              <span class="countdown__num" data-cd="segundos">00</span>
+              <span class="countdown__label">Seg</span>
+            </div>
+          </div>
+
+          <p class="countdown__pie" data-reveal data-reveal-delay="2">
+            <span class="countdown__pie-em">para celebrar</span> este momento único
+          </p>
+        </div>
+      </section>
     </main>
 
     <!-- Toast centrado al entrar/salir del modo editor -->
@@ -116,6 +155,6 @@
       <button type="button" class="edit-bar__btn edit-bar__btn--primary" data-action="exit">Salir</button>
     </div>
 
-    <script src="./script.js?v=9" defer></script>
+    <script src="./script.js?v=13" defer></script>
   </body>
 </html>
