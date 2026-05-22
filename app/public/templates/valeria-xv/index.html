@@ -157,13 +157,17 @@
       inset: 0;
       z-index: 2;
       pointer-events: none;
+      /* Degradado mas fuerte abajo para que los textos blancos lean
+         con seguridad sobre cualquier zona de la foto (vestido lavanda,
+         flores en bokeh, dorado del golden hour). */
       background: linear-gradient(
         to bottom,
-        var(--overlay-soft) 0%,
-        var(--overlay-soft) 35%,
-        rgba(94, 73, 120, 0.35) 55%,
-        var(--overlay-mid) 72%,
-        var(--overlay-deep) 100%
+        rgba(94, 73, 120, 0) 0%,
+        rgba(94, 73, 120, 0) 28%,
+        rgba(94, 73, 120, 0.22) 45%,
+        rgba(94, 73, 120, 0.55) 65%,
+        rgba(74, 50, 100, 0.88) 85%,
+        rgba(60, 40, 85, 0.96) 100%
       );
     }
 
@@ -221,12 +225,14 @@
       font-size: 0.78rem;
       letter-spacing: 0.55em;
       text-transform: uppercase;
-      color: var(--blanco-soft);
+      /* Sobre la foto: blanco crema con halo oscuro para legibilidad */
+      color: #FFF8EC;
       /* Indent visual para letter-spacing balanceado */
       padding-left: 0.55em;
       text-shadow:
-        0 0 10px rgba(157, 138, 196, 0.45),
-        0 0 20px rgba(157, 138, 196, 0.25);
+        0 0 2px rgba(94, 73, 120, 0.7),
+        0 0 10px rgba(94, 73, 120, 0.55),
+        0 0 22px rgba(94, 73, 120, 0.35);
       opacity: 0;
       transform: translateY(22px);
       filter: blur(6px);
@@ -242,14 +248,15 @@
       font-size: clamp(4.5rem, 18cqw, 6.5rem);
       line-height: 0.95;
       letter-spacing: 0.01em;
-      color: var(--blanco-glow);
+      /* Sobre la foto: blanco crema + glow lavanda exterior + halo oscuro */
+      color: #FFFFFF;
       margin: 0.35rem 0 0.85rem;
-      /* Glow neon fino cinematografico — capas de luz */
+      /* Stack: halo oscuro para contraste + glow lavanda romantico */
       text-shadow:
-        0 0 6px  rgba(255, 255, 255, 0.55),
-        0 0 14px rgba(197, 181, 220, 0.55),
-        0 0 26px rgba(157, 138, 196, 0.45),
-        0 0 48px rgba(126, 102, 168, 0.35),
+        0 0 3px  rgba(94, 73, 120, 0.6),
+        0 0 14px rgba(197, 181, 220, 0.65),
+        0 0 26px rgba(157, 138, 196, 0.5),
+        0 0 48px rgba(126, 102, 168, 0.38),
         0 0 90px rgba(126, 102, 168, 0.22);
       opacity: 0;
       transform: translateY(34px);
@@ -330,8 +337,13 @@
       font-size: 0.82rem;
       letter-spacing: 0.32em;
       text-transform: uppercase;
-      color: var(--blanco-soft);
-      text-shadow: 0 0 14px rgba(197, 181, 220, 0.35);
+      /* Sobre la foto: blanco crema con halo oscuro fuerte para contraste */
+      color: #FFF8EC;
+      text-shadow:
+        0 0 2px rgba(94, 73, 120, 0.85),
+        0 0 8px rgba(94, 73, 120, 0.6),
+        0 0 18px rgba(94, 73, 120, 0.4),
+        0 0 28px rgba(197, 181, 220, 0.3);
       opacity: 0;
       transform: translateY(22px);
       filter: blur(6px);
