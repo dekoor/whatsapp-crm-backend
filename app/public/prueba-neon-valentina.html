@@ -2355,6 +2355,150 @@
     .rsvp.is-visible .rsvp__closing  { transition-delay: 0.6s; }
 
     /* ============================================================
+       OUTRO · Cierre cinematografico (bookend de la portada)
+       Foto full-bleed + overlay + vignette + frase en brush con
+       glow + signature minimalista. Mismo lenguaje que la portada
+       para sentir apertura/cierre simetrico.
+       ============================================================ */
+    .outro {
+      position: relative;
+      width: 100%;
+      min-height: 100dvh;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    /* Foto de fondo — editable via [data-editable] para panear el crop */
+    .outro__bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 50% 50%;
+      z-index: 0;
+      /* Micro-zoom cinematografico identico al de la portada */
+      animation: outroKenBurns 28s ease-in-out infinite alternate;
+    }
+    @keyframes outroKenBurns {
+      0%   { transform: scale(1.0); }
+      100% { transform: scale(1.06); }
+    }
+
+    /* Overlay degradado — oscurece arriba sutil + abajo fuerte para leer */
+    .outro__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(10, 6, 18, 0.42) 0%,
+        rgba(10, 6, 18, 0.08) 30%,
+        rgba(10, 6, 18, 0.55) 70%,
+        rgba(10, 6, 18, 0.95) 100%
+      );
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Vignette radial — cierra los bordes */
+    .outro__vignette {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 50% 35%, transparent 35%, rgba(10, 6, 18, 0.65) 100%);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* Contenido — frase abajo-centro como en la portada */
+    .outro__content {
+      position: relative;
+      z-index: 3;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 2rem 1.5rem 3.5rem;
+      text-align: center;
+    }
+
+    /* Frase principal en brush con glow capa-a-capa (mismo tratamiento que el nombre) */
+    .outro__phrase {
+      font-family: var(--font-brush);
+      font-weight: 400;
+      font-size: clamp(2.4rem, 13cqw, 3.6rem);
+      line-height: 1.02;
+      color: var(--blanco-glow);
+      margin: 0 0 1.5rem;
+      letter-spacing: 0.01em;
+      text-shadow:
+        0 0 8px rgba(255, 255, 255, 0.55),
+        0 0 22px rgba(255, 122, 224, 0.55),
+        0 0 44px rgba(255, 43, 214, 0.42),
+        0 0 80px rgba(138, 43, 255, 0.32);
+      max-width: 26rem;
+      /* Reveal */
+      opacity: 0;
+      transform: translateY(20px);
+      filter: blur(8px);
+      transition:
+        opacity 1.2s var(--ease-soft),
+        transform 1.2s var(--ease-soft),
+        filter 1.2s var(--ease-soft);
+    }
+
+    /* Signature minimalista — pequena, dos hairlines + nombre tracked */
+    .outro__signature {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.85rem;
+      opacity: 0;
+      transform: translateY(14px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+    .outro__signature-line {
+      width: 30px;
+      height: 1px;
+      background: linear-gradient(
+        to right,
+        transparent,
+        rgba(255, 122, 224, 0.65),
+        transparent
+      );
+    }
+    .outro__signature-name {
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-size: 0.68rem;
+      letter-spacing: 0.55em;
+      padding-left: 0.55em;
+      text-transform: uppercase;
+      color: var(--blanco-soft);
+      text-shadow:
+        0 0 10px rgba(255, 43, 214, 0.45),
+        0 0 20px rgba(255, 43, 214, 0.22);
+    }
+
+    /* Reveal stagger */
+    .outro.is-visible .outro__phrase {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+      transition-delay: 0.15s;
+    }
+    .outro.is-visible .outro__signature {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+      transition-delay: 0.5s;
+    }
+
+    /* ============================================================
        DESKTOP MOCKUP — desde 768px renderiza la portada dentro de
        un marco tipo iPhone (390x844) centrado en pantalla.
        Mobile real sigue intacto (fullscreen).
@@ -2898,6 +3042,43 @@
     <!-- Cierre cinematografico — italica brush -->
     <p class="rsvp__closing">Nos vemos en la noche m&aacute;s esperada</p>
   </section>
+
+  <!-- =========================================================
+       OUTRO · Cierre cinematografico (bookend de la portada)
+       Foto full-bleed + overlay + vignette + frase en brush con
+       glow + signature minimalista. La foto es editable: el
+       editor puede panear el recuadro (object-position) para
+       recomponer el encuadre.
+       ========================================================= -->
+  <section class="outro" id="outro" aria-label="Cierre — Hoy escribo mi propia historia">
+    <!-- Foto de fondo full-bleed -->
+    <img
+      class="outro__bg"
+      src="assets/prueba%20neon/outro-valentina.png"
+      alt=""
+      loading="lazy"
+      decoding="async"
+      data-editable
+    />
+
+    <!-- Overlay + vignette para legibilidad -->
+    <div class="outro__overlay" aria-hidden="true"></div>
+    <div class="outro__vignette" aria-hidden="true"></div>
+
+    <!-- Contenido centrado abajo -->
+    <div class="outro__content">
+      <p class="outro__phrase" data-editable>
+        Hoy escribo<br/>mi propia historia
+      </p>
+
+      <!-- Signature: dos hairlines + nombre tracked -->
+      <div class="outro__signature" aria-hidden="true">
+        <span class="outro__signature-line"></span>
+        <span class="outro__signature-name">Valentina</span>
+        <span class="outro__signature-line"></span>
+      </div>
+    </div>
+  </section>
   </div><!-- /.phone -->
 
   <script>
@@ -2975,6 +3156,7 @@
         document.getElementById('dresscode'),
         document.getElementById('instagram'),
         document.getElementById('rsvp'),
+        document.getElementById('outro'),
       ].filter(Boolean);
 
       if (revealTargets.length && 'IntersectionObserver' in window) {
