@@ -9,5 +9,16 @@
     "thumb": "templates/valentina-xv/assets/portada-neon-valentina.png",
     "url": "templates/valentina-xv/",
     "creada": "2026-05-21"
+  },
+  {
+    "id": "valeria-xv",
+    "nombre": "Valeria",
+    "evento": "XV años",
+    "fecha": "2025-08-24",
+    "estilo": "romántico floral lavanda",
+    "estado": "en-progreso",
+    "thumb": "templates/valeria-xv/assets/thumb.png",
+    "url": "templates/valeria-xv/",
+    "creada": "2026-05-22"
   }
 ]
