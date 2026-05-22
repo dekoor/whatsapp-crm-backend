@@ -31,6 +31,11 @@
   <link rel="stylesheet" href="../../assets/customizer/customizer.css" />
   <script src="../../assets/customizer/customizer.js" defer></script>
 
+  <!-- Musica de fondo (YouTube oculto). El boton flotante esta antes
+       del </body>. Cambiar data-video-id para cambiar la cancion. -->
+  <link rel="stylesheet" href="../../assets/music/music.css" />
+  <script src="../../assets/music/music.js" defer></script>
+
   <style>
     /* ============================================================
        VARIABLES — paleta neon luxury urbano
@@ -3446,8 +3451,53 @@
             }
           }
         ]
+      },
+
+      {
+        label: 'Música de fondo',
+        fields: [
+          {
+            key: 'music.videoId',
+            label: 'Canción (ID de YouTube)',
+            type: 'text',
+            selector: '.music-toggle',
+            attribute: 'data-video-id',
+            placeholder: '6Yq_YFDL-jQ',
+            hint: 'Copia el URL del video de YouTube. El ID es lo que va después de "v=". Recarga la página para que tome el cambio.'
+          }
+        ]
       }
     ];
   </script>
+
+  <!-- ============================================================
+       MUSICA DE FONDO
+       Iframe oculto + boton flotante (esquina superior derecha).
+       Para cambiar la cancion: edita data-video-id con el ID del
+       video de YouTube (la parte despues de "v=" en el URL).
+       Default: placeholder generico — el customizer permite cambiarlo
+       sin tocar HTML.
+       ============================================================ -->
+  <div class="yt-host" aria-hidden="true">
+    <div id="yt-player"></div>
+  </div>
+  <button
+    class="music-toggle"
+    type="button"
+    aria-label="Reproducir música"
+    data-state="off"
+    data-video-id="6Yq_YFDL-jQ"
+  >
+    <!-- Icono mute (estado off) -->
+    <svg class="music-toggle__icon music-toggle__icon--off" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 00-2.5-4.03v8.06A4.5 4.5 0 0016.5 12z"/>
+      <line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+    <!-- Icono volumen (estado on) -->
+    <svg class="music-toggle__icon music-toggle__icon--on" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 00-2.5-4.03v8.06A4.5 4.5 0 0016.5 12zM14 3.23v2.06a7 7 0 010 13.42v2.06a9 9 0 000-17.54z"/>
+    </svg>
+    <span class="music-toggle__pulse" aria-hidden="true"></span>
+  </button>
 </body>
 </html>
