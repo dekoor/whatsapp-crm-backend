@@ -49,6 +49,117 @@
     );
   }
 
+  // ----- PERSISTENCIA EN LOCALSTORAGE -----
+  // Clave por pathname para que cada plantilla tenga su propio store.
+  // El estado guardado se aplica al cargar la pagina (hydrateFromStore),
+  // y se actualiza en cada commit despues de un drag/resize/pan.
+  var STORE_KEY = 'editor:state:' + location.pathname;
+
+  function readStore() {
+    try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }
+    catch (e) { return {}; }
+  }
+  function writeStore(store) {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); }
+    catch (e) { /* sin localStorage, modo privado, o quota llena */ }
+  }
+  // Clave estable por elemento. Si la plantilla pone data-edit-id, lo
+  // respetamos. Si no, generamos uno a partir de tag + clases + indice
+  // dentro de la lista de [data-editable]. Mientras el markup no cambie
+  // de orden ni de clases, las posiciones se reaplican correctamente.
+  function makeKey(el, index) {
+    if (el.dataset.editId) return el.dataset.editId;
+    var cls = (el.className || '').toString().split(/\s+/).filter(Boolean).join('.');
+    return [el.tagName.toLowerCase(), cls, String(index)].filter(Boolean).join(':');
+  }
+  function indexOfEditable(el, list) {
+    list = list || collectEditables();
+    for (var i = 0; i < list.length; i++) if (list[i] === el) return i;
+    return -1;
+  }
+
+  // Aplica state guardado a CADA editable al cargar la pagina.
+  // Funciona sin que el editor este activo: solo escribe CSS vars +
+  // data-attrs, asi los edits son visibles inmediatamente.
+  function hydrateFromStore() {
+    var store = readStore();
+    var keys = Object.keys(store);
+    if (!keys.length) return;
+    var all = collectEditables();
+    for (var i = 0; i < all.length; i++) {
+      var el = all[i];
+      var saved = store[makeKey(el, i)];
+      if (!saved) continue;
+      if (el.tagName === 'IMG') {
+        if (saved.objX != null) {
+          el.style.setProperty('--editor-obj-x', saved.objX + '%');
+          el.dataset.editorObjX = saved.objX;
+        }
+        if (saved.objY != null) {
+          el.style.setProperty('--editor-obj-y', saved.objY + '%');
+          el.dataset.editorObjY = saved.objY;
+        }
+      } else {
+        if (saved.x != null) {
+          el.style.setProperty('--editor-x', saved.x + 'px');
+          el.dataset.editorX = saved.x;
+        }
+        if (saved.y != null) {
+          el.style.setProperty('--editor-y', saved.y + 'px');
+          el.dataset.editorY = saved.y;
+        }
+        if (saved.scale != null) {
+          el.style.setProperty('--editor-scale', saved.scale);
+          el.dataset.editorScale = saved.scale;
+        }
+      }
+    }
+  }
+
+  // Llamado desde persist* despues de cada edit. Guarda solo el estado
+  // del elemento que cambio para minimizar escrituras.
+  function commit(el, state) {
+    var list = collectEditables();
+    var idx = indexOfEditable(el, list);
+    if (idx === -1) return;
+    var store = readStore();
+    var key   = makeKey(el, idx);
+    if (el.tagName === 'IMG') {
+      store[key] = { objX: state.objX, objY: state.objY };
+    } else {
+      store[key] = { x: state.x, y: state.y, scale: state.scale };
+    }
+    writeStore(store);
+  }
+
+  // Hidratacion al cargar — antes de cualquier otra cosa
+  hydrateFromStore();
+
+  // Borra el store y limpia las CSS vars + data-attrs de cada editable.
+  // Llamado desde el boton Reset del editor.
+  function resetAllState() {
+    try { localStorage.removeItem(STORE_KEY); } catch (e) {}
+    var all = collectEditables();
+    var vars = ['--editor-x','--editor-y','--editor-scale','--editor-obj-x','--editor-obj-y'];
+    var attrs = ['editorX','editorY','editorScale','editorObjX','editorObjY'];
+    for (var i = 0; i < all.length; i++) {
+      var el = all[i];
+      vars.forEach(function (v) { el.style.removeProperty(v); });
+      attrs.forEach(function (a) { delete el.dataset[a]; });
+      // Actualiza el state en memoria del elemento si esta vivo
+      if (el._editorState) {
+        if (el.tagName === 'IMG') {
+          el._editorState.objX = 50;
+          el._editorState.objY = 50;
+        } else {
+          el._editorState.x = 0;
+          el._editorState.y = 0;
+          el._editorState.scale = 1;
+        }
+      }
+    }
+  }
+
   buildTapsIndicator();
 
   // ----- DETECCION DE 5 TAPS -----
@@ -210,6 +321,18 @@
     label.className = 'editor-bar__label';
     label.textContent = 'Editor';
 
+    // Boton Reset: limpia el state guardado y devuelve los editables a
+    // sus posiciones originales del diseno. Pide confirmacion antes.
+    var reset = document.createElement('button');
+    reset.type = 'button';
+    reset.className = 'editor-bar__reset';
+    reset.setAttribute('aria-label', 'Restablecer cambios');
+    reset.textContent = 'Reset';
+    reset.addEventListener('click', function () {
+      if (!confirm('Borrar todos los cambios guardados de esta plantilla?')) return;
+      resetAllState();
+    });
+
     var exit = document.createElement('button');
     exit.type = 'button';
     exit.className = 'editor-bar__exit';
@@ -218,6 +341,7 @@
     exit.addEventListener('click', disableEditor);
 
     bar.appendChild(label);
+    bar.appendChild(reset);
     bar.appendChild(exit);
 
     var guide = document.createElement('div');
@@ -298,6 +422,7 @@
   function persistImageState(el, state) {
     el.dataset.editorObjX = state.objX;
     el.dataset.editorObjY = state.objY;
+    commit(el, state);
   }
 
   // Para un <img> con object-fit: cover, calcula cuanto sobresale (en px)
@@ -452,5 +577,6 @@
     el.dataset.editorX     = state.x;
     el.dataset.editorY     = state.y;
     el.dataset.editorScale = state.scale;
+    commit(el, state);
   }
 })();
