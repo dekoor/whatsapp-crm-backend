@@ -21,7 +21,14 @@
   font-size: 0.78rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--blanco-glow, #fff);
+  /* FAB flotante: el texto siempre va crema/blanco con halo plum
+     porque vive sobre cualquier zona (foto, overlay oscuro, seccion
+     clara). No hereda el --blanco-glow del template porque ese se
+     redefine como texto-sobre-fondo-claro en temas light. */
+  color: #FFF8EC;
+  text-shadow:
+    0 0 2px rgba(0, 0, 0, 0.45),
+    0 0 8px rgba(0, 0, 0, 0.25);
   /* Tinte glass + degradado discreto en la paleta del template */
   background:
     linear-gradient(135deg, rgba(var(--rosa-neon-rgb, 255, 43, 214), 0.14) 0%, rgba(var(--morado-uv-rgb, 138, 43, 255), 0.12) 100%);
