@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0612" />
+  <title>Plantillas · Invitaciones digitales</title>
+  <meta name="description" content="Catálogo de plantillas premium de invitaciones digitales." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Italianno&family=Outfit:wght@200;300;400;500&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    /* Mismo lenguaje visual que las plantillas: dark + neon */
+    :root {
+      --rosa-neon:      #ff2bd6;
+      --rosa-neon-soft: #ff7ae0;
+      --morado-uv:      #8a2bff;
+      --morado-deep:    #4a0e7a;
+      --blanco-glow:    #ffffff;
+      --blanco-soft:    #f1e8ff;
+      --negro-carbon:   #0a0612;
+      --cyan-accent:    #6bf0ff;
+      --font-brush:     'Italianno', cursive;
+      --font-ui:        'Outfit', system-ui, sans-serif;
+      --ease-soft:      cubic-bezier(.2, .7, .2, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body { margin: 0; padding: 0; }
+
+    body {
+      min-height: 100dvh;
+      font-family: var(--font-ui);
+      color: var(--blanco-soft);
+      background:
+        radial-gradient(ellipse at 22% 18%, rgba(255, 43, 214, 0.18) 0%, transparent 55%),
+        radial-gradient(ellipse at 82% 78%, rgba(138, 43, 255, 0.22) 0%, transparent 55%),
+        linear-gradient(180deg, #06030c 0%, var(--negro-carbon) 50%, #06030c 100%);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3.2rem 1.3rem 4rem;
+    }
+
+    /* Header */
+    .head {
+      text-align: center;
+      margin: 0 0 3rem;
+    }
+    .head__eyebrow {
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-size: 0.78rem;
+      letter-spacing: 0.55em;
+      padding-left: 0.55em;
+      text-transform: uppercase;
+      color: var(--blanco-soft);
+      text-shadow:
+        0 0 10px rgba(255, 43, 214, 0.45),
+        0 0 20px rgba(255, 43, 214, 0.22);
+      margin: 0 0 0.6rem;
+    }
+    .head__title {
+      font-family: var(--font-brush);
+      font-weight: 400;
+      font-size: clamp(2.8rem, 8vw, 4.2rem);
+      line-height: 1;
+      margin: 0 0 0.6rem;
+      color: var(--blanco-glow);
+      letter-spacing: 0.01em;
+      text-shadow:
+        0 0 8px rgba(255, 255, 255, 0.5),
+        0 0 22px rgba(255, 122, 224, 0.55),
+        0 0 44px rgba(255, 43, 214, 0.35),
+        0 0 80px rgba(138, 43, 255, 0.25);
+    }
+    .head__sub {
+      font-family: var(--font-ui);
+      font-weight: 200;
+      font-style: italic;
+      font-size: 1rem;
+      color: var(--blanco-soft);
+      opacity: 0.85;
+      margin: 0;
+    }
+
+    /* Grid de cards */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.4rem;
+    }
+
+    /* Card */
+    .card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 43, 214, 0.22);
+      border-radius: 22px;
+      overflow: hidden;
+      -webkit-backdrop-filter: blur(14px) saturate(140%);
+      backdrop-filter: blur(14px) saturate(140%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+        0 8px 28px rgba(0, 0, 0, 0.4),
+        0 0 18px rgba(255, 43, 214, 0.14);
+      text-decoration: none;
+      color: inherit;
+      transition:
+        transform .35s var(--ease-soft),
+        border-color .35s ease,
+        box-shadow .35s ease;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: cardIn .9s var(--ease-soft) forwards;
+    }
+    @keyframes cardIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .card:hover,
+    .card:focus-visible {
+      transform: translateY(-4px);
+      border-color: rgba(255, 122, 224, 0.5);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+        0 14px 36px rgba(0, 0, 0, 0.5),
+        0 0 30px rgba(255, 43, 214, 0.32),
+        0 0 56px rgba(138, 43, 255, 0.2);
+      outline: none;
+    }
+
+    .card__thumb {
+      position: relative;
+      aspect-ratio: 3 / 4;
+      overflow: hidden;
+      background: #14091f;
+    }
+    .card__thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform .9s var(--ease-soft);
+    }
+    .card:hover .card__thumb img { transform: scale(1.04); }
+
+    /* Overlay de degradado abajo del thumb */
+    .card__thumb::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        transparent 30%,
+        rgba(10, 6, 18, 0.85) 100%
+      );
+      pointer-events: none;
+    }
+
+    /* Estado pill — esquina superior derecha */
+    .card__status {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 2;
+      padding: 0.3rem 0.7rem;
+      font-family: var(--font-ui);
+      font-weight: 400;
+      font-size: 0.6rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--blanco-glow);
+      background: rgba(10, 6, 18, 0.7);
+      border: 1px solid rgba(255, 43, 214, 0.5);
+      border-radius: 999px;
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+    }
+    .card__status[data-estado="listo"] {
+      border-color: rgba(107, 240, 255, 0.6);
+      color: var(--cyan-accent);
+    }
+    .card__status[data-estado="archivado"] {
+      border-color: rgba(138, 43, 255, 0.5);
+      color: var(--blanco-soft);
+      opacity: 0.7;
+    }
+
+    .card__body {
+      padding: 1.1rem 1.2rem 1.3rem;
+    }
+    .card__name {
+      font-family: var(--font-brush);
+      font-weight: 400;
+      font-size: 2rem;
+      line-height: 1;
+      margin: 0 0 0.25rem;
+      color: var(--blanco-glow);
+      text-shadow:
+        0 0 8px rgba(255, 255, 255, 0.4),
+        0 0 18px rgba(255, 122, 224, 0.35);
+    }
+    .card__event {
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-style: italic;
+      font-size: 0.85rem;
+      color: var(--blanco-soft);
+      opacity: 0.75;
+      margin: 0 0 0.85rem;
+    }
+
+    .card__meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.7rem;
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-size: 0.7rem;
+      letter-spacing: 0.05em;
+      color: var(--blanco-soft);
+      opacity: 0.7;
+    }
+    .card__date {
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    .card__style {
+      font-style: italic;
+      text-align: right;
+      flex: 1 1 auto;
+    }
+
+    /* Empty state */
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem 1rem;
+      font-family: var(--font-ui);
+      font-weight: 200;
+      font-style: italic;
+      font-size: 0.95rem;
+      color: var(--blanco-soft);
+      opacity: 0.6;
+    }
+
+    @media (min-width: 768px) {
+      .wrap { padding: 4.5rem 2rem 5rem; }
+      .grid { gap: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="head">
+      <p class="head__eyebrow">Mis plantillas</p>
+      <h1 class="head__title">Invitaciones</h1>
+      <p class="head__sub">Premium &middot; Editorial &middot; Personalizables</p>
+    </header>
+
+    <main class="grid" id="grid" aria-label="Listado de plantillas">
+      <div class="empty">Cargando&hellip;</div>
+    </main>
+  </div>
+
+  <script>
+    /* Lee templates.json, renderiza un card por plantilla.
+       Cada card es un <a> que abre la URL relativa de la plantilla. */
+    (function () {
+      var grid = document.getElementById('grid');
+
+      fetch('templates.json', { cache: 'no-cache' })
+        .then(function (r) { return r.json(); })
+        .then(function (items) {
+          if (!items || !items.length) {
+            grid.innerHTML = '<div class="empty">A&uacute;n no hay plantillas registradas.</div>';
+            return;
+          }
+
+          grid.innerHTML = '';
+          items.forEach(function (t, i) {
+            var a = document.createElement('a');
+            a.className = 'card';
+            a.href = t.url;
+            a.setAttribute('aria-label', t.nombre + ' — ' + t.evento);
+            a.style.animationDelay = (i * 0.08) + 's';
+
+            var thumb = document.createElement('div');
+            thumb.className = 'card__thumb';
+            if (t.thumb) {
+              var img = document.createElement('img');
+              img.src = t.thumb;
+              img.alt = '';
+              img.loading = 'lazy';
+              img.decoding = 'async';
+              thumb.appendChild(img);
+            }
+            if (t.estado) {
+              var status = document.createElement('span');
+              status.className = 'card__status';
+              status.setAttribute('data-estado', t.estado);
+              status.textContent = t.estado.replace('-', ' ');
+              thumb.appendChild(status);
+            }
+            a.appendChild(thumb);
+
+            var body = document.createElement('div');
+            body.className = 'card__body';
+
+            var name = document.createElement('h2');
+            name.className = 'card__name';
+            name.textContent = t.nombre;
+            body.appendChild(name);
+
+            if (t.evento) {
+              var ev = document.createElement('p');
+              ev.className = 'card__event';
+              ev.textContent = t.evento;
+              body.appendChild(ev);
+            }
+
+            var meta = document.createElement('div');
+            meta.className = 'card__meta';
+            if (t.fecha) {
+              var d = document.createElement('span');
+              d.className = 'card__date';
+              d.textContent = formatDate(t.fecha);
+              meta.appendChild(d);
+            }
+            if (t.estilo) {
+              var s = document.createElement('span');
+              s.className = 'card__style';
+              s.textContent = t.estilo;
+              meta.appendChild(s);
+            }
+            body.appendChild(meta);
+
+            a.appendChild(body);
+            grid.appendChild(a);
+          });
+        })
+        .catch(function () {
+          grid.innerHTML = '<div class="empty">No se pudo cargar el cat&aacute;logo.</div>';
+        });
+
+      function formatDate(iso) {
+        // iso: YYYY-MM-DD
+        var p = (iso || '').split('-');
+        if (p.length !== 3) return iso;
+        var meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+        return parseInt(p[2], 10) + ' ' + meses[parseInt(p[1], 10) - 1] + ' ' + p[0];
+      }
+    })();
+  </script>
+</body>
+</html>
