@@ -898,7 +898,8 @@
     .gallery__grid {
       display: grid;
       grid-template-columns: 1.25fr 1fr;
-      grid-template-rows: 1fr 1fr 0.85fr;
+      /* Filas 1 y 2 con altura fija; fila 3 (p4) auto via aspect-ratio 1:1 */
+      grid-template-rows: 140px 140px auto;
       grid-template-areas:
         "p1 p2"
         "p1 p3"
@@ -906,9 +907,13 @@
       gap: 8px;
       width: 100%;
       max-width: 340px;
-      height: 400px;            /* altura total fija — proporciones predecibles */
+      height: auto;
       position: relative;
       z-index: 2;
+    }
+    /* p4 (close-up de rostro) ocupa toda la fila como cuadrado 1:1 */
+    .gallery__item--p4 {
+      aspect-ratio: 1 / 1;
     }
 
     /* Item de la galeria — wrapper con bordes redondeados + glow */
