@@ -26,6 +26,11 @@
   <link rel="stylesheet" href="assets/editor/editor.css" />
   <script src="assets/editor/editor.js" defer></script>
 
+  <!-- Customizer compartido (formulario para datos personales).
+       La config se declara mas abajo en window.CustomizerConfig. -->
+  <link rel="stylesheet" href="assets/customizer/customizer.css" />
+  <script src="assets/customizer/customizer.js" defer></script>
+
   <style>
     /* ============================================================
        VARIABLES — paleta neon luxury urbano
@@ -2689,7 +2694,7 @@
           </span>
           <div class="venue__col">
             <span class="venue__caption">Fecha</span>
-            <span class="venue__value">15 Junio 2026</span>
+            <span class="venue__value" data-field="venue.date">15 Junio 2026</span>
           </div>
         </div>
 
@@ -2705,7 +2710,7 @@
           </span>
           <div class="venue__col">
             <span class="venue__caption">Hora</span>
-            <span class="venue__value">7:00 PM</span>
+            <span class="venue__value" data-field="venue.time">7:00 PM</span>
           </div>
         </div>
       </div>
@@ -3220,6 +3225,202 @@
     })();
 
     /* Editor compartido: logica en assets/editor/editor.js */
+  </script>
+
+  <!-- ============================================================
+       CUSTOMIZER CONFIG — campos editables desde el FAB
+       "Personalizar mi invitacion". Cada field mapea a un punto
+       del DOM. Apply/read personalizados para casos no triviales
+       (nombre con data-text, numero de WhatsApp que vive en 2
+       URLs, frase de cierre con <br>).
+       ============================================================ -->
+  <script>
+    window.CustomizerConfig = [
+      {
+        label: 'Datos principales',
+        fields: [
+          {
+            key: 'hero.subtitle',
+            label: 'Subíndice (Mis XV)',
+            type: 'text',
+            selector: '.portada__sub',
+            placeholder: 'Mis XV'
+          },
+          {
+            key: 'hero.name',
+            label: 'Nombre principal',
+            type: 'text',
+            placeholder: 'Valentina',
+            hint: 'Aparece como título gigante en la portada y se replica en el shimmer.',
+            apply: function (value) {
+              var el = document.querySelector('.portada__nombre');
+              if (!el) return;
+              el.textContent = value;
+              el.setAttribute('data-text', value);
+            },
+            read: function () {
+              var el = document.querySelector('.portada__nombre');
+              return el ? (el.textContent || '').trim() : '';
+            }
+          },
+          {
+            key: 'hero.date',
+            label: 'Fecha (portada)',
+            type: 'text',
+            selector: '.portada__fecha span',
+            placeholder: '15 Junio 2026'
+          }
+        ]
+      },
+
+      {
+        label: 'Lugar y hora',
+        fields: [
+          {
+            key: 'venue.date',
+            label: 'Fecha del evento',
+            type: 'text',
+            placeholder: '15 Junio 2026'
+          },
+          {
+            key: 'venue.time',
+            label: 'Hora',
+            type: 'text',
+            placeholder: '7:00 PM'
+          },
+          {
+            key: 'venue.name',
+            label: 'Nombre del lugar',
+            type: 'text',
+            selector: '.venue__value--name',
+            placeholder: 'Salón Urbano 360'
+          },
+          {
+            key: 'venue.address',
+            label: 'Dirección',
+            type: 'text',
+            selector: '.venue__address',
+            placeholder: 'Av. Revolución 1234, Monterrey, N.L.'
+          },
+          {
+            key: 'venue.maps',
+            label: 'Link de Google Maps',
+            type: 'url',
+            selector: '.venue__cta',
+            attribute: 'href',
+            placeholder: 'https://maps.google.com/?q=...',
+            hint: 'Pega aquí el link de Google Maps del lugar.'
+          }
+        ]
+      },
+
+      {
+        label: 'Instagram',
+        fields: [
+          {
+            key: 'ig.hashtag',
+            label: 'Hashtag',
+            type: 'text',
+            selector: '.instagram__hashtag',
+            placeholder: '#ValentinaXV',
+            hint: 'Incluí el "#" al inicio.'
+          },
+          {
+            key: 'ig.handle',
+            label: '@usuario',
+            type: 'text',
+            selector: '.instagram__handle',
+            placeholder: '@valentina.xv'
+          },
+          {
+            key: 'ig.url',
+            label: 'URL del perfil',
+            type: 'url',
+            selector: '#instagram-open',
+            attribute: 'href',
+            placeholder: 'https://www.instagram.com/valentina.xv/'
+          }
+        ]
+      },
+
+      {
+        label: 'Confirmación (RSVP)',
+        fields: [
+          {
+            key: 'rsvp.contact',
+            label: 'Contacto (nombre de la familia)',
+            type: 'text',
+            selector: '.rsvp__contact',
+            placeholder: 'Familia López'
+          },
+          {
+            key: 'rsvp.deadline',
+            label: 'Fecha límite (cierre)',
+            type: 'text',
+            selector: '.rsvp__deadline strong',
+            placeholder: '8 de Junio'
+          },
+          {
+            key: 'rsvp.phone',
+            label: 'WhatsApp (lada + 10 dígitos, sin "+")',
+            type: 'tel',
+            placeholder: '5216182297167',
+            hint: 'México celular: "521" + 10 dígitos. Actualiza los 2 botones del RSVP.',
+            apply: function (value) {
+              ['rsvp-yes', 'rsvp-no'].forEach(function (id) {
+                var a = document.getElementById(id);
+                if (!a) return;
+                try {
+                  var u = new URL(a.href);
+                  a.href = 'https://wa.me/' + value + u.search;
+                } catch (e) { /* href no parseable */ }
+              });
+            },
+            read: function () {
+              var a = document.getElementById('rsvp-yes');
+              if (!a) return '';
+              var m = a.href.match(/wa\.me\/(\d+)/);
+              return m ? m[1] : '';
+            }
+          }
+        ]
+      },
+
+      {
+        label: 'Cierre',
+        fields: [
+          {
+            key: 'outro.phrase',
+            label: 'Frase de cierre',
+            type: 'textarea',
+            placeholder: 'Hoy escribo\nmi propia historia',
+            hint: 'Enter para salto de línea.',
+            apply: function (value) {
+              var el = document.querySelector('.outro__phrase');
+              if (!el) return;
+              // Escape basico + convierte \n a <br>
+              var html = value
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/\n/g, '<br/>');
+              el.innerHTML = html;
+            },
+            read: function () {
+              var el = document.querySelector('.outro__phrase');
+              if (!el) return '';
+              return (el.innerHTML || '')
+                .replace(/<br\s*\/?>/gi, '\n')
+                .replace(/<[^>]+>/g, '')
+                .replace(/&amp;/g, '&')
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>')
+                .trim();
+            }
+          }
+        ]
+      }
+    ];
   </script>
 </body>
 </html>
