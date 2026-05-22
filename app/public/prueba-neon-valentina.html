@@ -1720,6 +1720,308 @@
     .dresscode.is-visible .dresscode__tip                { transition-delay: 0.88s; }
 
     /* ============================================================
+       INSTAGRAM · Hashtag para etiquetar momentos en IG
+       Estructura: label + intro + hashtag con shimmer + card glass
+       con logo IG / handle / CTA + boton "copiar #" + micro-toast.
+       Para reutilizar el hashtag, JS lee el textContent del <h2>.
+       ============================================================ */
+    .instagram {
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2.4rem 1.5rem 3.4rem;
+      text-align: center;
+      /* Glows asimetricos para variar ritmo respecto a dresscode */
+      background:
+        radial-gradient(ellipse at 22% 28%, rgba(255, 43, 214, 0.20) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 75%, rgba(138, 43, 255, 0.20) 0%, transparent 55%),
+        radial-gradient(ellipse at 50% 50%, rgba(107, 240, 255, 0.05) 0%, transparent 60%),
+        linear-gradient(180deg, var(--negro-carbon) 0%, #0c0815 50%, var(--negro-carbon) 100%);
+      isolation: isolate;
+      overflow: hidden;
+    }
+
+    /* Label "INSTAGRAM" — mismo tratamiento */
+    .instagram__label {
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-size: 0.78rem;
+      letter-spacing: 0.55em;
+      padding-left: 0.55em;
+      text-transform: uppercase;
+      color: var(--blanco-soft);
+      text-shadow:
+        0 0 10px rgba(255, 43, 214, 0.45),
+        0 0 20px rgba(255, 43, 214, 0.22);
+      margin: 0 0 0.7rem;
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+      transform: translateY(20px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+
+    /* Subtitulo italica */
+    .instagram__intro {
+      font-family: var(--font-ui);
+      font-weight: 200;
+      font-style: italic;
+      font-size: 0.92rem;
+      letter-spacing: 0.04em;
+      color: var(--blanco-soft);
+      text-shadow:
+        0 0 10px rgba(255, 122, 224, 0.32),
+        0 0 22px rgba(138, 43, 255, 0.18);
+      margin: 0 0 1.6rem;
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+      transform: translateY(18px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+
+    /* Hashtag grande con shimmer (mismo tratamiento que el nombre) */
+    .instagram__hashtag {
+      position: relative;
+      z-index: 2;
+      font-family: var(--font-ui);
+      font-weight: 500;
+      font-size: clamp(2rem, 11cqw, 2.8rem);
+      letter-spacing: 0.005em;
+      color: var(--blanco-glow);
+      margin: 0.4rem 0 1.6rem;
+      text-shadow:
+        0 0 8px rgba(255, 255, 255, 0.45),
+        0 0 18px rgba(255, 122, 224, 0.5),
+        0 0 36px rgba(255, 43, 214, 0.4),
+        0 0 64px rgba(138, 43, 255, 0.28);
+      /* Shimmer pasando por encima del texto */
+      background: linear-gradient(
+        110deg,
+        rgba(255, 255, 255, 0) 35%,
+        rgba(255, 255, 255, 0.85) 50%,
+        rgba(255, 255, 255, 0) 65%
+      );
+      background-size: 220% 100%;
+      background-position: -120% 0;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: var(--blanco-glow);
+      animation: hashtagShimmer 5.5s ease-in-out infinite 2s;
+      /* Reveal */
+      opacity: 0;
+      transform: translateY(18px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+    @keyframes hashtagShimmer {
+      0%, 100% { background-position: -120% 0; }
+      50%      { background-position: 220% 0; }
+    }
+
+    /* Card glass con logo + handle + CTAs */
+    .instagram__card {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 340px;
+      padding: 1.5rem 1.3rem 1.6rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 43, 214, 0.22);
+      border-radius: 22px;
+      -webkit-backdrop-filter: blur(14px) saturate(140%);
+      backdrop-filter: blur(14px) saturate(140%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+        0 8px 24px rgba(0, 0, 0, 0.3),
+        0 0 18px rgba(255, 43, 214, 0.14);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.85rem;
+      opacity: 0;
+      transform: translateY(28px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+
+    /* Logo IG dentro de un holder glass tipo "app icon" */
+    .instagram__logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      box-shadow:
+        0 0 16px rgba(255, 43, 214, 0.35),
+        0 0 32px rgba(138, 43, 255, 0.22),
+        0 6px 16px rgba(0, 0, 0, 0.4);
+      display: block;
+    }
+
+    /* @handle en italica delicada */
+    .instagram__handle {
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-style: italic;
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+      color: var(--blanco-glow);
+      text-shadow:
+        0 0 8px rgba(255, 255, 255, 0.25),
+        0 0 18px rgba(255, 122, 224, 0.3);
+    }
+
+    /* Row de acciones */
+    .instagram__actions {
+      display: flex;
+      gap: 0.7rem;
+      width: 100%;
+      margin-top: 0.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Boton primario glass — abre IG */
+    .instagram__cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.7rem 1.15rem;
+      font-family: var(--font-ui);
+      font-weight: 400;
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--blanco-glow);
+      text-decoration: none;
+      background: rgba(255, 43, 214, 0.12);
+      border: 1px solid rgba(255, 43, 214, 0.55);
+      border-radius: 999px;
+      -webkit-backdrop-filter: blur(10px) saturate(140%);
+      backdrop-filter: blur(10px) saturate(140%);
+      box-shadow:
+        0 0 16px rgba(255, 43, 214, 0.3),
+        0 4px 14px rgba(0, 0, 0, 0.35);
+      cursor: pointer;
+      transition:
+        background .3s ease,
+        border-color .3s ease,
+        box-shadow .3s ease,
+        transform .3s var(--ease-soft);
+    }
+    .instagram__cta:hover,
+    .instagram__cta:focus-visible {
+      background: rgba(255, 43, 214, 0.22);
+      border-color: rgba(255, 122, 224, 0.85);
+      box-shadow:
+        0 0 22px rgba(255, 43, 214, 0.55),
+        0 0 44px rgba(138, 43, 255, 0.3),
+        0 6px 18px rgba(0, 0, 0, 0.45);
+      transform: translateY(-1px);
+      outline: none;
+    }
+    .instagram__cta:active { transform: translateY(0); }
+
+    /* Boton secundario — copiar hashtag */
+    .instagram__copy {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.7rem 1.15rem;
+      font-family: var(--font-ui);
+      font-weight: 400;
+      font-size: 0.74rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--blanco-soft);
+      background: transparent;
+      border: 1px solid rgba(138, 43, 255, 0.45);
+      border-radius: 999px;
+      cursor: pointer;
+      transition:
+        background .3s ease,
+        border-color .3s ease,
+        color .3s ease,
+        box-shadow .3s ease,
+        transform .3s var(--ease-soft);
+    }
+    .instagram__copy:hover,
+    .instagram__copy:focus-visible {
+      background: rgba(138, 43, 255, 0.14);
+      border-color: rgba(184, 118, 255, 0.7);
+      color: var(--blanco-glow);
+      box-shadow: 0 0 18px rgba(138, 43, 255, 0.35);
+      outline: none;
+    }
+    .instagram__copy.is-copied {
+      background: rgba(107, 240, 255, 0.10);
+      border-color: rgba(107, 240, 255, 0.55);
+      color: var(--cyan-accent);
+      box-shadow: 0 0 18px rgba(107, 240, 255, 0.4);
+    }
+
+    /* Micro-toast "Copiado" — vive dentro de la seccion para mobile */
+    .instagram__toast {
+      position: absolute;
+      left: 50%;
+      bottom: 1.3rem;
+      transform: translate(-50%, 12px);
+      padding: 0.55rem 1rem;
+      font-family: var(--font-ui);
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--blanco-glow);
+      background: rgba(10, 6, 18, 0.85);
+      border: 1px solid rgba(107, 240, 255, 0.5);
+      border-radius: 999px;
+      box-shadow:
+        0 0 16px rgba(107, 240, 255, 0.35),
+        0 4px 14px rgba(0, 0, 0, 0.5);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 3;
+      transition:
+        opacity .35s var(--ease-soft),
+        transform .35s var(--ease-soft);
+    }
+    .instagram__toast.is-visible {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    /* Reveal con stagger */
+    .instagram.is-visible .instagram__label,
+    .instagram.is-visible .instagram__intro,
+    .instagram.is-visible .instagram__hashtag,
+    .instagram.is-visible .instagram__card {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+    .instagram.is-visible .instagram__label    { transition-delay: 0s; }
+    .instagram.is-visible .instagram__intro    { transition-delay: 0.08s; }
+    .instagram.is-visible .instagram__hashtag  { transition-delay: 0.22s; }
+    .instagram.is-visible .instagram__card     { transition-delay: 0.38s; }
+
+    /* ============================================================
        DESKTOP MOCKUP — desde 768px renderiza la portada dentro de
        un marco tipo iPhone (390x844) centrado en pantalla.
        Mobile real sigue intacto (fullscreen).
@@ -2137,6 +2439,61 @@
       <span>Tip &mdash;</span> piensa <em>editorial</em>, piensa <em>portada</em>.
     </p>
   </section>
+
+  <!-- =========================================================
+       INSTAGRAM · Hashtag para etiquetar momentos en IG
+       Cambia el handle @valentina.xv por el real cuando lo
+       tengamos. El JS lee el hashtag del <h2> y construye el
+       enlace al perfil a partir del data-handle de la card.
+       ========================================================= -->
+  <section class="instagram" id="instagram" aria-label="Hashtag de Instagram">
+    <p class="instagram__label">Instagram</p>
+    <p class="instagram__intro">Etiqueta tus momentos de la noche</p>
+
+    <h2 class="instagram__hashtag">#ValentinaXV</h2>
+
+    <div class="instagram__card" data-handle="valentina.xv">
+      <img
+        class="instagram__logo"
+        src="assets/icons/instagram.png"
+        alt="Instagram"
+        width="56"
+        height="56"
+        loading="lazy"
+        decoding="async"
+      />
+      <span class="instagram__handle">@valentina.xv</span>
+
+      <div class="instagram__actions">
+        <!-- CTA primario: abre el perfil de IG (app si esta instalada, web si no) -->
+        <a
+          class="instagram__cta"
+          id="instagram-open"
+          href="https://www.instagram.com/valentina.xv/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Abrir perfil de Instagram"
+        >
+          Abrir perfil
+        </a>
+
+        <!-- Boton secundario: copia el hashtag al portapapeles -->
+        <button
+          class="instagram__copy"
+          id="instagram-copy"
+          type="button"
+          aria-label="Copiar hashtag"
+        >
+          Copiar #
+        </button>
+      </div>
+    </div>
+
+    <!-- Micro-toast — feedback al copiar -->
+    <div class="instagram__toast" id="instagram-toast" role="status" aria-live="polite">
+      Copiado &#10003;
+    </div>
+  </section>
   </div><!-- /.phone -->
 
   <script>
@@ -2212,6 +2569,7 @@
         document.getElementById('gallery'),
         document.getElementById('padrinos'),
         document.getElementById('dresscode'),
+        document.getElementById('instagram'),
       ].filter(Boolean);
 
       if (revealTargets.length && 'IntersectionObserver' in window) {
@@ -2228,6 +2586,50 @@
         // Fallback navegadores antiguos — mostrar directamente
         revealTargets.forEach(function (el) { el.classList.add('is-visible'); });
       }
+    })();
+
+    /* ========================================================
+       INSTAGRAM — copiar hashtag al portapapeles + micro-toast
+       Lee el hashtag del <h2> para que cambiar el texto del HTML
+       sea suficiente; no hay valores hardcodeados aqui.
+       ======================================================== */
+    (function () {
+      'use strict';
+      var btn   = document.getElementById('instagram-copy');
+      var tag   = document.querySelector('.instagram__hashtag');
+      var toast = document.getElementById('instagram-toast');
+      if (!btn || !tag || !toast) return;
+
+      var hideTimer = null;
+      var resetTimer = null;
+
+      btn.addEventListener('click', async function () {
+        var text = (tag.textContent || '').trim();
+        if (!text) return;
+
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (err) {
+          // Fallback: selectionRange + execCommand para navegadores viejos
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly', '');
+          ta.style.position = 'absolute';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+        }
+
+        // Feedback visual: estado "copiado" + toast
+        btn.classList.add('is-copied');
+        toast.classList.add('is-visible');
+        clearTimeout(hideTimer);
+        clearTimeout(resetTimer);
+        hideTimer  = setTimeout(function () { toast.classList.remove('is-visible'); }, 1800);
+        resetTimer = setTimeout(function () { btn.classList.remove('is-copied'); }, 2200);
+      });
     })();
 
     /* Editor compartido: logica en assets/editor/editor.js */
