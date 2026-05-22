@@ -1,5 +1,16 @@
 [
   {
+    "id": "valentina-neon",
+    "nombre": "Valentina Neon",
+    "evento": "XV años",
+    "fecha": "2026-06-15",
+    "estilo": "neon luxury urbano (snapshot original)",
+    "estado": "archivado",
+    "thumb": "templates/valentina-neon/assets/thumb.png",
+    "url": "templates/valentina-neon/",
+    "creada": "2026-05-21"
+  },
+  {
     "id": "valentina-xv",
     "nombre": "Valentina",
     "evento": "XV años",
