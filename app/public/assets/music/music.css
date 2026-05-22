@@ -1,0 +1,100 @@
+/* ============================================================
+   MUSIC — reproductor de fondo (YouTube oculto) compartido
+   Cualquier plantilla que cargue music.css + music.js y declare
+       <button class="music-toggle" data-video-id="ID_DE_YOUTUBE">
+       <div class="yt-host"><div id="yt-player"></div></div>
+   obtiene un boton flotante de play/pause con halo pulsante.
+   El color del halo lee --rosa-neon-rgb de la plantilla activa,
+   asi que adopta la paleta del template sin codigo extra.
+   ============================================================ */
+
+/* Contenedor donde la YT iframe API monta el reproductor de 1x1px */
+.yt-host {
+  position: fixed;
+  bottom: -100px;
+  left: -100px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Boton flotante en esquina superior derecha */
+.music-toggle {
+  position: fixed;
+  top: max(env(safe-area-inset-top, 0px), 14px);
+  right: 14px;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(11, 11, 11, 0.85);
+  border: 1px solid rgba(var(--rosa-neon-rgb, 255, 43, 214), 0.55);
+  color: #FFF8EC;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.5),
+    0 0 22px rgba(var(--rosa-neon-rgb, 255, 43, 214), 0.22);
+  transition: transform .25s, background .25s, color .25s, border-color .25s;
+}
+
+.music-toggle:hover,
+.music-toggle:focus-visible {
+  background: rgba(var(--rosa-neon-rgb, 255, 43, 214), 0.85);
+  color: #0b0b0b;
+  border-color: rgba(var(--rosa-neon-rgb, 255, 43, 214), 1);
+  transform: scale(1.06);
+  outline: none;
+}
+
+/* Iconos overlapped — solo uno visible segun data-state */
+.music-toggle__icon {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  transition: opacity .2s;
+}
+
+.music-toggle[data-state="off"] .music-toggle__icon--on { opacity: 0; }
+.music-toggle[data-state="off"] .music-toggle__icon--off { opacity: 1; }
+.music-toggle[data-state="on"]  .music-toggle__icon--on { opacity: 1; }
+.music-toggle[data-state="on"]  .music-toggle__icon--off { opacity: 0; }
+
+/* Halo pulsante mientras suena */
+.music-toggle__pulse {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 0 0 rgba(var(--rosa-neon-rgb, 255, 43, 214), 0.5);
+  opacity: 0;
+  transition: opacity .3s;
+}
+.music-toggle[data-state="on"] .music-toggle__pulse {
+  opacity: 1;
+  animation: musicPulse 2.4s ease-in-out infinite;
+}
+@keyframes musicPulse {
+  0%   { box-shadow: 0 0 0 0  rgba(var(--rosa-neon-rgb, 255, 43, 214), 0.45); }
+  70%  { box-shadow: 0 0 0 14px rgba(var(--rosa-neon-rgb, 255, 43, 214), 0); }
+  100% { box-shadow: 0 0 0 0  rgba(var(--rosa-neon-rgb, 255, 43, 214), 0); }
+}
+
+/* Pista inicial: brinco para invitar al primer tap del usuario */
+.music-toggle[data-state="off"] {
+  animation: musicHint 3s ease-in-out 1.2s 3;
+}
+@keyframes musicHint {
+  0%, 100% { transform: scale(1); }
+  10%, 30% { transform: scale(1.12); }
+  20%      { transform: scale(0.96); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .music-toggle[data-state="off"] { animation: none; }
+  .music-toggle__pulse             { animation: none; }
+}

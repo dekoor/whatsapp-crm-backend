@@ -1,0 +1,3225 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0612" />
+  <title>Valentina · Mis XV · Neon Original</title>
+  <meta name="description" content="Invitación digital premium de XV años · Valentina · Estilo neon luxury urbano." />
+
+  <!-- Preconnect a Google Fonts (solo recurso tipográfico, no libreria JS/CSS) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!--
+    Tipografias:
+      - Italianno: brush elegante femenino con flow natural (nombre principal)
+      - Outfit: sans-serif urbano premium moderno (subtexto, fecha, boton)
+  -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Italianno&family=Outfit:wght@200;300;400;500&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Editor compartido (modo edicion secreto, 5 taps).
+       Mismo archivo para todas las plantillas: si se modifica
+       assets/editor/editor.(css|js), todas heredan los cambios. -->
+  <link rel="stylesheet" href="../../assets/editor/editor.css" />
+  <script src="../../assets/editor/editor.js" defer></script>
+
+  <style>
+    /* ============================================================
+       VARIABLES — paleta neon luxury urbano
+       ============================================================ */
+    :root {
+      /* Paleta principal */
+      --rosa-neon:        #ff2bd6;   /* Rosa neon premium */
+      --rosa-neon-soft:   #ff7ae0;   /* Rosa glow suavizado */
+      --morado-uv:        #8a2bff;   /* Morado ultraviolet */
+      --morado-deep:      #4a0e7a;   /* Morado profundo cinematografico */
+      --blanco-glow:      #ffffff;   /* Blanco puro / glow */
+      --blanco-soft:      #f1e8ff;   /* Blanco con tinte lavanda */
+      --negro-carbon:     #0a0612;   /* Negro carbon de fondo */
+      --cyan-accent:      #6bf0ff;   /* Acento cyan sutil */
+
+      /* Sombras / overlays */
+      --overlay-deep:     rgba(10, 6, 18, 0.92);
+      --overlay-mid:      rgba(10, 6, 18, 0.55);
+      --overlay-soft:     rgba(10, 6, 18, 0.0);
+
+      /* Tipos */
+      --font-brush:       'Italianno', 'Apple Chancery', 'Snell Roundhand', cursive;
+      --font-ui:          'Outfit', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+      /* Curvas de animacion */
+      --ease-soft:        cubic-bezier(.2, .7, .2, 1);
+    }
+
+    /* ============================================================
+       RESET MINIMO
+       ============================================================ */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      /* Sin height fijo — el body crece con el contenido (scroll en mobile) */
+    }
+
+    body {
+      font-family: var(--font-ui);
+      background: var(--negro-carbon);
+      color: var(--blanco-glow);
+      min-height: 100dvh;
+      overflow-x: hidden;            /* nunca scroll horizontal */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      /* En mobile el body es un layout normal que hace scroll natural.
+         En desktop (>=768px) se convierte en flex centrado para el mockup. */
+    }
+
+    /* ============================================================
+       PHONE — contenedor tipo telefono (mockup en desktop)
+       Mobile: ocupa 100% (fullscreen real)
+       Desktop: 390x844 con bordes redondeados (se define mas abajo)
+       ============================================================ */
+    .phone {
+      position: relative;
+      width: 100%;
+      min-height: 100dvh;            /* primera pantalla completa; crece con secciones futuras */
+      background: var(--negro-carbon);
+      isolation: isolate;
+      /* Container query — todo el contenido escala segun el ancho del .phone,
+         no del viewport. Asi el nombre cabe igual en mobile real que en
+         el mockup desktop (390px). */
+      container-type: inline-size;
+      container-name: phone;
+    }
+
+    /* ============================================================
+       PORTADA — primera "pantalla" del telefono (100dvh en mobile,
+       100% del .phone en el mockup desktop). Despues vendran mas
+       secciones que el usuario alcanza con scroll.
+       ============================================================ */
+    .portada {
+      position: relative;
+      width: 100%;
+      min-height: 100dvh;
+      overflow: hidden;              /* clip de la imagen + animaciones */
+      background: var(--negro-carbon);
+      isolation: isolate;
+    }
+
+    /* Imagen de fondo — object-fit:cover, sin deformar, con micro zoom cinematografico */
+    .portada__bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      z-index: 1;
+      will-change: transform;
+      animation: bgZoom 22s ease-in-out infinite alternate;
+      /* Tinte sutil para integrar con la paleta neon */
+      filter: saturate(1.08) contrast(1.04);
+    }
+
+    @keyframes bgZoom {
+      from { transform: scale(1.0); }
+      to   { transform: scale(1.06); }
+    }
+
+    /* Overlay degradado inferior — legibilidad sin saturar la imagen */
+    .portada__overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background: linear-gradient(
+        to bottom,
+        var(--overlay-soft) 0%,
+        var(--overlay-soft) 35%,
+        rgba(10, 6, 18, 0.35) 55%,
+        var(--overlay-mid) 72%,
+        var(--overlay-deep) 100%
+      );
+    }
+
+    /* Vignette radial sutil — foco cinematografico */
+    .portada__vignette {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 50% 60%, transparent 40%, rgba(0,0,0,0.45) 100%),
+        radial-gradient(circle at 50% 100%, rgba(138, 43, 255, 0.18) 0%, transparent 55%);
+      mix-blend-mode: multiply;
+    }
+
+    /* Acento cyan flotante muy sutil arriba */
+    .portada__accent {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60cqw;
+      height: 1px;
+      max-width: 260px;
+      z-index: 4;
+      background: linear-gradient(
+        to right,
+        transparent,
+        rgba(107, 240, 255, 0.35),
+        transparent
+      );
+      opacity: 0;
+      animation: fadeIn 1.4s ease-out 1.6s forwards;
+    }
+
+    /* ============================================================
+       CONTENIDO — abajo-centro, composicion limpia
+       ============================================================ */
+    .portada__content {
+      position: relative;
+      z-index: 10;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 2rem 1.5rem 3.2rem; /* padding-bottom mayor: la fecha queda mas abajo, cerca del borde */
+      text-align: center;
+    }
+
+    /* Subtexto "Mis XV" */
+    .portada__sub {
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-size: 0.78rem;
+      letter-spacing: 0.55em;
+      text-transform: uppercase;
+      color: var(--blanco-soft);
+      /* Indent visual para letter-spacing balanceado */
+      padding-left: 0.55em;
+      text-shadow:
+        0 0 10px rgba(255, 43, 214, 0.45),
+        0 0 20px rgba(255, 43, 214, 0.25);
+      opacity: 0;
+      transform: translateY(22px);
+      filter: blur(6px);
+      animation: fadeUp 1.2s var(--ease-soft) 0.35s forwards;
+    }
+
+    /* Nombre principal "Valentina" — brush elegante con glow neon fino
+       Tamano basado en cqw (container query width) para que escale con el .phone */
+    .portada__nombre {
+      position: relative;
+      font-family: var(--font-brush);
+      font-weight: 400;
+      font-size: clamp(4.5rem, 18cqw, 6.5rem);
+      line-height: 0.95;
+      letter-spacing: 0.01em;
+      color: var(--blanco-glow);
+      margin: 0.35rem 0 0.85rem;
+      /* Glow neon fino cinematografico — capas de luz */
+      text-shadow:
+        0 0 6px  rgba(255, 255, 255, 0.55),
+        0 0 14px rgba(255, 122, 224, 0.55),
+        0 0 26px rgba(255, 43, 214, 0.45),
+        0 0 48px rgba(138, 43, 255, 0.35),
+        0 0 90px rgba(138, 43, 255, 0.22);
+      opacity: 0;
+      transform: translateY(34px);
+      filter: blur(10px);
+      animation: fadeUp 1.6s var(--ease-soft) 0.55s forwards, breatheText 4.5s ease-in-out 2.4s infinite;
+      /* Para shimmer overlay */
+      background-image: linear-gradient(
+        110deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.85) 50%,
+        transparent 70%
+      );
+      background-size: 220% 100%;
+      background-position: -120% center;
+      background-repeat: no-repeat;
+      -webkit-background-clip: text;
+      background-clip: text;
+      /* Mantiene el color base; el shimmer se anima encima */
+      -webkit-text-fill-color: var(--blanco-glow);
+    }
+
+    /* Shimmer animado pasando sobre el nombre */
+    .portada__nombre::after {
+      content: attr(data-text);
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: linear-gradient(
+        110deg,
+        transparent 35%,
+        rgba(255, 255, 255, 0.9) 50%,
+        transparent 65%
+      );
+      background-size: 220% 100%;
+      background-position: -120% center;
+      background-repeat: no-repeat;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      animation: shimmer 6s ease-in-out 3s infinite;
+      text-shadow: none;
+    }
+
+    /* Glow respirando del nombre */
+    @keyframes breatheText {
+      0%, 100% {
+        text-shadow:
+          0 0 6px  rgba(255, 255, 255, 0.45),
+          0 0 14px rgba(255, 122, 224, 0.45),
+          0 0 26px rgba(255, 43, 214, 0.40),
+          0 0 48px rgba(138, 43, 255, 0.30),
+          0 0 90px rgba(138, 43, 255, 0.18);
+      }
+      50% {
+        text-shadow:
+          0 0 8px  rgba(255, 255, 255, 0.7),
+          0 0 18px rgba(255, 122, 224, 0.65),
+          0 0 34px rgba(255, 43, 214, 0.55),
+          0 0 60px rgba(138, 43, 255, 0.45),
+          0 0 110px rgba(138, 43, 255, 0.28);
+      }
+    }
+
+    @keyframes shimmer {
+      0%   { background-position: -120% center; }
+      45%  { background-position: 220% center; }
+      100% { background-position: 220% center; }
+    }
+
+    /* Fecha "15 Junio 2026" */
+    .portada__fecha {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.9rem;
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-size: 0.82rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--blanco-soft);
+      text-shadow: 0 0 14px rgba(255, 122, 224, 0.35);
+      opacity: 0;
+      transform: translateY(22px);
+      filter: blur(6px);
+      animation: fadeUp 1.2s var(--ease-soft) 0.85s forwards;
+    }
+
+    /* Lineas decorativas a los lados de la fecha */
+    .portada__fecha::before,
+    .portada__fecha::after {
+      content: '';
+      display: inline-block;
+      width: 1.5rem;
+      height: 1px;
+      background: linear-gradient(
+        to right,
+        transparent,
+        var(--rosa-neon-soft),
+        transparent
+      );
+      flex: 0 0 auto;
+    }
+
+    /* ============================================================
+       ANIMACIONES BASE
+       ============================================================ */
+    @keyframes fadeUp {
+      0% {
+        opacity: 0;
+        transform: translateY(28px);
+        filter: blur(8px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* ============================================================
+       COUNTDOWN — seccion debajo de la portada (segunda pantalla)
+       Cards glassmorphism con glow rosa/morado, mismo lenguaje
+       visual que la portada (dark feminine, neon luxury urbano).
+       ============================================================ */
+    .countdown {
+      position: relative;
+      width: 100%;
+      /* SIN min-height: la seccion mide solo lo que ocupa su contenido
+         + padding. Asi no queda espacio vacio entre countdown y venue. */
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 2rem 1.5rem 2.8rem;     /* padding compacto arriba y abajo */
+      text-align: center;
+      /* Fondo negro carbon + glows rosa/morado sutiles en esquinas opuestas */
+      background:
+        radial-gradient(ellipse at 18% 18%, rgba(255, 43, 214, 0.18) 0%, transparent 50%),
+        radial-gradient(ellipse at 82% 82%, rgba(138, 43, 255, 0.18) 0%, transparent 55%),
+        linear-gradient(180deg, var(--negro-carbon) 0%, #0c0815 50%, var(--negro-carbon) 100%);
+      isolation: isolate;
+      overflow: hidden;
+    }
+
+    /* Tagline italica delicada — antesala suave al "Faltan" */
+    .countdown__intro {
+      font-family: var(--font-ui);
+      font-weight: 200;
+      font-style: italic;
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
+      color: var(--blanco-soft);
+      text-shadow:
+        0 0 10px rgba(255, 122, 224, 0.35),
+        0 0 22px rgba(138, 43, 255, 0.18);
+      margin: 0 0 1rem;
+      position: relative;
+      z-index: 2;
+      /* Estado inicial — invisible hasta que entra al viewport */
+      opacity: 0;
+      transform: translateY(18px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+
+    /* Titulo "Faltan" — mismo tratamiento que el subtexto "Mis XV" */
+    .countdown__label {
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-size: 0.78rem;
+      letter-spacing: 0.55em;
+      padding-left: 0.55em;             /* compensa el spacing para verse centrado */
+      text-transform: uppercase;
+      color: var(--blanco-soft);
+      text-shadow:
+        0 0 10px rgba(255, 43, 214, 0.45),
+        0 0 20px rgba(255, 43, 214, 0.22);
+      margin-bottom: 1.8rem;            /* compacto: bloque mas equilibrado */
+      /* Estado inicial — invisible hasta que entra al viewport */
+      opacity: 0;
+      transform: translateY(20px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Grid de 4 cards */
+    .countdown__grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+      width: 100%;
+      max-width: 340px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Card individual — glassmorphism premium con borde neon fino */
+    .countdown__card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.15rem 0.3rem 1rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 43, 214, 0.25);
+      border-radius: 18px;
+      -webkit-backdrop-filter: blur(12px) saturate(140%);
+      backdrop-filter: blur(12px) saturate(140%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+        0 8px 24px rgba(0, 0, 0, 0.3),
+        0 0 18px rgba(255, 43, 214, 0.18);
+      overflow: hidden;
+      /* Estado inicial */
+      opacity: 0;
+      transform: translateY(28px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+
+    /* Reveal cuando .countdown entra al viewport — fade-up con stagger */
+    .countdown.is-visible .countdown__intro,
+    .countdown.is-visible .countdown__label,
+    .countdown.is-visible .countdown__card {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+
+    /* Stagger: intro -> label -> cards 1..4 */
+    .countdown.is-visible .countdown__intro { transition-delay: 0s; }
+    .countdown.is-visible .countdown__label { transition-delay: 0.12s; }
+    .countdown.is-visible .countdown__card:nth-child(1) { transition-delay: 0.22s; }
+    .countdown.is-visible .countdown__card:nth-child(2) { transition-delay: 0.34s; }
+    .countdown.is-visible .countdown__card:nth-child(3) { transition-delay: 0.46s; }
+    .countdown.is-visible .countdown__card:nth-child(4) { transition-delay: 0.58s; }
+
+    /* Glow respirando muy sutil — arranca despues del reveal, staggered */
+    .countdown.is-visible .countdown__card {
+      animation: cardBreathe 4.8s ease-in-out infinite;
+    }
+    .countdown.is-visible .countdown__card:nth-child(1) { animation-delay: 2.2s; }
+    .countdown.is-visible .countdown__card:nth-child(2) { animation-delay: 2.45s; }
+    .countdown.is-visible .countdown__card:nth-child(3) { animation-delay: 2.7s; }
+    .countdown.is-visible .countdown__card:nth-child(4) { animation-delay: 2.95s; }
+
+    @keyframes cardBreathe {
+      0%, 100% {
+        box-shadow:
+          inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+          0 8px 24px rgba(0, 0, 0, 0.3),
+          0 0 18px rgba(255, 43, 214, 0.18);
+        border-color: rgba(255, 43, 214, 0.25);
+      }
+      50% {
+        box-shadow:
+          inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+          0 8px 24px rgba(0, 0, 0, 0.3),
+          0 0 28px rgba(255, 43, 214, 0.32),
+          0 0 56px rgba(138, 43, 255, 0.18);
+        border-color: rgba(255, 122, 224, 0.45);
+      }
+    }
+
+    /* Valor numerico — grande, blanco con glow suave */
+    .countdown__value {
+      display: block;
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-size: clamp(1.6rem, 9cqw, 2.4rem);
+      line-height: 1;
+      color: var(--blanco-glow);
+      text-shadow:
+        0 0 6px rgba(255, 255, 255, 0.45),
+        0 0 14px rgba(255, 122, 224, 0.4),
+        0 0 26px rgba(255, 43, 214, 0.28);
+      font-variant-numeric: tabular-nums;   /* anchos constantes — no salta al cambiar */
+      letter-spacing: 0.02em;
+    }
+
+    /* Label de unidad — pequeno en rosa neon */
+    .countdown__unit {
+      display: block;
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-size: 0.6rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--rosa-neon-soft);
+      margin-top: 0.6rem;
+      text-shadow: 0 0 8px rgba(255, 43, 214, 0.3);
+    }
+
+    /* ============================================================
+       VENUE — Donde y Cuando: fecha, hora, lugar, direccion + CTA
+       Editorial fashion: cards apiladas, iconos lineales finos,
+       separadores sutiles, mucha respiracion vertical.
+       ============================================================ */
+    .venue {
+      position: relative;
+      width: 100%;
+      /* SIN min-height: la seccion crece con su contenido + padding,
+         igual que countdown. Asi fluye natural hacia la galeria sin
+         gap vertical vacio. */
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 1.8rem 1.5rem 3rem;     /* padding-bottom compacto: pega con la galeria */
+      text-align: center;
+      /* Fondo negro carbon con glows rosa/morado en esquinas opuestas
+         (intercambiadas vs countdown para variar el ritmo visual) */
+      background:
+        radial-gradient(ellipse at 80% 18%, rgba(255, 43, 214, 0.16) 0%, transparent 50%),
+        radial-gradient(ellipse at 15% 82%, rgba(138, 43, 255, 0.18) 0%, transparent 55%),
+        linear-gradient(180deg, var(--negro-carbon) 0%, #0c0815 50%, var(--negro-carbon) 100%);
+      isolation: isolate;
+      overflow: hidden;
+    }
+
+    /* Label "Donde y Cuando" — mismo tratamiento que la portada/countdown */
+    .venue__label {
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-size: 0.78rem;
+      letter-spacing: 0.55em;
+      padding-left: 0.55em;
+      text-transform: uppercase;
+      color: var(--blanco-soft);
+      text-shadow:
+        0 0 10px rgba(255, 43, 214, 0.45),
+        0 0 20px rgba(255, 43, 214, 0.22);
+      margin: 0 0 2.2rem;
+      /* Reveal */
+      opacity: 0;
+      transform: translateY(20px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Stack vertical de cards */
+    .venue__cards {
+      display: flex;
+      flex-direction: column;
+      gap: 0.95rem;
+      width: 100%;
+      max-width: 340px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Card glassmorphism premium */
+    .venue__card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding: 1.45rem 1.3rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 43, 214, 0.25);
+      border-radius: 22px;
+      -webkit-backdrop-filter: blur(12px) saturate(140%);
+      backdrop-filter: blur(12px) saturate(140%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+        0 8px 24px rgba(0, 0, 0, 0.3),
+        0 0 18px rgba(255, 43, 214, 0.16);
+      text-align: left;
+      /* Reveal */
+      opacity: 0;
+      transform: translateY(28px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+
+    /* Row icono + texto */
+    .venue__row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.95rem;
+    }
+
+    /* Icono circular con SVG lineal dentro */
+    .venue__icon {
+      flex: 0 0 auto;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 43, 214, 0.1);
+      border: 1px solid rgba(255, 43, 214, 0.3);
+      color: var(--rosa-neon-soft);
+      box-shadow: inset 0 0 12px rgba(255, 43, 214, 0.18);
+    }
+
+    .venue__icon svg {
+      width: 18px;
+      height: 18px;
+      display: block;
+    }
+
+    /* Columna texto del row */
+    .venue__col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.18rem;
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+
+    /* Caption (tag pequeno superior) */
+    .venue__caption {
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-size: 0.6rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--rosa-neon-soft);
+      text-shadow: 0 0 8px rgba(255, 43, 214, 0.28);
+    }
+
+    /* Valor principal — editorial, limpio */
+    .venue__value {
+      font-family: var(--font-ui);
+      font-weight: 400;
+      font-size: 1.02rem;
+      color: var(--blanco-glow);
+      text-shadow:
+        0 0 8px rgba(255, 255, 255, 0.22),
+        0 0 16px rgba(255, 122, 224, 0.18);
+      letter-spacing: 0.02em;
+      line-height: 1.25;
+    }
+
+    /* Variant para el nombre del lugar (un toque mayor) */
+    .venue__value--name {
+      font-size: 1.08rem;
+    }
+
+    /* Direccion subdued */
+    .venue__address {
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-size: 0.78rem;
+      color: var(--blanco-soft);
+      opacity: 0.78;
+      letter-spacing: 0.02em;
+      line-height: 1.45;
+      margin-top: 0.3rem;
+    }
+
+    /* Separador sutil dentro de card (gradiente rosa que se desvanece) */
+    .venue__divider {
+      height: 1px;
+      width: 100%;
+      margin: 1rem 0;
+      background: linear-gradient(
+        to right,
+        transparent,
+        rgba(255, 122, 224, 0.22),
+        transparent
+      );
+    }
+
+    /* CTA "Ver ubicacion" — glass neon pequeno, preparado para Google Maps */
+    .venue__cta {
+      align-self: center;
+      margin-top: 1.2rem;
+      padding: 0.7rem 1.4rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55em;
+      font-family: var(--font-ui);
+      font-weight: 400;
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--blanco-glow);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 43, 214, 0.5);
+      border-radius: 999px;
+      cursor: pointer;
+      text-decoration: none;
+      -webkit-backdrop-filter: blur(10px) saturate(140%);
+      backdrop-filter: blur(10px) saturate(140%);
+      box-shadow:
+        0 0 14px rgba(255, 43, 214, 0.25),
+        0 6px 16px rgba(0, 0, 0, 0.3);
+      transition:
+        transform .35s var(--ease-soft),
+        border-color .35s ease,
+        background .35s ease,
+        box-shadow .35s ease;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .venue__cta-arrow {
+      display: inline-block;
+      font-size: 1.05em;
+      line-height: 1;
+      transition: transform .35s var(--ease-soft);
+    }
+
+    /* Hover/focus — glow elegante suave */
+    .venue__cta:hover,
+    .venue__cta:focus-visible {
+      transform: translateY(-1px);
+      background: rgba(255, 43, 214, 0.14);
+      border-color: var(--rosa-neon-soft);
+      box-shadow:
+        0 0 22px rgba(255, 43, 214, 0.6),
+        0 0 44px rgba(138, 43, 255, 0.32),
+        0 8px 20px rgba(0, 0, 0, 0.4);
+      outline: none;
+    }
+
+    .venue__cta:hover .venue__cta-arrow,
+    .venue__cta:focus-visible .venue__cta-arrow {
+      transform: translateX(3px);
+    }
+
+    .venue__cta:active {
+      transform: translateY(0);
+    }
+
+    /* Reveal con stagger: label -> card 1 -> card 2 */
+    .venue.is-visible .venue__label,
+    .venue.is-visible .venue__card {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+    .venue.is-visible .venue__label              { transition-delay: 0s; }
+    .venue.is-visible .venue__card:nth-child(1)  { transition-delay: 0.14s; }
+    .venue.is-visible .venue__card:nth-child(2)  { transition-delay: 0.28s; }
+
+    /* Micro glow respirando — reutiliza el keyframe cardBreathe del countdown */
+    .venue.is-visible .venue__card {
+      animation: cardBreathe 5.2s ease-in-out infinite;
+    }
+    .venue.is-visible .venue__card:nth-child(1) { animation-delay: 2.0s; }
+    .venue.is-visible .venue__card:nth-child(2) { animation-delay: 2.4s; }
+
+    /* ============================================================
+       GALLERY — galeria editorial tipo collage premium
+       Rompe visualmente con tanto texto: 4 fotos en grid asimetrico
+       (2 grandes + 2 pequenas), bordes redondeados, glow rosa/morado
+       alrededor, overlay sutil, fade-up con stagger, hover zoom.
+       ============================================================ */
+    .gallery {
+      position: relative;
+      width: 100%;
+      /* SIN min-height: ahora es seccion intermedia (padrinos es el cierre).
+         Crece con su contenido + padding, fluye natural hacia padrinos. */
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 1.8rem 1.5rem 3rem;
+      text-align: center;
+      /* Glows rosa/morado centrados verticalmente — distinto patron de las
+         secciones anteriores (que usaban esquinas) para variar el ritmo */
+      background:
+        radial-gradient(ellipse at 50% 12%, rgba(255, 43, 214, 0.18) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 88%, rgba(138, 43, 255, 0.16) 0%, transparent 55%),
+        linear-gradient(180deg, var(--negro-carbon) 0%, #0c0815 50%, var(--negro-carbon) 100%);
+      isolation: isolate;
+      overflow: hidden;
+    }
+
+    /* Label "Momentos" — mismo tratamiento que portada/countdown/venue */
+    .gallery__label {
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-size: 0.78rem;
+      letter-spacing: 0.55em;
+      padding-left: 0.55em;
+      text-transform: uppercase;
+      color: var(--blanco-soft);
+      text-shadow:
+        0 0 10px rgba(255, 43, 214, 0.45),
+        0 0 20px rgba(255, 43, 214, 0.22);
+      margin: 0 0 0.7rem;
+      position: relative;
+      z-index: 2;
+      /* Reveal */
+      opacity: 0;
+      transform: translateY(20px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+
+    /* Subtitulo italica — antesala delicada a las fotos */
+    .gallery__intro {
+      font-family: var(--font-ui);
+      font-weight: 200;
+      font-style: italic;
+      font-size: 0.92rem;
+      letter-spacing: 0.04em;
+      color: var(--blanco-soft);
+      text-shadow:
+        0 0 10px rgba(255, 122, 224, 0.32),
+        0 0 22px rgba(138, 43, 255, 0.18);
+      margin: 0 0 1.6rem;
+      position: relative;
+      z-index: 2;
+      /* Reveal */
+      opacity: 0;
+      transform: translateY(18px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+
+    /* Grid editorial — 2 columnas asimetricas + 3 filas
+       Layout:
+         [ p1       ][ p2 ]
+         [ tall     ][ p3 ]
+         [ p4 (wide)      ]
+       Photo 1 y Photo 4 = grandes / Photo 2 y Photo 3 = pequenas */
+    .gallery__grid {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      grid-template-rows: 1fr 1fr 0.85fr;
+      grid-template-areas:
+        "p1 p2"
+        "p1 p3"
+        "p4 p4";
+      gap: 8px;
+      width: 100%;
+      max-width: 340px;
+      height: 400px;            /* altura total fija — proporciones predecibles */
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Item de la galeria — wrapper con bordes redondeados + glow */
+    .gallery__item {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 43, 214, 0.22);
+      background: rgba(0, 0, 0, 0.4);   /* fallback mientras carga */
+      box-shadow:
+        0 0 16px rgba(255, 43, 214, 0.18),
+        0 0 36px rgba(138, 43, 255, 0.1),
+        0 8px 22px rgba(0, 0, 0, 0.45);
+      cursor: pointer;
+      margin: 0;                /* reset figure */
+      /* Reveal initial */
+      opacity: 0;
+      transform: translateY(28px) scale(0.97);
+      filter: blur(8px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft),
+        box-shadow .45s ease,
+        border-color .45s ease;
+    }
+
+    /* Asignacion de cada foto a su area del grid */
+    .gallery__item--p1 { grid-area: p1; }
+    .gallery__item--p2 { grid-area: p2; }
+    .gallery__item--p3 { grid-area: p3; }
+    .gallery__item--p4 { grid-area: p4; }
+
+    /* Imagen — cubre todo el wrapper, listo para hover zoom */
+    .gallery__item img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .9s var(--ease-soft);
+      will-change: transform;
+    }
+
+    /* Overlay oscuro suave + tinte rosa muy sutil (cinematografico) */
+    .gallery__item::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, transparent 45%, rgba(10, 6, 18, 0.5) 100%),
+        rgba(255, 43, 214, 0.05);
+      pointer-events: none;
+      z-index: 1;
+      transition: opacity .45s ease;
+    }
+
+    /* Hover — zoom suave + glow rosa/morado mas intenso */
+    .gallery__item:hover,
+    .gallery__item:focus-within {
+      border-color: rgba(255, 122, 224, 0.5);
+      box-shadow:
+        0 0 26px rgba(255, 43, 214, 0.45),
+        0 0 56px rgba(138, 43, 255, 0.28),
+        0 12px 32px rgba(0, 0, 0, 0.55);
+    }
+
+    .gallery__item:hover img,
+    .gallery__item:focus-within img {
+      transform: scale(1.06);
+    }
+
+    .gallery__item:hover::after,
+    .gallery__item:focus-within::after {
+      opacity: 0.65;
+    }
+
+    /* Reveal — stagger por foto */
+    .gallery.is-visible .gallery__label,
+    .gallery.is-visible .gallery__intro,
+    .gallery.is-visible .gallery__item {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+    .gallery.is-visible .gallery__label   { transition-delay: 0s; }
+    .gallery.is-visible .gallery__intro   { transition-delay: 0.08s; }
+    .gallery.is-visible .gallery__item--p1 { transition-delay: 0.22s; }
+    .gallery.is-visible .gallery__item--p2 { transition-delay: 0.34s; }
+    .gallery.is-visible .gallery__item--p3 { transition-delay: 0.46s; }
+    .gallery.is-visible .gallery__item--p4 { transition-delay: 0.58s; }
+
+    /* ============================================================
+       PADRINOS — Con la bendicion de
+       Seccion emocional cinematografica: orbs glow flotantes,
+       cards glass con bordes ULTRA sutiles, nombres en Italianno
+       (mismo brush elegante de "Valentina"), linea luminosa con
+       punto pulsante entre PADRES y PADRINOS.
+       ============================================================ */
+    .padrinos {
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 2.4rem 1.5rem 4.5rem;
+      text-align: center;
+      background:
+        radial-gradient(ellipse at 35% 18%, rgba(255, 43, 214, 0.16) 0%, transparent 50%),
+        radial-gradient(ellipse at 65% 82%, rgba(138, 43, 255, 0.20) 0%, transparent 55%),
+        linear-gradient(180deg, var(--negro-carbon) 0%, #0c0815 50%, var(--negro-carbon) 100%);
+      isolation: isolate;
+      overflow: hidden;
+    }
+
+    /* Orbs glow flotantes — cinematograficos, blur grande */
+    .padrinos__orb {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(45px);
+      z-index: 1;
+    }
+
+    .padrinos__orb--1 {
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(255, 43, 214, 0.32) 0%, transparent 70%);
+      top: 8%;
+      left: -10%;
+      animation: orbFloat1 12s ease-in-out infinite;
+    }
+
+    .padrinos__orb--2 {
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, rgba(138, 43, 255, 0.32) 0%, transparent 70%);
+      bottom: 6%;
+      right: -12%;
+      animation: orbFloat2 14s ease-in-out infinite;
+    }
+
+    @keyframes orbFloat1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50%      { transform: translate(22px, -12px) scale(1.06); }
+    }
+
+    @keyframes orbFloat2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50%      { transform: translate(-18px, -20px) scale(1.09); }
+    }
+
+    /* Label "Con la bendicion de" */
+    .padrinos__label {
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-size: 0.78rem;
+      letter-spacing: 0.55em;
+      padding-left: 0.55em;
+      text-transform: uppercase;
+      color: var(--blanco-soft);
+      text-shadow:
+        0 0 10px rgba(255, 43, 214, 0.45),
+        0 0 20px rgba(255, 43, 214, 0.22);
+      margin: 0 0 0.85rem;
+      position: relative;
+      z-index: 2;
+      /* Reveal */
+      opacity: 0;
+      transform: translateY(20px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+
+    /* Subtitulo italica — emocional, delicado */
+    .padrinos__intro {
+      font-family: var(--font-ui);
+      font-weight: 200;
+      font-style: italic;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+      line-height: 1.5;
+      color: var(--blanco-soft);
+      text-shadow:
+        0 0 10px rgba(255, 122, 224, 0.32),
+        0 0 22px rgba(138, 43, 255, 0.18);
+      max-width: 280px;
+      margin: 0 0 2.2rem;
+      position: relative;
+      z-index: 2;
+      /* Reveal */
+      opacity: 0;
+      transform: translateY(18px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+
+    /* Stack vertical de cards */
+    .padrinos__cards {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 340px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Card glass premium con borde MUY sutil */
+    .padrinos__card {
+      position: relative;
+      padding: 2rem 1.4rem 2.2rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 43, 214, 0.16);  /* borde MUY sutil */
+      border-radius: 24px;
+      -webkit-backdrop-filter: blur(14px) saturate(140%);
+      backdrop-filter: blur(14px) saturate(140%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+        0 8px 28px rgba(0, 0, 0, 0.35),
+        0 0 22px rgba(255, 43, 214, 0.14);
+      text-align: center;
+      transition:
+        transform .45s var(--ease-soft),
+        border-color .45s ease,
+        box-shadow .45s ease,
+        opacity 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+      /* Reveal initial state */
+      opacity: 0;
+      transform: translateY(28px);
+      filter: blur(6px);
+    }
+
+    /* Sparkle decorativo arriba del tag — radial burst minimalista */
+    .padrinos__spark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      margin: 0 auto 0.6rem;
+      color: var(--rosa-neon-soft);
+      filter: drop-shadow(0 0 6px rgba(255, 43, 214, 0.55));
+    }
+
+    .padrinos__spark svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Tag PADRES/PADRINOS — pequeno, etiquetado tipo editorial */
+    .padrinos__tag {
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-size: 0.62rem;
+      letter-spacing: 0.42em;
+      padding-left: 0.42em;
+      text-transform: uppercase;
+      color: var(--rosa-neon-soft);
+      text-shadow: 0 0 10px rgba(255, 43, 214, 0.4);
+      margin: 0 0 1.2rem;
+    }
+
+    /* Container de nombres */
+    .padrinos__names {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    /* Cada nombre en Italianno (brush elegante, mismo que portada) */
+    .padrinos__name {
+      font-family: var(--font-brush);
+      font-weight: 400;
+      font-size: clamp(1.5rem, 8.5cqw, 2rem);
+      line-height: 1.05;
+      color: var(--blanco-glow);
+      letter-spacing: 0.01em;
+      text-shadow:
+        0 0 6px rgba(255, 255, 255, 0.4),
+        0 0 16px rgba(255, 122, 224, 0.42),
+        0 0 30px rgba(255, 43, 214, 0.3),
+        0 0 56px rgba(138, 43, 255, 0.22);
+      margin: 0;
+    }
+
+    /* Separador delicado entre dos nombres dentro de una card */
+    .padrinos__sep {
+      display: block;
+      width: 30px;
+      height: 1px;
+      background: linear-gradient(
+        to right,
+        transparent,
+        rgba(255, 122, 224, 0.35),
+        transparent
+      );
+      margin: 0.2rem auto;
+    }
+
+    /* Hover suave en card — eleva ligeramente con glow extra */
+    .padrinos__card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 122, 224, 0.35);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+        0 12px 32px rgba(0, 0, 0, 0.45),
+        0 0 32px rgba(255, 43, 214, 0.3),
+        0 0 56px rgba(138, 43, 255, 0.18);
+    }
+
+    /* Linea luminosa decorativa entre PADRES y PADRINOS, con punto pulsante */
+    .padrinos__divider {
+      position: relative;
+      width: 100%;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* Reveal */
+      opacity: 0;
+      transition: opacity 1s var(--ease-soft);
+    }
+
+    .padrinos__divider::before {
+      content: '';
+      position: absolute;
+      left: 14%;
+      right: 14%;
+      top: 50%;
+      height: 1px;
+      background: linear-gradient(
+        to right,
+        transparent,
+        rgba(255, 43, 214, 0.35),
+        rgba(138, 43, 255, 0.45),
+        rgba(255, 43, 214, 0.35),
+        transparent
+      );
+    }
+
+    .padrinos__divider::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--rosa-neon-soft) 0%, rgba(255, 43, 214, 0) 70%);
+      transform: translate(-50%, -50%);
+      box-shadow:
+        0 0 12px rgba(255, 43, 214, 0.7),
+        0 0 24px rgba(138, 43, 255, 0.5);
+      animation: dividerPulse 3.5s ease-in-out infinite;
+    }
+
+    @keyframes dividerPulse {
+      0%, 100% {
+        opacity: 0.7;
+        transform: translate(-50%, -50%) scale(1);
+        box-shadow: 0 0 10px rgba(255, 43, 214, 0.55);
+      }
+      50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.18);
+        box-shadow:
+          0 0 18px rgba(255, 43, 214, 0.9),
+          0 0 36px rgba(138, 43, 255, 0.55);
+      }
+    }
+
+    /* Reveal con stagger */
+    .padrinos.is-visible .padrinos__label,
+    .padrinos.is-visible .padrinos__intro,
+    .padrinos.is-visible .padrinos__card {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+    .padrinos.is-visible .padrinos__divider {
+      opacity: 1;
+    }
+
+    .padrinos.is-visible .padrinos__label               { transition-delay: 0s; }
+    .padrinos.is-visible .padrinos__intro               { transition-delay: 0.1s; }
+    .padrinos.is-visible .padrinos__card:nth-of-type(1) { transition-delay: 0.22s; }
+    .padrinos.is-visible .padrinos__divider             { transition-delay: 0.42s; }
+    .padrinos.is-visible .padrinos__card:nth-of-type(2) { transition-delay: 0.52s; }
+
+    /* Glow respirando muy sutil — keyframe propio que respeta el borde
+       MUY sutil de las cards de padrinos */
+    .padrinos.is-visible .padrinos__card {
+      animation: padrinosBreathe 5.5s ease-in-out infinite;
+    }
+    .padrinos.is-visible .padrinos__card:nth-of-type(1) { animation-delay: 2.4s; }
+    .padrinos.is-visible .padrinos__card:nth-of-type(2) { animation-delay: 2.8s; }
+
+    @keyframes padrinosBreathe {
+      0%, 100% {
+        box-shadow:
+          inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+          0 8px 28px rgba(0, 0, 0, 0.35),
+          0 0 22px rgba(255, 43, 214, 0.14);
+        border-color: rgba(255, 43, 214, 0.16);
+      }
+      50% {
+        box-shadow:
+          inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+          0 8px 28px rgba(0, 0, 0, 0.35),
+          0 0 32px rgba(255, 43, 214, 0.28),
+          0 0 56px rgba(138, 43, 255, 0.16);
+        border-color: rgba(255, 122, 224, 0.3);
+      }
+    }
+
+    /* ============================================================
+       DRESS CODE — codigo de vestimenta editorial
+       Estructura: label + intro + paleta de 5 swatches + 2 cards
+       (Atrevete / Mejor no) + tip de cierre.
+       Sigue el mismo lenguaje visual del resto: glass + glows.
+       ============================================================ */
+    .dresscode {
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 2.2rem 1.5rem 3.2rem;
+      text-align: center;
+      /* Mismo lenguaje de fondo: negro carbon + glows, posiciones
+         intercambiadas para variar ritmo respecto a padrinos */
+      background:
+        radial-gradient(ellipse at 75% 22%, rgba(138, 43, 255, 0.20) 0%, transparent 55%),
+        radial-gradient(ellipse at 18% 78%, rgba(255, 43, 214, 0.18) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 100%, rgba(107, 240, 255, 0.05) 0%, transparent 55%),
+        linear-gradient(180deg, var(--negro-carbon) 0%, #0c0815 50%, var(--negro-carbon) 100%);
+      isolation: isolate;
+      overflow: hidden;
+    }
+
+    /* Label "DRESS CODE" — mismo tratamiento que las demas secciones */
+    .dresscode__label {
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-size: 0.78rem;
+      letter-spacing: 0.55em;
+      padding-left: 0.55em;
+      text-transform: uppercase;
+      color: var(--blanco-soft);
+      text-shadow:
+        0 0 10px rgba(255, 43, 214, 0.45),
+        0 0 20px rgba(255, 43, 214, 0.22);
+      margin: 0 0 0.7rem;
+      position: relative;
+      z-index: 2;
+      /* Reveal */
+      opacity: 0;
+      transform: translateY(20px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+
+    /* Subtitulo "Street Glam · Neon Chic" */
+    .dresscode__intro {
+      font-family: var(--font-ui);
+      font-weight: 200;
+      font-style: italic;
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
+      color: var(--blanco-soft);
+      text-shadow:
+        0 0 10px rgba(255, 122, 224, 0.32),
+        0 0 22px rgba(138, 43, 255, 0.18);
+      margin: 0 0 2rem;
+      position: relative;
+      z-index: 2;
+      /* Reveal */
+      opacity: 0;
+      transform: translateY(18px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+
+    /* Paleta — 5 swatches en row, glassmorphism contenedor sutil */
+    .dresscode__palette {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 0.7rem;
+      width: 100%;
+      max-width: 340px;
+      margin: 0 0 2.2rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .dresscode__swatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      flex: 1 1 0;
+      min-width: 0;
+      /* Reveal */
+      opacity: 0;
+      transform: translateY(16px);
+      filter: blur(6px);
+      transition:
+        opacity .9s var(--ease-soft),
+        transform .9s var(--ease-soft),
+        filter .9s var(--ease-soft);
+    }
+
+    /* Chip circular con color + glow propio */
+    .dresscode__chip {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+        inset 0 -6px 10px rgba(0, 0, 0, 0.35),
+        0 4px 12px rgba(0, 0, 0, 0.45);
+      transition:
+        transform .35s var(--ease-soft),
+        box-shadow .35s ease;
+    }
+
+    /* Variantes — un chip por color de la paleta */
+    .dresscode__chip--carbon {
+      background: radial-gradient(circle at 30% 30%, #2a1f3a 0%, #0a0612 70%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+        inset 0 -6px 10px rgba(0, 0, 0, 0.6),
+        0 0 14px rgba(138, 43, 255, 0.18),
+        0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+    .dresscode__chip--silver {
+      background: linear-gradient(135deg, #f0f0f5 0%, #c8c9d2 45%, #7e8189 100%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.4),
+        inset 0 -6px 10px rgba(0, 0, 0, 0.25),
+        0 0 16px rgba(200, 201, 210, 0.25),
+        0 4px 12px rgba(0, 0, 0, 0.45);
+    }
+    .dresscode__chip--neon {
+      background: radial-gradient(circle at 35% 30%, #ff7ae0 0%, var(--rosa-neon) 60%, #c9119f 100%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+        inset 0 -6px 10px rgba(0, 0, 0, 0.25),
+        0 0 18px rgba(255, 43, 214, 0.55),
+        0 0 36px rgba(255, 43, 214, 0.25),
+        0 4px 12px rgba(0, 0, 0, 0.45);
+    }
+    .dresscode__chip--glow {
+      background: radial-gradient(circle at 35% 30%, #ffffff 0%, #f1e8ff 60%, #c5b8d8 100%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+        inset 0 -6px 10px rgba(0, 0, 0, 0.18),
+        0 0 18px rgba(255, 255, 255, 0.3),
+        0 0 36px rgba(241, 232, 255, 0.2),
+        0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+    .dresscode__chip--uv {
+      background: radial-gradient(circle at 35% 30%, #b876ff 0%, var(--morado-uv) 55%, var(--morado-deep) 100%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+        inset 0 -6px 10px rgba(0, 0, 0, 0.3),
+        0 0 18px rgba(138, 43, 255, 0.5),
+        0 0 36px rgba(138, 43, 255, 0.25),
+        0 4px 12px rgba(0, 0, 0, 0.45);
+    }
+
+    /* Label debajo del chip */
+    .dresscode__chip-label {
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--blanco-soft);
+      opacity: 0.75;
+    }
+
+    /* Stack vertical de cards */
+    .dresscode__cards {
+      display: flex;
+      flex-direction: column;
+      gap: 0.95rem;
+      width: 100%;
+      max-width: 340px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Card base — glassmorphism premium */
+    .dresscode__card {
+      position: relative;
+      padding: 1.4rem 1.35rem 1.5rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 43, 214, 0.22);
+      border-radius: 22px;
+      -webkit-backdrop-filter: blur(12px) saturate(140%);
+      backdrop-filter: blur(12px) saturate(140%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+        0 8px 24px rgba(0, 0, 0, 0.3),
+        0 0 18px rgba(255, 43, 214, 0.14);
+      text-align: left;
+      /* Reveal */
+      opacity: 0;
+      transform: translateY(28px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft),
+        border-color .4s ease,
+        box-shadow .4s ease;
+    }
+
+    /* Card "Mejor no" — borde mas apagado, glow morado profundo,
+       jerarquia secundaria sin perder elegancia */
+    .dresscode__card--no {
+      border-color: rgba(138, 43, 255, 0.20);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.025),
+        0 8px 24px rgba(0, 0, 0, 0.3),
+        0 0 14px rgba(138, 43, 255, 0.12);
+    }
+
+    /* Header de cada card: icono circular + titulo */
+    .dresscode__card-head {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin: 0 0 0.85rem;
+    }
+
+    /* Icono circular (check / cross) */
+    .dresscode__icon {
+      flex: 0 0 auto;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .dresscode__icon svg {
+      width: 16px;
+      height: 16px;
+      display: block;
+    }
+    .dresscode__icon--yes {
+      background: rgba(255, 43, 214, 0.1);
+      border: 1px solid rgba(255, 43, 214, 0.35);
+      color: var(--rosa-neon-soft);
+      box-shadow: inset 0 0 12px rgba(255, 43, 214, 0.18);
+    }
+    .dresscode__icon--no {
+      background: rgba(138, 43, 255, 0.08);
+      border: 1px solid rgba(138, 43, 255, 0.3);
+      color: rgba(184, 118, 255, 0.85);
+      box-shadow: inset 0 0 12px rgba(138, 43, 255, 0.15);
+    }
+
+    /* Titulo de card "Atrevete con" / "Mejor no" */
+    .dresscode__card-title {
+      font-family: var(--font-ui);
+      font-weight: 400;
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
+      color: var(--blanco-glow);
+      margin: 0;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.18);
+    }
+
+    /* Lista de items — sin bullets nativos, separadores hairline */
+    .dresscode__list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dresscode__list li {
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-size: 0.88rem;
+      letter-spacing: 0.015em;
+      color: var(--blanco-soft);
+      padding: 0.55rem 0 0.55rem 1.1rem;
+      position: relative;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .dresscode__list li:first-child { border-top: 0; padding-top: 0.2rem; }
+    .dresscode__list li:last-child  { padding-bottom: 0; }
+
+    /* Bullet personalizado: pequeno punto neon a la izquierda */
+    .dresscode__list li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      transform: translateY(-50%);
+      background: var(--rosa-neon-soft);
+      box-shadow: 0 0 6px rgba(255, 43, 214, 0.6);
+    }
+    .dresscode__card--no .dresscode__list li::before {
+      background: rgba(138, 43, 255, 0.7);
+      box-shadow: 0 0 6px rgba(138, 43, 255, 0.5);
+    }
+    .dresscode__list li:first-child::before { top: 0.6rem; transform: none; }
+
+    /* Tip de cierre — italica delicada con flourish lateral */
+    .dresscode__tip {
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-style: italic;
+      font-size: 0.82rem;
+      letter-spacing: 0.03em;
+      color: var(--blanco-soft);
+      opacity: 0.85;
+      margin: 1.8rem 0 0;
+      position: relative;
+      z-index: 2;
+      text-shadow: 0 0 8px rgba(255, 122, 224, 0.22);
+      /* Reveal */
+      opacity: 0;
+      transform: translateY(14px);
+      filter: blur(5px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+    .dresscode__tip span {
+      font-style: normal;
+      font-weight: 400;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      color: var(--rosa-neon-soft);
+      margin-right: 0.35rem;
+    }
+    .dresscode__tip em {
+      font-style: italic;
+      color: var(--blanco-glow);
+    }
+
+    /* Hover suave en cards (desktop) */
+    @media (hover: hover) {
+      .dresscode__card--yes:hover {
+        transform: translateY(-2px);
+        border-color: rgba(255, 122, 224, 0.42);
+        box-shadow:
+          inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+          0 12px 30px rgba(0, 0, 0, 0.4),
+          0 0 26px rgba(255, 43, 214, 0.28);
+      }
+      .dresscode__card--no:hover {
+        transform: translateY(-2px);
+        border-color: rgba(138, 43, 255, 0.4);
+        box-shadow:
+          inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+          0 12px 30px rgba(0, 0, 0, 0.4),
+          0 0 26px rgba(138, 43, 255, 0.22);
+      }
+      .dresscode__swatch:hover .dresscode__chip {
+        transform: translateY(-3px) scale(1.08);
+      }
+    }
+
+    /* Reveal con stagger */
+    .dresscode.is-visible .dresscode__label,
+    .dresscode.is-visible .dresscode__intro,
+    .dresscode.is-visible .dresscode__swatch,
+    .dresscode.is-visible .dresscode__card,
+    .dresscode.is-visible .dresscode__tip {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+    .dresscode.is-visible .dresscode__label              { transition-delay: 0s; }
+    .dresscode.is-visible .dresscode__intro              { transition-delay: 0.08s; }
+    .dresscode.is-visible .dresscode__swatch:nth-child(1){ transition-delay: 0.20s; }
+    .dresscode.is-visible .dresscode__swatch:nth-child(2){ transition-delay: 0.28s; }
+    .dresscode.is-visible .dresscode__swatch:nth-child(3){ transition-delay: 0.36s; }
+    .dresscode.is-visible .dresscode__swatch:nth-child(4){ transition-delay: 0.44s; }
+    .dresscode.is-visible .dresscode__swatch:nth-child(5){ transition-delay: 0.52s; }
+    .dresscode.is-visible .dresscode__card:nth-of-type(1){ transition-delay: 0.62s; }
+    .dresscode.is-visible .dresscode__card:nth-of-type(2){ transition-delay: 0.74s; }
+    .dresscode.is-visible .dresscode__tip                { transition-delay: 0.88s; }
+
+    /* ============================================================
+       INSTAGRAM · Hashtag para etiquetar momentos en IG
+       Estructura: label + intro + hashtag con shimmer + card glass
+       con logo IG / handle / CTA + boton "copiar #" + micro-toast.
+       Para reutilizar el hashtag, JS lee el textContent del <h2>.
+       ============================================================ */
+    .instagram {
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2.4rem 1.5rem 3.4rem;
+      text-align: center;
+      /* Glows asimetricos para variar ritmo respecto a dresscode */
+      background:
+        radial-gradient(ellipse at 22% 28%, rgba(255, 43, 214, 0.20) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 75%, rgba(138, 43, 255, 0.20) 0%, transparent 55%),
+        radial-gradient(ellipse at 50% 50%, rgba(107, 240, 255, 0.05) 0%, transparent 60%),
+        linear-gradient(180deg, var(--negro-carbon) 0%, #0c0815 50%, var(--negro-carbon) 100%);
+      isolation: isolate;
+      overflow: hidden;
+    }
+
+    /* Label "INSTAGRAM" — mismo tratamiento */
+    .instagram__label {
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-size: 0.78rem;
+      letter-spacing: 0.55em;
+      padding-left: 0.55em;
+      text-transform: uppercase;
+      color: var(--blanco-soft);
+      text-shadow:
+        0 0 10px rgba(255, 43, 214, 0.45),
+        0 0 20px rgba(255, 43, 214, 0.22);
+      margin: 0 0 0.7rem;
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+      transform: translateY(20px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+
+    /* Subtitulo italica */
+    .instagram__intro {
+      font-family: var(--font-ui);
+      font-weight: 200;
+      font-style: italic;
+      font-size: 0.92rem;
+      letter-spacing: 0.04em;
+      color: var(--blanco-soft);
+      text-shadow:
+        0 0 10px rgba(255, 122, 224, 0.32),
+        0 0 22px rgba(138, 43, 255, 0.18);
+      margin: 0 0 1.6rem;
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+      transform: translateY(18px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+
+    /* Hashtag grande con shimmer (mismo tratamiento que el nombre) */
+    .instagram__hashtag {
+      position: relative;
+      z-index: 2;
+      font-family: var(--font-ui);
+      font-weight: 500;
+      font-size: clamp(2rem, 11cqw, 2.8rem);
+      letter-spacing: 0.005em;
+      color: var(--blanco-glow);
+      margin: 0.4rem 0 1.6rem;
+      text-shadow:
+        0 0 8px rgba(255, 255, 255, 0.45),
+        0 0 18px rgba(255, 122, 224, 0.5),
+        0 0 36px rgba(255, 43, 214, 0.4),
+        0 0 64px rgba(138, 43, 255, 0.28);
+      /* Shimmer pasando por encima del texto */
+      background: linear-gradient(
+        110deg,
+        rgba(255, 255, 255, 0) 35%,
+        rgba(255, 255, 255, 0.85) 50%,
+        rgba(255, 255, 255, 0) 65%
+      );
+      background-size: 220% 100%;
+      background-position: -120% 0;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: var(--blanco-glow);
+      animation: hashtagShimmer 5.5s ease-in-out infinite 2s;
+      /* Reveal */
+      opacity: 0;
+      transform: translateY(18px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+    @keyframes hashtagShimmer {
+      0%, 100% { background-position: -120% 0; }
+      50%      { background-position: 220% 0; }
+    }
+
+    /* Card glass con logo + handle + CTAs */
+    .instagram__card {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 340px;
+      padding: 1.5rem 1.3rem 1.6rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 43, 214, 0.22);
+      border-radius: 22px;
+      -webkit-backdrop-filter: blur(14px) saturate(140%);
+      backdrop-filter: blur(14px) saturate(140%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+        0 8px 24px rgba(0, 0, 0, 0.3),
+        0 0 18px rgba(255, 43, 214, 0.14);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.85rem;
+      opacity: 0;
+      transform: translateY(28px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+
+    /* Logo IG dentro de un holder glass tipo "app icon" */
+    .instagram__logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      box-shadow:
+        0 0 16px rgba(255, 43, 214, 0.35),
+        0 0 32px rgba(138, 43, 255, 0.22),
+        0 6px 16px rgba(0, 0, 0, 0.4);
+      display: block;
+    }
+
+    /* @handle en italica delicada */
+    .instagram__handle {
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-style: italic;
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+      color: var(--blanco-glow);
+      text-shadow:
+        0 0 8px rgba(255, 255, 255, 0.25),
+        0 0 18px rgba(255, 122, 224, 0.3);
+    }
+
+    /* Row de acciones */
+    .instagram__actions {
+      display: flex;
+      gap: 0.7rem;
+      width: 100%;
+      margin-top: 0.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Boton primario glass — abre IG */
+    .instagram__cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.7rem 1.15rem;
+      font-family: var(--font-ui);
+      font-weight: 400;
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--blanco-glow);
+      text-decoration: none;
+      background: rgba(255, 43, 214, 0.12);
+      border: 1px solid rgba(255, 43, 214, 0.55);
+      border-radius: 999px;
+      -webkit-backdrop-filter: blur(10px) saturate(140%);
+      backdrop-filter: blur(10px) saturate(140%);
+      box-shadow:
+        0 0 16px rgba(255, 43, 214, 0.3),
+        0 4px 14px rgba(0, 0, 0, 0.35);
+      cursor: pointer;
+      transition:
+        background .3s ease,
+        border-color .3s ease,
+        box-shadow .3s ease,
+        transform .3s var(--ease-soft);
+    }
+    .instagram__cta:hover,
+    .instagram__cta:focus-visible {
+      background: rgba(255, 43, 214, 0.22);
+      border-color: rgba(255, 122, 224, 0.85);
+      box-shadow:
+        0 0 22px rgba(255, 43, 214, 0.55),
+        0 0 44px rgba(138, 43, 255, 0.3),
+        0 6px 18px rgba(0, 0, 0, 0.45);
+      transform: translateY(-1px);
+      outline: none;
+    }
+    .instagram__cta:active { transform: translateY(0); }
+
+    /* Boton secundario — copiar hashtag */
+    .instagram__copy {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.7rem 1.15rem;
+      font-family: var(--font-ui);
+      font-weight: 400;
+      font-size: 0.74rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--blanco-soft);
+      background: transparent;
+      border: 1px solid rgba(138, 43, 255, 0.45);
+      border-radius: 999px;
+      cursor: pointer;
+      transition:
+        background .3s ease,
+        border-color .3s ease,
+        color .3s ease,
+        box-shadow .3s ease,
+        transform .3s var(--ease-soft);
+    }
+    .instagram__copy:hover,
+    .instagram__copy:focus-visible {
+      background: rgba(138, 43, 255, 0.14);
+      border-color: rgba(184, 118, 255, 0.7);
+      color: var(--blanco-glow);
+      box-shadow: 0 0 18px rgba(138, 43, 255, 0.35);
+      outline: none;
+    }
+    .instagram__copy.is-copied {
+      background: rgba(107, 240, 255, 0.10);
+      border-color: rgba(107, 240, 255, 0.55);
+      color: var(--cyan-accent);
+      box-shadow: 0 0 18px rgba(107, 240, 255, 0.4);
+    }
+
+    /* Micro-toast "Copiado" — vive dentro de la seccion para mobile */
+    .instagram__toast {
+      position: absolute;
+      left: 50%;
+      bottom: 1.3rem;
+      transform: translate(-50%, 12px);
+      padding: 0.55rem 1rem;
+      font-family: var(--font-ui);
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--blanco-glow);
+      background: rgba(10, 6, 18, 0.85);
+      border: 1px solid rgba(107, 240, 255, 0.5);
+      border-radius: 999px;
+      box-shadow:
+        0 0 16px rgba(107, 240, 255, 0.35),
+        0 4px 14px rgba(0, 0, 0, 0.5);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 3;
+      transition:
+        opacity .35s var(--ease-soft),
+        transform .35s var(--ease-soft);
+    }
+    .instagram__toast.is-visible {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    /* Reveal con stagger */
+    .instagram.is-visible .instagram__label,
+    .instagram.is-visible .instagram__intro,
+    .instagram.is-visible .instagram__hashtag,
+    .instagram.is-visible .instagram__card {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+    .instagram.is-visible .instagram__label    { transition-delay: 0s; }
+    .instagram.is-visible .instagram__intro    { transition-delay: 0.08s; }
+    .instagram.is-visible .instagram__hashtag  { transition-delay: 0.22s; }
+    .instagram.is-visible .instagram__card     { transition-delay: 0.38s; }
+
+    /* ============================================================
+       RSVP · Confirmacion de asistencia
+       Cierre de la invitacion: label + intro + pildora con fecha
+       limite + CTA grande WhatsApp + link "no podre asistir" +
+       linea de cierre. Toda la accion se canaliza a wa.me con
+       mensaje prellenado.
+       ============================================================ */
+    .rsvp {
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2.6rem 1.5rem 3.6rem;
+      text-align: center;
+      /* Cierre cinematografico — glow rosa dominante, morado de apoyo */
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(255, 43, 214, 0.22) 0%, transparent 55%),
+        radial-gradient(ellipse at 18% 85%, rgba(138, 43, 255, 0.22) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 85%, rgba(138, 43, 255, 0.16) 0%, transparent 55%),
+        linear-gradient(180deg, var(--negro-carbon) 0%, #0c0815 60%, var(--negro-carbon) 100%);
+      isolation: isolate;
+      overflow: hidden;
+    }
+
+    .rsvp__label {
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-size: 0.78rem;
+      letter-spacing: 0.55em;
+      padding-left: 0.55em;
+      text-transform: uppercase;
+      color: var(--blanco-soft);
+      text-shadow:
+        0 0 10px rgba(255, 43, 214, 0.45),
+        0 0 20px rgba(255, 43, 214, 0.22);
+      margin: 0 0 0.7rem;
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+      transform: translateY(20px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+
+    .rsvp__intro {
+      font-family: var(--font-ui);
+      font-weight: 200;
+      font-style: italic;
+      font-size: 0.98rem;
+      letter-spacing: 0.04em;
+      color: var(--blanco-soft);
+      text-shadow:
+        0 0 10px rgba(255, 122, 224, 0.32),
+        0 0 22px rgba(138, 43, 255, 0.18);
+      margin: 0 0 1.5rem;
+      max-width: 22rem;
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+      transform: translateY(18px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+
+    /* Pildora con la fecha limite — glass discreto */
+    .rsvp__deadline {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 0.95rem;
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--blanco-soft);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(107, 240, 255, 0.32);
+      border-radius: 999px;
+      -webkit-backdrop-filter: blur(10px) saturate(140%);
+      backdrop-filter: blur(10px) saturate(140%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+        0 0 14px rgba(107, 240, 255, 0.14);
+      margin: 0 0 1.8rem;
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+      transform: translateY(14px);
+      filter: blur(5px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+    .rsvp__deadline svg {
+      width: 14px;
+      height: 14px;
+      color: var(--cyan-accent);
+      filter: drop-shadow(0 0 4px rgba(107, 240, 255, 0.6));
+    }
+    .rsvp__deadline strong {
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      color: var(--blanco-glow);
+      margin-left: 0.2em;
+    }
+
+    /* Card principal — logo + contacto + CTAs (mirror del card de Instagram) */
+    .rsvp__card {
+      width: 100%;
+      max-width: 340px;
+      padding: 1.6rem 1.4rem 1.6rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 43, 214, 0.28);
+      border-radius: 24px;
+      -webkit-backdrop-filter: blur(14px) saturate(140%);
+      backdrop-filter: blur(14px) saturate(140%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+        0 12px 32px rgba(0, 0, 0, 0.4),
+        0 0 28px rgba(255, 43, 214, 0.22);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.85rem;
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+      transform: translateY(28px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+
+    /* Logo WhatsApp en holder "app icon" — mismo tratamiento que Instagram */
+    .rsvp__logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      box-shadow:
+        0 0 16px rgba(37, 211, 102, 0.35),
+        0 0 32px rgba(138, 43, 255, 0.18),
+        0 6px 16px rgba(0, 0, 0, 0.4);
+      display: block;
+    }
+
+    /* Nombre del contacto en italica delicada */
+    .rsvp__contact {
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-style: italic;
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+      color: var(--blanco-glow);
+      text-shadow:
+        0 0 8px rgba(255, 255, 255, 0.25),
+        0 0 18px rgba(255, 122, 224, 0.3);
+    }
+
+    /* Row de acciones — boton primario apilado con el link secundario */
+    .rsvp__actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+
+    /* CTA principal — boton GRANDE con respiracion neon */
+    .rsvp__cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+      width: 100%;
+      padding: 1.05rem 1.3rem;
+      font-family: var(--font-ui);
+      font-weight: 500;
+      font-size: 0.86rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--blanco-glow);
+      text-decoration: none;
+      background:
+        linear-gradient(135deg, rgba(255, 43, 214, 0.22) 0%, rgba(138, 43, 255, 0.18) 100%);
+      border: 1px solid rgba(255, 43, 214, 0.6);
+      border-radius: 999px;
+      -webkit-backdrop-filter: blur(12px) saturate(150%);
+      backdrop-filter: blur(12px) saturate(150%);
+      box-shadow:
+        0 0 22px rgba(255, 43, 214, 0.4),
+        0 0 48px rgba(138, 43, 255, 0.22),
+        0 8px 20px rgba(0, 0, 0, 0.45);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition:
+        background .35s ease,
+        border-color .35s ease,
+        box-shadow .35s ease,
+        transform .35s var(--ease-soft);
+      animation: rsvpBreathe 4.5s ease-in-out 1.5s infinite;
+    }
+    .rsvp__cta:hover,
+    .rsvp__cta:focus-visible {
+      background:
+        linear-gradient(135deg, rgba(255, 43, 214, 0.32) 0%, rgba(138, 43, 255, 0.26) 100%);
+      border-color: rgba(255, 122, 224, 0.95);
+      box-shadow:
+        0 0 28px rgba(255, 43, 214, 0.65),
+        0 0 60px rgba(138, 43, 255, 0.4),
+        0 12px 28px rgba(0, 0, 0, 0.55);
+      transform: translateY(-1px);
+      outline: none;
+    }
+    .rsvp__cta:active { transform: translateY(0); }
+
+    /* Sweep brillante pasando sobre el boton cada loop */
+    .rsvp__cta::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -60%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(
+        100deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.18) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: skewX(-12deg);
+      animation: rsvpSweep 5.5s ease-in-out 3s infinite;
+      pointer-events: none;
+    }
+
+    @keyframes rsvpBreathe {
+      0%, 100% {
+        box-shadow:
+          0 0 22px rgba(255, 43, 214, 0.4),
+          0 0 48px rgba(138, 43, 255, 0.22),
+          0 8px 20px rgba(0, 0, 0, 0.45);
+      }
+      50% {
+        box-shadow:
+          0 0 30px rgba(255, 43, 214, 0.6),
+          0 0 70px rgba(138, 43, 255, 0.32),
+          0 0 110px rgba(255, 122, 224, 0.18),
+          0 8px 20px rgba(0, 0, 0, 0.45);
+      }
+    }
+    @keyframes rsvpSweep {
+      0%, 100% { left: -60%; }
+      55%      { left: 120%; }
+    }
+
+    /* Link secundario "No podre asistir" — discreto */
+    .rsvp__skip {
+      align-self: center;
+      display: inline-flex;
+      align-items: center;
+      padding: 0.5rem 0.4rem;
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-style: italic;
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      color: var(--blanco-soft);
+      text-decoration: none;
+      opacity: 0.7;
+      border-bottom: 1px solid transparent;
+      transition: opacity .3s ease, color .3s ease, border-color .3s ease;
+    }
+    .rsvp__skip:hover,
+    .rsvp__skip:focus-visible {
+      opacity: 1;
+      color: var(--blanco-glow);
+      border-bottom-color: rgba(184, 118, 255, 0.45);
+      outline: none;
+    }
+
+    /* Linea de cierre — italica grande, mensaje final */
+    .rsvp__closing {
+      margin: 2.2rem 0 0;
+      font-family: var(--font-brush);
+      font-weight: 400;
+      font-size: clamp(1.6rem, 8cqw, 2rem);
+      line-height: 1.1;
+      color: var(--blanco-glow);
+      letter-spacing: 0.01em;
+      text-shadow:
+        0 0 8px rgba(255, 255, 255, 0.5),
+        0 0 22px rgba(255, 122, 224, 0.5),
+        0 0 44px rgba(255, 43, 214, 0.35),
+        0 0 80px rgba(138, 43, 255, 0.25);
+      position: relative;
+      z-index: 2;
+      opacity: 0;
+      transform: translateY(14px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+
+    /* Reveal con stagger */
+    .rsvp.is-visible .rsvp__label,
+    .rsvp.is-visible .rsvp__intro,
+    .rsvp.is-visible .rsvp__deadline,
+    .rsvp.is-visible .rsvp__card,
+    .rsvp.is-visible .rsvp__closing {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+    .rsvp.is-visible .rsvp__label    { transition-delay: 0s; }
+    .rsvp.is-visible .rsvp__intro    { transition-delay: 0.08s; }
+    .rsvp.is-visible .rsvp__deadline { transition-delay: 0.22s; }
+    .rsvp.is-visible .rsvp__card     { transition-delay: 0.36s; }
+    .rsvp.is-visible .rsvp__closing  { transition-delay: 0.6s; }
+
+    /* ============================================================
+       OUTRO · Cierre cinematografico (bookend de la portada)
+       Foto full-bleed + overlay + vignette + frase en brush con
+       glow + signature minimalista. Mismo lenguaje que la portada
+       para sentir apertura/cierre simetrico.
+       ============================================================ */
+    .outro {
+      position: relative;
+      width: 100%;
+      min-height: 100dvh;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    /* Foto de fondo — editable via [data-editable] para panear el crop */
+    .outro__bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 50% 50%;
+      z-index: 0;
+      /* Micro-zoom cinematografico identico al de la portada */
+      animation: outroKenBurns 28s ease-in-out infinite alternate;
+    }
+    @keyframes outroKenBurns {
+      0%   { transform: scale(1.0); }
+      100% { transform: scale(1.06); }
+    }
+
+    /* Overlay degradado — oscurece arriba sutil + abajo fuerte para leer */
+    .outro__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(10, 6, 18, 0.42) 0%,
+        rgba(10, 6, 18, 0.08) 30%,
+        rgba(10, 6, 18, 0.55) 70%,
+        rgba(10, 6, 18, 0.95) 100%
+      );
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Vignette radial — cierra los bordes */
+    .outro__vignette {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 50% 35%, transparent 35%, rgba(10, 6, 18, 0.65) 100%);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* Contenido — frase abajo-centro como en la portada */
+    .outro__content {
+      position: relative;
+      z-index: 3;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 2rem 1.5rem 3.5rem;
+      text-align: center;
+    }
+
+    /* Frase principal en brush con glow capa-a-capa (mismo tratamiento que el nombre) */
+    .outro__phrase {
+      font-family: var(--font-brush);
+      font-weight: 400;
+      font-size: clamp(2.4rem, 13cqw, 3.6rem);
+      line-height: 1.02;
+      color: var(--blanco-glow);
+      margin: 0 0 1.5rem;
+      letter-spacing: 0.01em;
+      text-shadow:
+        0 0 8px rgba(255, 255, 255, 0.55),
+        0 0 22px rgba(255, 122, 224, 0.55),
+        0 0 44px rgba(255, 43, 214, 0.42),
+        0 0 80px rgba(138, 43, 255, 0.32);
+      max-width: 26rem;
+      /* Reveal */
+      opacity: 0;
+      transform: translateY(20px);
+      filter: blur(8px);
+      transition:
+        opacity 1.2s var(--ease-soft),
+        transform 1.2s var(--ease-soft),
+        filter 1.2s var(--ease-soft);
+    }
+
+    /* Signature minimalista — pequena, dos hairlines + nombre tracked */
+    .outro__signature {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.85rem;
+      opacity: 0;
+      transform: translateY(14px);
+      filter: blur(6px);
+      transition:
+        opacity 1s var(--ease-soft),
+        transform 1s var(--ease-soft),
+        filter 1s var(--ease-soft);
+    }
+    .outro__signature-line {
+      width: 30px;
+      height: 1px;
+      background: linear-gradient(
+        to right,
+        transparent,
+        rgba(255, 122, 224, 0.65),
+        transparent
+      );
+    }
+    .outro__signature-name {
+      font-family: var(--font-ui);
+      font-weight: 300;
+      font-size: 0.68rem;
+      letter-spacing: 0.55em;
+      padding-left: 0.55em;
+      text-transform: uppercase;
+      color: var(--blanco-soft);
+      text-shadow:
+        0 0 10px rgba(255, 43, 214, 0.45),
+        0 0 20px rgba(255, 43, 214, 0.22);
+    }
+
+    /* Reveal stagger */
+    .outro.is-visible .outro__phrase {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+      transition-delay: 0.15s;
+    }
+    .outro.is-visible .outro__signature {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+      transition-delay: 0.5s;
+    }
+
+    /* ============================================================
+       DESKTOP MOCKUP — desde 768px renderiza la portada dentro de
+       un marco tipo iPhone (390x844) centrado en pantalla.
+       Mobile real sigue intacto (fullscreen).
+       ============================================================ */
+    @media (min-width: 768px) {
+      body {
+        /* Escena exterior oscura, telefono centrado, body NO hace scroll */
+        height: 100dvh;
+        overflow: hidden;
+        padding: 28px 20px;
+        background:
+          radial-gradient(ellipse at 50% 35%, #1a1424 0%, #060309 60%, #030106 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .phone {
+        /* Marco fisico del telefono */
+        flex: 0 0 auto;
+        width: 390px;
+        min-height: 0;                       /* override mobile */
+        height: auto;
+        aspect-ratio: 390 / 844;
+        /* Adapta sin deformar si el viewport no llega a 844px de alto */
+        max-width: min(390px, calc((100dvh - 64px) * 390 / 844));
+        padding: 13px;                       /* bisel */
+        border-radius: 56px;                  /* esquina exterior tipo iPhone */
+        background: linear-gradient(145deg, #1a1a22 0%, #07070c 100%);
+        box-shadow:
+          inset 0 0 0 2px rgba(255, 255, 255, 0.045),   /* highlight interno bisel */
+          0 0 0 1px rgba(0, 0, 0, 0.65),                /* hairline exterior */
+          0 30px 80px rgba(0, 0, 0, 0.7),               /* drop shadow profunda */
+          0 0 100px rgba(255, 43, 214, 0.12),           /* ambient rosa neon */
+          0 0 180px rgba(138, 43, 255, 0.08);           /* ambient ultraviolet */
+        /* Scroll INTERNO del telefono — la portada queda en su sitio
+           y las secciones futuras se descubren con scroll dentro del marco */
+        overflow-y: auto;
+        overflow-x: hidden;
+        scrollbar-width: none;               /* Firefox */
+      }
+      .phone::-webkit-scrollbar { width: 0; height: 0; }  /* WebKit: scrollbar invisible */
+
+      .portada {
+        /* Esquina interior — anida dentro del bisel */
+        border-radius: 44px;
+        /* En desktop la portada mide exactamente UNA pantalla del telefono */
+        min-height: 100%;
+      }
+
+      /* countdown ya no necesita min-height: solo crece con su contenido,
+         flotando entre portada y venue sin gap vertical innecesario. */
+
+      /* venue, gallery y padrinos son secciones intermedias ahora.
+         Fluyen directamente al siguiente bloque sin gap vertical. */
+    }
+
+    /* ============================================================
+       RESPONSIVE — mobile first, escala hacia arriba
+       ============================================================ */
+    @media (min-width: 480px) {
+      .portada__content { padding-bottom: 3.6rem; }
+      .portada__sub { font-size: 0.85rem; }
+      .portada__fecha { font-size: 0.88rem; }
+    }
+
+    /* Nota: ya NO subimos el tamano del nombre en breakpoints de viewport
+       porque el container .phone es fijo (~390px) en desktop. El cqw
+       arriba hace todo el trabajo y mantiene el texto dentro del marco. */
+    @media (min-width: 768px) {
+      .portada__content { padding-bottom: 4.2rem; }
+      .portada__fecha::before,
+      .portada__fecha::after { width: 2rem; }
+    }
+
+    /* Orientacion landscape mobile — compactar */
+    @media (max-height: 520px) and (orientation: landscape) {
+      .portada__nombre { font-size: clamp(3.5rem, 11vh, 6rem); margin: 0.2rem 0 0.4rem; }
+      .portada__content { padding-bottom: 1.4rem; }
+    }
+
+    /* Accesibilidad — usuarios que prefieren menos movimiento */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .portada__bg { animation: none; }
+    }
+
+    /* Editor compartido: estilos en ../../assets/editor/editor.css */
+  </style>
+</head>
+<body>
+  <!-- =========================================================
+       PORTADA · Valentina · Mis XV · 15 Junio 2026
+       Estilo: neon luxury urbano · dark feminine · glow futurista
+       Wrapper .phone — fullscreen en mobile, mockup 390x844 en desktop
+       ========================================================= -->
+  <div class="phone">
+  <main class="portada" role="main" aria-label="Invitacion de XV anos de Valentina">
+
+    <!-- Fondo cinematografico
+         Ruta relativa + espacio URL-encoded (%20) para compatibilidad con file:// y servidores -->
+    <img
+      class="portada__bg"
+      src="assets/portada-neon-valentina.png"
+      alt=""
+      aria-hidden="true"
+      fetchpriority="high"
+      decoding="async"
+    />
+
+    <!-- Capas de overlay -->
+    <div class="portada__overlay" aria-hidden="true"></div>
+    <div class="portada__vignette" aria-hidden="true"></div>
+    <div class="portada__accent" aria-hidden="true"></div>
+
+    <!-- Contenido textual abajo-centro -->
+    <div class="portada__content">
+
+      <!-- Subtexto · [data-editable] = movible y escalable via editor -->
+      <p class="portada__sub" data-editable>Mis XV</p>
+
+      <!-- Nombre principal con shimmer animado -->
+      <h1 class="portada__nombre" data-text="Valentina" data-editable>Valentina</h1>
+
+      <!-- Fecha -->
+      <p class="portada__fecha" data-editable>
+        <span>15 Junio 2026</span>
+      </p>
+
+    </div>
+  </main>
+
+  <!-- =========================================================
+       COUNTDOWN · Cuenta regresiva para los XV
+       Vive dentro del mismo .phone — el usuario llega con scroll
+       ========================================================= -->
+  <section class="countdown" id="countdown" aria-label="Cuenta regresiva para los XV anos">
+    <p class="countdown__intro">La gran noche se acerca</p>
+    <p class="countdown__label">Faltan</p>
+
+    <div class="countdown__grid">
+      <div class="countdown__card">
+        <span class="countdown__value" data-unit="days">178</span>
+        <span class="countdown__unit">dias</span>
+      </div>
+      <div class="countdown__card">
+        <span class="countdown__value" data-unit="hours">07</span>
+        <span class="countdown__unit">horas</span>
+      </div>
+      <div class="countdown__card">
+        <span class="countdown__value" data-unit="minutes">20</span>
+        <span class="countdown__unit">min</span>
+      </div>
+      <div class="countdown__card">
+        <span class="countdown__value" data-unit="seconds">47</span>
+        <span class="countdown__unit">seg</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       VENUE · Donde y Cuando
+       Fecha, hora, lugar, direccion + boton "Ver ubicacion"
+       Cards glass apiladas, iconos SVG lineales finos, fashion editorial
+       ========================================================= -->
+  <section class="venue" id="venue" aria-label="Donde y cuando">
+    <p class="venue__label">D&oacute;nde y Cu&aacute;ndo</p>
+
+    <div class="venue__cards">
+
+      <!-- Card 1 — Fecha + Hora, con separador sutil -->
+      <div class="venue__card">
+        <div class="venue__row">
+          <span class="venue__icon" aria-hidden="true">
+            <!-- Icono calendario lineal -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3.5" y="5.5" width="17" height="15" rx="2"/>
+              <path d="M3.5 10h17"/>
+              <path d="M8 3.5v3"/>
+              <path d="M16 3.5v3"/>
+            </svg>
+          </span>
+          <div class="venue__col">
+            <span class="venue__caption">Fecha</span>
+            <span class="venue__value">15 Junio 2026</span>
+          </div>
+        </div>
+
+        <div class="venue__divider" aria-hidden="true"></div>
+
+        <div class="venue__row">
+          <span class="venue__icon" aria-hidden="true">
+            <!-- Icono reloj lineal -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="8.5"/>
+              <path d="M12 7.5v5l3 2"/>
+            </svg>
+          </span>
+          <div class="venue__col">
+            <span class="venue__caption">Hora</span>
+            <span class="venue__value">7:00 PM</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 — Lugar + Direccion + CTA -->
+      <div class="venue__card">
+        <div class="venue__row">
+          <span class="venue__icon" aria-hidden="true">
+            <!-- Icono pin/ubicacion lineal -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 21.5s-7-7.5-7-13a7 7 0 1 1 14 0c0 5.5-7 13-7 13z"/>
+              <circle cx="12" cy="8.5" r="2.4"/>
+            </svg>
+          </span>
+          <div class="venue__col">
+            <span class="venue__caption">Lugar</span>
+            <span class="venue__value venue__value--name">Sal&oacute;n Urbano 360</span>
+            <span class="venue__address">Av. Revoluci&oacute;n 1234, Monterrey, N.L.</span>
+          </div>
+        </div>
+
+        <!-- CTA — abre Google Maps en pestana nueva.
+             Ajusta la URL si cambia la direccion. -->
+        <a
+          class="venue__cta"
+          id="venue-cta"
+          href="https://www.google.com/maps/search/?api=1&amp;query=Sal%C3%B3n+Urbano+360%2C+Av.+Revoluci%C3%B3n+1234%2C+Monterrey%2C+N.L."
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Ver ubicacion en Google Maps"
+        >
+          <span>Ver ubicaci&oacute;n</span>
+          <span class="venue__cta-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================
+       GALLERY · Momentos
+       Collage editorial: 2 fotos grandes + 2 pequenas, glow neon,
+       hover zoom, fade-up con stagger. Sustituir las 4 src para
+       cambiar las fotos.
+       ========================================================= -->
+  <section class="gallery" id="gallery" aria-label="Galeria de momentos">
+    <p class="gallery__label">Momentos</p>
+    <p class="gallery__intro">Una noche para recordar</p>
+
+    <div class="gallery__grid">
+      <figure class="gallery__item gallery__item--p1">
+        <img src="assets/galeria-1.png" alt="" loading="lazy" decoding="async" data-editable />
+      </figure>
+      <figure class="gallery__item gallery__item--p2">
+        <img src="assets/galeria-2.png" alt="" loading="lazy" decoding="async" data-editable />
+      </figure>
+      <figure class="gallery__item gallery__item--p3">
+        <img src="assets/galeria-3.png" alt="" loading="lazy" decoding="async" data-editable />
+      </figure>
+      <figure class="gallery__item gallery__item--p4">
+        <img src="assets/galeria-4.png" alt="" loading="lazy" decoding="async" data-editable />
+      </figure>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       PADRINOS · Con la bendicion de
+       Seccion emocional con orbs glow flotantes, cards glass,
+       nombres en script Italianno, linea pulsante decorativa.
+       ========================================================= -->
+  <section class="padrinos" id="padrinos" aria-label="Padres y padrinos">
+    <!-- Orbs glow flotantes (decoracion cinematografica) -->
+    <span class="padrinos__orb padrinos__orb--1" aria-hidden="true"></span>
+    <span class="padrinos__orb padrinos__orb--2" aria-hidden="true"></span>
+
+    <p class="padrinos__label">Con la bendici&oacute;n de</p>
+    <p class="padrinos__intro">Quienes han guiado cada paso de este momento especial</p>
+
+    <div class="padrinos__cards">
+
+      <!-- Card PADRES -->
+      <article class="padrinos__card">
+        <span class="padrinos__spark" aria-hidden="true">
+          <!-- Sparkle radial burst minimalista -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+            <line x1="12" y1="3"     x2="12"   y2="7"/>
+            <line x1="12" y1="17"    x2="12"   y2="21"/>
+            <line x1="3"  y1="12"    x2="7"    y2="12"/>
+            <line x1="17" y1="12"    x2="21"   y2="12"/>
+            <line x1="5.64" y1="5.64"   x2="8.46"  y2="8.46"/>
+            <line x1="15.54" y1="15.54" x2="18.36" y2="18.36"/>
+            <line x1="5.64"  y1="18.36" x2="8.46"  y2="15.54"/>
+            <line x1="15.54" y1="8.46"  x2="18.36" y2="5.64"/>
+            <circle cx="12" cy="12" r="1.4" fill="currentColor"/>
+          </svg>
+        </span>
+        <p class="padrinos__tag">Padres</p>
+        <div class="padrinos__names">
+          <p class="padrinos__name">Mar&iacute;a L&oacute;pez</p>
+          <span class="padrinos__sep" aria-hidden="true"></span>
+          <p class="padrinos__name">Carlos Ram&iacute;rez</p>
+        </div>
+      </article>
+
+      <!-- Linea luminosa decorativa entre bloques -->
+      <div class="padrinos__divider" aria-hidden="true"></div>
+
+      <!-- Card PADRINOS -->
+      <article class="padrinos__card">
+        <span class="padrinos__spark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+            <line x1="12" y1="3"     x2="12"   y2="7"/>
+            <line x1="12" y1="17"    x2="12"   y2="21"/>
+            <line x1="3"  y1="12"    x2="7"    y2="12"/>
+            <line x1="17" y1="12"    x2="21"   y2="12"/>
+            <line x1="5.64" y1="5.64"   x2="8.46"  y2="8.46"/>
+            <line x1="15.54" y1="15.54" x2="18.36" y2="18.36"/>
+            <line x1="5.64"  y1="18.36" x2="8.46"  y2="15.54"/>
+            <line x1="15.54" y1="8.46"  x2="18.36" y2="5.64"/>
+            <circle cx="12" cy="12" r="1.4" fill="currentColor"/>
+          </svg>
+        </span>
+        <p class="padrinos__tag">Padrinos</p>
+        <div class="padrinos__names">
+          <p class="padrinos__name">Andrea &amp; Luis</p>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- =========================================================
+       DRESS CODE · C&oacute;digo de vestimenta
+       Estructura: label + intro + paleta de 5 swatches + 2 cards
+       (Atr&eacute;vete / Mejor no) + tip de cierre.
+       ========================================================= -->
+  <section class="dresscode" id="dresscode" aria-label="Codigo de vestimenta">
+    <p class="dresscode__label">Dress Code</p>
+    <p class="dresscode__intro">Street Glam &middot; Neon Chic</p>
+
+    <!-- Paleta de colores sugerida — 5 swatches -->
+    <div class="dresscode__palette" role="group" aria-label="Paleta de colores sugerida">
+      <div class="dresscode__swatch">
+        <span class="dresscode__chip dresscode__chip--carbon" aria-hidden="true"></span>
+        <span class="dresscode__chip-label">Carbon</span>
+      </div>
+      <div class="dresscode__swatch">
+        <span class="dresscode__chip dresscode__chip--silver" aria-hidden="true"></span>
+        <span class="dresscode__chip-label">Silver</span>
+      </div>
+      <div class="dresscode__swatch">
+        <span class="dresscode__chip dresscode__chip--neon" aria-hidden="true"></span>
+        <span class="dresscode__chip-label">Neon</span>
+      </div>
+      <div class="dresscode__swatch">
+        <span class="dresscode__chip dresscode__chip--glow" aria-hidden="true"></span>
+        <span class="dresscode__chip-label">Glow</span>
+      </div>
+      <div class="dresscode__swatch">
+        <span class="dresscode__chip dresscode__chip--uv" aria-hidden="true"></span>
+        <span class="dresscode__chip-label">UV</span>
+      </div>
+    </div>
+
+    <!-- 2 cards: Atrevete (S&iacute;) / Mejor no (Evita) -->
+    <div class="dresscode__cards">
+
+      <!-- Card 1 — Atrevete con (positivo, rosa neon) -->
+      <article class="dresscode__card dresscode__card--yes">
+        <header class="dresscode__card-head">
+          <span class="dresscode__icon dresscode__icon--yes" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12.5l4.5 4.5L19 7.5"/>
+            </svg>
+          </span>
+          <h3 class="dresscode__card-title">Atr&eacute;vete con</h3>
+        </header>
+        <ul class="dresscode__list">
+          <li>Cuero &middot; sat&eacute;n &middot; met&aacute;licos</li>
+          <li>Brillo sutil y texturas</li>
+          <li>Heels o sneakers blancos</li>
+          <li>Joyas plata / cromo</li>
+        </ul>
+      </article>
+
+      <!-- Card 2 — Mejor no (secundario, morado UV) -->
+      <article class="dresscode__card dresscode__card--no">
+        <header class="dresscode__card-head">
+          <span class="dresscode__icon dresscode__icon--no" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 7l10 10M7 17L17 7"/>
+            </svg>
+          </span>
+          <h3 class="dresscode__card-title">Mejor no</h3>
+        </header>
+        <ul class="dresscode__list">
+          <li>Denim casual</li>
+          <li>Colores tierra</li>
+          <li>Deportivo total</li>
+          <li>Tonos pasteles</li>
+        </ul>
+      </article>
+
+    </div>
+
+    <!-- Tip de cierre — frase memorable -->
+    <p class="dresscode__tip">
+      <span>Tip &mdash;</span> piensa <em>editorial</em>, piensa <em>portada</em>.
+    </p>
+  </section>
+
+  <!-- =========================================================
+       INSTAGRAM · Hashtag para etiquetar momentos en IG
+       Cambia el handle @valentina.xv por el real cuando lo
+       tengamos. El JS lee el hashtag del <h2> y construye el
+       enlace al perfil a partir del data-handle de la card.
+       ========================================================= -->
+  <section class="instagram" id="instagram" aria-label="Hashtag de Instagram">
+    <p class="instagram__label">Instagram</p>
+    <p class="instagram__intro">Etiqueta tus momentos de la noche</p>
+
+    <h2 class="instagram__hashtag">#ValentinaXV</h2>
+
+    <div class="instagram__card" data-handle="valentina.xv">
+      <img
+        class="instagram__logo"
+        src="../../assets/icons/instagram.png"
+        alt="Instagram"
+        width="56"
+        height="56"
+        loading="lazy"
+        decoding="async"
+      />
+      <span class="instagram__handle">@valentina.xv</span>
+
+      <div class="instagram__actions">
+        <!-- CTA primario: abre el perfil de IG (app si esta instalada, web si no) -->
+        <a
+          class="instagram__cta"
+          id="instagram-open"
+          href="https://www.instagram.com/valentina.xv/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Abrir perfil de Instagram"
+        >
+          Abrir perfil
+        </a>
+
+        <!-- Boton secundario: copia el hashtag al portapapeles -->
+        <button
+          class="instagram__copy"
+          id="instagram-copy"
+          type="button"
+          aria-label="Copiar hashtag"
+        >
+          Copiar #
+        </button>
+      </div>
+    </div>
+
+    <!-- Micro-toast — feedback al copiar -->
+    <div class="instagram__toast" id="instagram-toast" role="status" aria-live="polite">
+      Copiado &#10003;
+    </div>
+  </section>
+
+  <!-- =========================================================
+       RSVP · Confirmacion de asistencia
+       Las dos URLs apuntan a wa.me con la lada + numero del
+       contacto y un mensaje prellenado (URL-encoded). Cambiar
+       el WHATSAPP_NUMBER en las 2 ocurrencias cuando este el
+       numero real. Formato wa.me: pais + numero, sin '+' ni
+       espacios. Para Mexico celular: '521' + 10 digitos.
+       ========================================================= -->
+  <section class="rsvp" id="rsvp" aria-label="Confirmacion de asistencia">
+    <p class="rsvp__label">Confirma tu lugar</p>
+    <p class="rsvp__intro">Tu presencia es nuestro mejor regalo</p>
+
+    <!-- Pildora con la fecha limite -->
+    <div class="rsvp__deadline">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3.5" y="5.5" width="17" height="15" rx="2"/>
+        <path d="M3.5 10h17"/>
+        <path d="M8 3.5v3"/>
+        <path d="M16 3.5v3"/>
+      </svg>
+      <span>Confirma antes del <strong>8 de Junio</strong></span>
+    </div>
+
+    <!-- Card con logo + contacto + CTAs (mismo lenguaje que Instagram) -->
+    <div class="rsvp__card">
+      <!-- Logo WhatsApp en holder glass "app icon" -->
+      <img
+        class="rsvp__logo"
+        src="../../assets/icons/whatsapp.png"
+        alt="WhatsApp"
+        width="56"
+        height="56"
+        loading="lazy"
+        decoding="async"
+      />
+
+      <!-- Contacto al que llega la confirmacion. Cambiar el texto cuando
+           tengamos el nombre real (placeholder: "Familia Lopez"). -->
+      <span class="rsvp__contact">Familia L&oacute;pez</span>
+
+      <div class="rsvp__actions">
+        <!-- CTA principal: confirmar asistencia via WhatsApp -->
+        <a
+          class="rsvp__cta"
+          id="rsvp-yes"
+          href="https://wa.me/5216182297167?text=Hola%21%20Confirmo%20mi%20asistencia%20a%20los%20XV%20de%20Valentina%20%2815%20Jun%202026%29."
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Confirmar asistencia por WhatsApp"
+        >
+          <span>Confirmar asistencia</span>
+        </a>
+
+        <!-- Link secundario: no podre asistir -->
+        <a
+          class="rsvp__skip"
+          id="rsvp-no"
+          href="https://wa.me/5216182297167?text=Hola%21%20Lamentablemente%20no%20podr%C3%A9%20asistir%20a%20los%20XV%20de%20Valentina."
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Avisar que no podre asistir"
+        >
+          No podr&eacute; asistir
+        </a>
+      </div>
+    </div>
+
+    <!-- Cierre cinematografico — italica brush -->
+    <p class="rsvp__closing">Nos vemos en la noche m&aacute;s esperada</p>
+  </section>
+
+  <!-- =========================================================
+       OUTRO · Cierre cinematografico (bookend de la portada)
+       Foto full-bleed + overlay + vignette + frase en brush con
+       glow + signature minimalista. La foto es editable: el
+       editor puede panear el recuadro (object-position) para
+       recomponer el encuadre.
+       ========================================================= -->
+  <section class="outro" id="outro" aria-label="Cierre — Hoy escribo mi propia historia">
+    <!-- Foto de fondo full-bleed -->
+    <img
+      class="outro__bg"
+      src="assets/outro-valentina.png"
+      alt=""
+      loading="lazy"
+      decoding="async"
+      data-editable
+    />
+
+    <!-- Overlay + vignette para legibilidad -->
+    <div class="outro__overlay" aria-hidden="true"></div>
+    <div class="outro__vignette" aria-hidden="true"></div>
+
+    <!-- Contenido centrado abajo -->
+    <div class="outro__content">
+      <p class="outro__phrase" data-editable>
+        Hoy escribo<br/>mi propia historia
+      </p>
+
+      <!-- Signature: dos hairlines + nombre tracked -->
+      <div class="outro__signature" aria-hidden="true">
+        <span class="outro__signature-line"></span>
+        <span class="outro__signature-name">Valentina</span>
+        <span class="outro__signature-line"></span>
+      </div>
+    </div>
+  </section>
+  </div><!-- /.phone -->
+
+  <script>
+    /* ============================================================
+       INTERACCION — entrada cinematografica
+       ============================================================ */
+    (function () {
+      'use strict';
+
+      // Espera a que la imagen de fondo cargue para arrancar la animacion suave
+      const bg = document.querySelector('.portada__bg');
+      const root = document.querySelector('.portada');
+
+      function onReady() {
+        if (root) root.classList.add('is-ready');
+      }
+
+      if (bg && !bg.complete) {
+        bg.addEventListener('load', onReady, { once: true });
+        bg.addEventListener('error', onReady, { once: true });
+      } else {
+        onReady();
+      }
+
+      /* ========================================================
+         COUNTDOWN — cuenta regresiva hacia los XV
+         Target: 15 de Junio 2026, 19:00 hora local (ajustable).
+         Refresca cada segundo. Si la fecha ya paso, queda en 00.
+         ======================================================== */
+      const TARGET_DATE = new Date('2026-06-15T19:00:00');
+      const countdownRoot = document.getElementById('countdown');
+
+      function pad2(n) {
+        return String(Math.max(0, Math.floor(n))).padStart(2, '0');
+      }
+
+      function setUnit(unit, value) {
+        if (!countdownRoot) return;
+        const el = countdownRoot.querySelector('[data-unit="' + unit + '"]');
+        if (el && el.textContent !== value) el.textContent = value;
+      }
+
+      function renderCountdown() {
+        const diff = TARGET_DATE - new Date();
+        let d = 0, h = 0, m = 0, s = 0;
+        if (diff > 0) {
+          d = Math.floor(diff / 86400000);                 // 1000*60*60*24
+          h = Math.floor((diff % 86400000) / 3600000);     // 1000*60*60
+          m = Math.floor((diff % 3600000) / 60000);        // 1000*60
+          s = Math.floor((diff % 60000) / 1000);
+        }
+        setUnit('days',    pad2(d));
+        setUnit('hours',   pad2(h));
+        setUnit('minutes', pad2(m));
+        setUnit('seconds', pad2(s));
+      }
+
+      // Render inmediato + tick cada segundo
+      renderCountdown();
+      window.setInterval(renderCountdown, 1000);
+
+      /* ========================================================
+         Reveal fade-up al hacer scroll — IntersectionObserver
+         Observa countdown + venue. Cada uno recibe la clase
+         'is-visible' cuando el 20% entra al viewport.
+         Funciona tanto con scroll del body (mobile) como con scroll
+         interno del .phone (desktop): el root default es el viewport
+         y getBoundingClientRect detecta correctamente la posicion.
+         ======================================================== */
+      const revealTargets = [
+        countdownRoot,
+        document.getElementById('venue'),
+        document.getElementById('gallery'),
+        document.getElementById('padrinos'),
+        document.getElementById('dresscode'),
+        document.getElementById('instagram'),
+        document.getElementById('rsvp'),
+        document.getElementById('outro'),
+      ].filter(Boolean);
+
+      if (revealTargets.length && 'IntersectionObserver' in window) {
+        const io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              io.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.2 });
+        revealTargets.forEach(function (el) { io.observe(el); });
+      } else {
+        // Fallback navegadores antiguos — mostrar directamente
+        revealTargets.forEach(function (el) { el.classList.add('is-visible'); });
+      }
+    })();
+
+    /* ========================================================
+       INSTAGRAM — copiar hashtag al portapapeles + micro-toast
+       Lee el hashtag del <h2> para que cambiar el texto del HTML
+       sea suficiente; no hay valores hardcodeados aqui.
+       ======================================================== */
+    (function () {
+      'use strict';
+      var btn   = document.getElementById('instagram-copy');
+      var tag   = document.querySelector('.instagram__hashtag');
+      var toast = document.getElementById('instagram-toast');
+      if (!btn || !tag || !toast) return;
+
+      var hideTimer = null;
+      var resetTimer = null;
+
+      btn.addEventListener('click', async function () {
+        var text = (tag.textContent || '').trim();
+        if (!text) return;
+
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (err) {
+          // Fallback: selectionRange + execCommand para navegadores viejos
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly', '');
+          ta.style.position = 'absolute';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+        }
+
+        // Feedback visual: estado "copiado" + toast
+        btn.classList.add('is-copied');
+        toast.classList.add('is-visible');
+        clearTimeout(hideTimer);
+        clearTimeout(resetTimer);
+        hideTimer  = setTimeout(function () { toast.classList.remove('is-visible'); }, 1800);
+        resetTimer = setTimeout(function () { btn.classList.remove('is-copied'); }, 2200);
+      });
+    })();
+
+    /* Editor compartido: logica en ../../assets/editor/editor.js */
+  </script>
+</body>
+</html>

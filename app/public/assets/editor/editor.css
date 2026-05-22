@@ -1,0 +1,265 @@
+/* ============================================================
+   EDITOR — modo edicion secreto
+   Se activa con 5 taps consecutivos (ventana 1.5s) en cualquier
+   zona no interactiva. Permite mover y redimensionar los
+   elementos marcados con [data-editable] en el HTML. Linea guia
+   vertical en el centro del phone, snap a centro automatico.
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   PERSISTENCIA VISUAL (siempre activa, dentro o fuera del editor)
+
+   Usamos las propiedades individuales `translate` y `scale` (no
+   `transform`) para que se compongan con cualquier `transform`
+   que ya tenga la plantilla (animaciones de reveal, breathing,
+   shimmer, etc.) sin necesidad de !important ni de pisarlas.
+
+   Asi los cambios del editor permanecen VISIBLES cuando el
+   usuario cierra el editor, y conviven con las animaciones del
+   diseno original sin conflicto.
+   ---------------------------------------------------------- */
+:not(img)[data-editable] {
+  translate: var(--editor-x, 0px) var(--editor-y, 0px);
+  scale:     var(--editor-scale, 1);
+}
+
+img[data-editable] {
+  object-position:
+    var(--editor-obj-x, 50%)
+    var(--editor-obj-y, 50%);
+}
+
+/* ----------------------------------------------------------
+   CAPA "MODO EDITOR" — solo cuando body.is-editor esta presente
+   Suprimimos animaciones para editar limpio + outline visible
+   + cursor grab/grabbing + bloqueos de interaccion nativa.
+   ---------------------------------------------------------- */
+body.is-editor [data-editable] {
+  animation: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  outline: 1px dashed rgba(255, 43, 214, 0.55);
+  cursor: grab;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+}
+
+body.is-editor [data-editable]:active {
+  cursor: grabbing;
+  outline-color: var(--rosa-neon);
+}
+
+body.is-editor :not(img)[data-editable] {
+  outline-offset: 5px;
+  position: relative;
+  z-index: 1;
+}
+
+body.is-editor :not(img)[data-editable]:active {
+  box-shadow: 0 0 22px rgba(255, 43, 214, 0.35);
+}
+
+body.is-editor img[data-editable] {
+  outline-offset: -1px;
+}
+
+/* Handle de resize: esquina inferior derecha */
+.editor-handle {
+  position: absolute;
+  right: -10px;
+  bottom: -10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--rosa-neon);
+  border: 2px solid var(--blanco-glow);
+  box-shadow:
+    0 0 12px rgba(255, 43, 214, 0.7),
+    0 0 24px rgba(138, 43, 255, 0.4);
+  cursor: nwse-resize;
+  touch-action: none;
+  z-index: 10001;
+}
+.editor-handle::before {
+  /* Punto de mira interno */
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* Overlay del editor (barra + linea guia) — vive dentro del .phone */
+/* Overlay del editor: vive a nivel viewport (no dentro del phone).
+   Asi la barra y la linea guia quedan ancladas a la pantalla mientras
+   el usuario scrollea contenido largo dentro del phone. */
+.editor-ui {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Barra superior — fixed al viewport */
+.editor-bar {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0.4rem 0.35rem 0.95rem;
+  background: rgba(10, 6, 18, 0.85);
+  border: 1px solid rgba(255, 43, 214, 0.5);
+  border-radius: 999px;
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  box-shadow:
+    0 0 16px rgba(255, 43, 214, 0.35),
+    0 4px 14px rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
+  z-index: 10000;
+}
+
+.editor-bar__label {
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: 0.62rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--rosa-neon-soft);
+  text-shadow: 0 0 10px rgba(255, 43, 214, 0.5);
+}
+
+/* Boton Reset — pildora pequena entre el label y la X */
+.editor-bar__reset {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 0.75rem;
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: 0.6rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--blanco-soft);
+  background: rgba(138, 43, 255, 0.12);
+  border: 1px solid rgba(138, 43, 255, 0.45);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background .25s ease, border-color .25s ease, color .25s ease;
+}
+.editor-bar__reset:hover,
+.editor-bar__reset:focus-visible {
+  background: rgba(138, 43, 255, 0.25);
+  border-color: rgba(184, 118, 255, 0.7);
+  color: var(--blanco-glow);
+  outline: none;
+}
+
+.editor-bar__exit {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 43, 214, 0.15);
+  border: 1px solid rgba(255, 43, 214, 0.55);
+  border-radius: 50%;
+  color: var(--blanco-glow);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  transition: background .25s ease, transform .25s ease, box-shadow .25s ease;
+}
+.editor-bar__exit:hover,
+.editor-bar__exit:focus-visible {
+  background: rgba(255, 43, 214, 0.35);
+  box-shadow: 0 0 14px rgba(255, 43, 214, 0.55);
+  transform: scale(1.06);
+  outline: none;
+}
+
+/* Linea guia vertical — fixed al centro del viewport.
+   En desktop el phone esta centrado en pantalla, asi que el centro
+   del viewport coincide con el centro del phone. En mobile el phone
+   ocupa el ancho completo, asi que tambien coincide. */
+.editor-guide {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  pointer-events: none;
+  transition: opacity .2s ease, background .2s ease, box-shadow .2s ease;
+  /* Solo visible dentro de modo editor (defensivo) */
+  display: none;
+}
+body.is-editor .editor-guide { display: block; }
+
+.editor-guide--v {
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(255, 43, 214, 0.32) 18%,
+    rgba(255, 43, 214, 0.32) 82%,
+    transparent 100%
+  );
+  opacity: 0.6;
+}
+.editor-guide--v.is-snap {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--rosa-neon) 18%,
+    var(--rosa-neon) 82%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 8px rgba(255, 43, 214, 0.75),
+    0 0 18px rgba(138, 43, 255, 0.5);
+  opacity: 1;
+}
+
+/* Mini indicador de progreso de taps (esquina inferior) — solo visible
+   en cuanto el primer tap arranca el contador */
+.editor-taps {
+  position: fixed;
+  bottom: 18px;
+  right: 18px;
+  display: flex;
+  gap: 5px;
+  padding: 6px 8px;
+  background: rgba(10, 6, 18, 0.7);
+  border: 1px solid rgba(255, 43, 214, 0.35);
+  border-radius: 999px;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  z-index: 10000;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .25s ease, transform .25s ease;
+  pointer-events: none;
+}
+.editor-taps.is-on {
+  opacity: 1;
+  transform: translateY(0);
+}
+.editor-taps__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  transition: background .2s ease, box-shadow .2s ease;
+}
+.editor-taps__dot.is-active {
+  background: var(--rosa-neon);
+  box-shadow: 0 0 8px rgba(255, 43, 214, 0.7);
+}
