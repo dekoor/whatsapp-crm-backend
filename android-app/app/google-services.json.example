@@ -1,0 +1,26 @@
+{
+  "_comment": "Reemplaza este archivo con el google-services.json real descargado desde Firebase Console. Renómbralo a google-services.json (sin .example). NUNCA lo commitees al repo: ya está en .gitignore.",
+  "project_info": {
+    "project_number": "REEMPLAZAR",
+    "project_id": "REEMPLAZAR",
+    "storage_bucket": "REEMPLAZAR.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "REEMPLAZAR",
+        "android_client_info": {
+          "package_name": "com.dekoor.lifetracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        { "current_key": "REEMPLAZAR" }
+      ],
+      "services": {
+        "appinvite_service": { "other_platform_oauth_client": [] }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

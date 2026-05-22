@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">LifeTracker</string>
+
+    <!-- Auth -->
+    <string name="auth_welcome">Bienvenido</string>
+    <string name="auth_subtitle">Tu progreso, en tus manos.</string>
+    <string name="auth_email">Correo</string>
+    <string name="auth_password">Contraseña</string>
+    <string name="auth_login">Iniciar sesión</string>
+    <string name="auth_signup">Crear cuenta</string>
+    <string name="auth_toggle_to_signup">¿No tienes cuenta? Crear una</string>
+    <string name="auth_toggle_to_login">¿Ya tienes cuenta? Inicia sesión</string>
+
+    <!-- Home -->
+    <string name="home_title">Hoy</string>
+    <string name="home_greeting">Hola, %1$s</string>
+    <string name="home_motivation_default">Cada pequeño registro construye una gran historia.</string>
+
+    <!-- Areas -->
+    <string name="area_health">Salud</string>
+    <string name="area_learning">Aprendizaje</string>
+    <string name="area_productivity">Productividad</string>
+    <string name="area_habits">Hábitos</string>
+
+    <!-- Tabs -->
+    <string name="tab_home">Inicio</string>
+    <string name="tab_journal">Diario</string>
+    <string name="tab_habits">Hábitos</string>
+    <string name="tab_notes">Notas</string>
+    <string name="tab_stats">Stats</string>
+
+    <!-- Journal -->
+    <string name="journal_title">Mi verdad de hoy</string>
+    <string name="journal_save">Guardar</string>
+    <string name="journal_prompt_grateful">¿Por qué estoy agradecido hoy?</string>
+    <string name="journal_prompt_win">¿Qué logré, por pequeño que parezca?</string>
+    <string name="journal_prompt_learn">¿Qué aprendí hoy?</string>
+    <string name="journal_prompt_improve">¿Qué puedo mejorar mañana?</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_reminders">Recordatorios</string>
+    <string name="notif_channel_reminders_desc">Recordatorios diarios para registrar tu progreso.</string>
+</resources>
